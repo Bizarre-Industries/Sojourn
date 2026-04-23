@@ -46,10 +46,12 @@ let package = Package(
         "Info.plist",
         "Sojourn.entitlements",
         "Resources/bin",
+        "Resources/Assets.xcassets",
+        "Config",
         // SwiftUI app entry + view layer: built only by Xcode (.app bundle).
         // SPM library cannot link @main cleanly, and AppKit/SwiftUI requires
         // an app bundle context that SPM does not provide.
-        "App/SojournApp.swift",
+        "App",
         "UI"
       ],
       resources: [
@@ -57,8 +59,10 @@ let package = Package(
       ],
       swiftSettings: [
         .enableExperimentalFeature("StrictConcurrency"),
-        .enableUpcomingFeature("ExistentialAny"),
-        .enableUpcomingFeature("InternalImportsByDefault")
+        .enableUpcomingFeature("ExistentialAny")
+        // NOTE: `InternalImportsByDefault` disabled because it prevents the
+        // `@Observable` macro from emitting public `Observation.Observable`
+        // conformances on public types. Revisit post-Swift-6.2 stabilization.
       ]
     ),
     .testTarget(

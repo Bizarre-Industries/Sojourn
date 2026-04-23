@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Sojourn — regenerate Sojourn.xcodeproj from project.yml
 # Run after modifying project.yml or adding/removing source files.
 # See docs/IMPLEMENTATION_PLAN.md Phase 0.

@@ -1,0 +1,25 @@
+// Sojourn — Release xcconfig
+//
+// Signed, hardened-runtime archive build. DEVELOPMENT_TEAM MUST be set
+// either in Local.xcconfig or via CI env at build time. Notarization runs
+// via .github/workflows/notarize.yml; see docs/RELEASE.md.
+
+#include? "Local.xcconfig"
+
+SWIFT_ACTIVE_COMPILATION_CONDITIONS = RELEASE SOJOURN_RELEASE
+SWIFT_OPTIMIZATION_LEVEL = -O
+GCC_OPTIMIZATION_LEVEL = s
+ONLY_ACTIVE_ARCH = NO
+ENABLE_TESTABILITY = NO
+ENABLE_PREVIEWS = NO
+
+ENABLE_HARDENED_RUNTIME = YES
+CODE_SIGN_STYLE = Manual
+OTHER_CODE_SIGN_FLAGS = --timestamp --options=runtime
+
+SWIFT_STRICT_CONCURRENCY = complete
+SWIFT_UPCOMING_FEATURE_EXISTENTIAL_ANY = YES
+
+DEPLOYMENT_POSTPROCESSING = YES
+STRIP_INSTALLED_PRODUCT = YES
+COPY_PHASE_STRIP = YES

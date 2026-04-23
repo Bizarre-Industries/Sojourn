@@ -1,0 +1,676 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		029D5D5DF9A3AADFEE4746E1 /* MenuBarExtraAccess in Frameworks */ = {isa = PBXBuildFile; productRef = B7BF6B03C13860CCD1E85526 /* MenuBarExtraAccess */; };
+		0CEE25D435216F1CD962C5FA /* SojournApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C51CA305B86C871748E4E6F /* SojournApp.swift */; };
+		1BC9B5A4FF2718D84D76DD36 /* MPMServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8E05CAA843B5A8B62671E5E /* MPMServiceTests.swift */; };
+		1C9F4FD8DDDFA42090126E5D /* SojournUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB7CC3F3D52767F5904DBEE9 /* SojournUITests.swift */; };
+		3EB86ACC2AEA892CCD8BD29F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C9AEE2DC539EF6F71004D7C9 /* Assets.xcassets */; };
+		508C867592BF7AA7D2D54400 /* SubprocessRunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D717FBA5804F28F8892BC95F /* SubprocessRunnerTests.swift */; };
+		5B90DE31FC7F4180A0AF34B8 /* SojournUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10DD40CBD9A7ADFED1E94D4 /* SojournUITests.swift */; };
+		61ACEEFF3B935E210E841E11 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8D7C1FDC46EC5469FDB9D8B /* ContentView.swift */; };
+		A87693ECF1AD077C66F127F2 /* SojournTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A31C19EA77B9ABFD2803BACE /* SojournTests.swift */; };
+		A97A642A3A1DF2DCAEF5D4BF /* SojournUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEFCBF0D0402541513BB4BF5 /* SojournUITestsLaunchTests.swift */; };
+		FEC5097A5FFAE8DAAA7D7B3A /* Subprocess in Frameworks */ = {isa = PBXBuildFile; productRef = 39BF93AAF2A4FCFC7EBAD55E /* Subprocess */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		8D8FDEE0D8BB2633AC860015 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8859980E698820D5DE487503 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 940E88B3F1FF4F0B348B13A6;
+			remoteInfo = Sojourn;
+		};
+		AA1E9A8F51EBDF161899C416 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8859980E698820D5DE487503 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 940E88B3F1FF4F0B348B13A6;
+			remoteInfo = Sojourn;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		27657F22347EC0CCD4B14D5C /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
+		5067374206B171480C067C6A /* SojournTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SojournTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		6C51CA305B86C871748E4E6F /* SojournApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SojournApp.swift; sourceTree = "<group>"; };
+		A31C19EA77B9ABFD2803BACE /* SojournTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SojournTests.swift; sourceTree = "<group>"; };
+		B10DD40CBD9A7ADFED1E94D4 /* SojournUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SojournUITests.swift; sourceTree = "<group>"; };
+		B8E05CAA843B5A8B62671E5E /* MPMServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MPMServiceTests.swift; sourceTree = "<group>"; };
+		BC0CD2FDD4876C335C51A7F6 /* SojournUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SojournUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		C40858EDF69CF14EA473AF3F /* Sojourn.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sojourn.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C8D7C1FDC46EC5469FDB9D8B /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		C9AEE2DC539EF6F71004D7C9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		CB7CC3F3D52767F5904DBEE9 /* SojournUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SojournUITests.swift; sourceTree = "<group>"; };
+		CEFCBF0D0402541513BB4BF5 /* SojournUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SojournUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		D717FBA5804F28F8892BC95F /* SubprocessRunnerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubprocessRunnerTests.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		9C4284049F2422D90142F370 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FEC5097A5FFAE8DAAA7D7B3A /* Subprocess in Frameworks */,
+				029D5D5DF9A3AADFEE4746E1 /* MenuBarExtraAccess in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		1EBA80D95A728FBBF2987A09 /* Sojourn */ = {
+			isa = PBXGroup;
+			children = (
+				469E41535DB8CDC34B14CF2A /* Sojourn */,
+				357D8C7F98000A6BD18E0BA2 /* SojournTests */,
+				E0C39F86863F2FCEA972F566 /* SojournUITests */,
+			);
+			path = Sojourn;
+			sourceTree = "<group>";
+		};
+		229A8660CAFF1E38993C29D9 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				C40858EDF69CF14EA473AF3F /* Sojourn.app */,
+				5067374206B171480C067C6A /* SojournTests.xctest */,
+				BC0CD2FDD4876C335C51A7F6 /* SojournUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		357D8C7F98000A6BD18E0BA2 /* SojournTests */ = {
+			isa = PBXGroup;
+			children = (
+				A31C19EA77B9ABFD2803BACE /* SojournTests.swift */,
+			);
+			path = SojournTests;
+			sourceTree = "<group>";
+		};
+		469E41535DB8CDC34B14CF2A /* Sojourn */ = {
+			isa = PBXGroup;
+			children = (
+				C9AEE2DC539EF6F71004D7C9 /* Assets.xcassets */,
+				C8D7C1FDC46EC5469FDB9D8B /* ContentView.swift */,
+				6C51CA305B86C871748E4E6F /* SojournApp.swift */,
+			);
+			path = Sojourn;
+			sourceTree = "<group>";
+		};
+		5BF9F126C4990185AB0C637A /* Sync */ = {
+			isa = PBXGroup;
+			children = (
+				27657F22347EC0CCD4B14D5C /* .gitkeep */,
+			);
+			path = Sync;
+			sourceTree = "<group>";
+		};
+		7E06F7AAD39986DE48F7C6C4 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				B8E05CAA843B5A8B62671E5E /* MPMServiceTests.swift */,
+				D717FBA5804F28F8892BC95F /* SubprocessRunnerTests.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		E0C39F86863F2FCEA972F566 /* SojournUITests */ = {
+			isa = PBXGroup;
+			children = (
+				CB7CC3F3D52767F5904DBEE9 /* SojournUITests.swift */,
+				CEFCBF0D0402541513BB4BF5 /* SojournUITestsLaunchTests.swift */,
+			);
+			path = SojournUITests;
+			sourceTree = "<group>";
+		};
+		E34DB116FC2DC6D41E6A6108 /* SojournTests */ = {
+			isa = PBXGroup;
+			children = (
+				7E06F7AAD39986DE48F7C6C4 /* Services */,
+				5BF9F126C4990185AB0C637A /* Sync */,
+			);
+			path = SojournTests;
+			sourceTree = "<group>";
+		};
+		E7BED3DB067A81B0C64AE9EC /* SojournUITests */ = {
+			isa = PBXGroup;
+			children = (
+				B10DD40CBD9A7ADFED1E94D4 /* SojournUITests.swift */,
+			);
+			path = SojournUITests;
+			sourceTree = "<group>";
+		};
+		F1B336C23BC566D8FC6623BC = {
+			isa = PBXGroup;
+			children = (
+				1EBA80D95A728FBBF2987A09 /* Sojourn */,
+				E34DB116FC2DC6D41E6A6108 /* SojournTests */,
+				E7BED3DB067A81B0C64AE9EC /* SojournUITests */,
+				229A8660CAFF1E38993C29D9 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		336FFBA988AC531D54137038 /* SojournUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D0C1628D69FE27EBB46460EC /* Build configuration list for PBXNativeTarget "SojournUITests" */;
+			buildPhases = (
+				D1D37EF70BFB995277458E9F /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D6206AF8934CE78F85B004C9 /* PBXTargetDependency */,
+			);
+			name = SojournUITests;
+			packageProductDependencies = (
+			);
+			productName = SojournUITests;
+			productReference = BC0CD2FDD4876C335C51A7F6 /* SojournUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		7DA063196B509545940AC43B /* SojournTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C61FD30EEAA27CE94DB738B9 /* Build configuration list for PBXNativeTarget "SojournTests" */;
+			buildPhases = (
+				CF44BC5C1163836DA373ED64 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				70C82EA66B9FA3604114CDB1 /* PBXTargetDependency */,
+			);
+			name = SojournTests;
+			packageProductDependencies = (
+			);
+			productName = SojournTests;
+			productReference = 5067374206B171480C067C6A /* SojournTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		940E88B3F1FF4F0B348B13A6 /* Sojourn */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2D4A2A3120869E1A7EFCC9F7 /* Build configuration list for PBXNativeTarget "Sojourn" */;
+			buildPhases = (
+				03461247699E2EA98CD75132 /* Re-sign bundled binaries */,
+				4238063442628CD3CA847C39 /* Sources */,
+				7C1898715F990B521D28067B /* Resources */,
+				9C4284049F2422D90142F370 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Sojourn;
+			packageProductDependencies = (
+				39BF93AAF2A4FCFC7EBAD55E /* Subprocess */,
+				B7BF6B03C13860CCD1E85526 /* MenuBarExtraAccess */,
+			);
+			productName = Sojourn;
+			productReference = C40858EDF69CF14EA473AF3F /* Sojourn.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		8859980E698820D5DE487503 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					336FFBA988AC531D54137038 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+						TestTargetID = 940E88B3F1FF4F0B348B13A6;
+					};
+					7DA063196B509545940AC43B = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+					940E88B3F1FF4F0B348B13A6 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = B57B0B1BF75E6527A6968C19 /* Build configuration list for PBXProject "Sojourn" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = F1B336C23BC566D8FC6623BC;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				6604167E2ABE1EBEEF5A47E4 /* XCRemoteSwiftPackageReference "MenuBarExtraAccess" */,
+				1059625C2ECBD3457AD1FA4C /* XCRemoteSwiftPackageReference "swift-subprocess" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 229A8660CAFF1E38993C29D9 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				940E88B3F1FF4F0B348B13A6 /* Sojourn */,
+				7DA063196B509545940AC43B /* SojournTests */,
+				336FFBA988AC531D54137038 /* SojournUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		7C1898715F990B521D28067B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3EB86ACC2AEA892CCD8BD29F /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		03461247699E2EA98CD75132 /* Re-sign bundled binaries */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Re-sign bundled binaries";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Re-sign gitleaks and age with hardened runtime\n# See docs/ARCHITECTURE.md §11 (bundled binaries)\nif [ -f \"${SRCROOT}/scripts/sign.sh\" ]; then\n  \"${SRCROOT}/scripts/sign.sh\" \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/Contents/Resources/bin\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		4238063442628CD3CA847C39 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				61ACEEFF3B935E210E841E11 /* ContentView.swift in Sources */,
+				0CEE25D435216F1CD962C5FA /* SojournApp.swift in Sources */,
+				A87693ECF1AD077C66F127F2 /* SojournTests.swift in Sources */,
+				1C9F4FD8DDDFA42090126E5D /* SojournUITests.swift in Sources */,
+				A97A642A3A1DF2DCAEF5D4BF /* SojournUITestsLaunchTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CF44BC5C1163836DA373ED64 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1BC9B5A4FF2718D84D76DD36 /* MPMServiceTests.swift in Sources */,
+				508C867592BF7AA7D2D54400 /* SubprocessRunnerTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D1D37EF70BFB995277458E9F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5B90DE31FC7F4180A0AF34B8 /* SojournUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		70C82EA66B9FA3604114CDB1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 940E88B3F1FF4F0B348B13A6 /* Sojourn */;
+			targetProxy = AA1E9A8F51EBDF161899C416 /* PBXContainerItemProxy */;
+		};
+		D6206AF8934CE78F85B004C9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 940E88B3F1FF4F0B348B13A6 /* Sojourn */;
+			targetProxy = 8D8FDEE0D8BB2633AC860015 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		00911198A434F6B629857350 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = app.bizarre.sojourn.uitests;
+				SDKROOT = macosx;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				TEST_TARGET_NAME = Sojourn;
+			};
+			name = Release;
+		};
+		0E9E4FFE30874D4F1DA58569 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_UPCOMING_FEATURE_EXISTENTIAL_ANY = YES;
+				SWIFT_UPCOMING_FEATURE_INTERNAL_IMPORTS_BY_DEFAULT = YES;
+				SWIFT_VERSION = 6.1;
+			};
+			name = Debug;
+		};
+		5CC4F7F4C027C06BA4EB3D29 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Sojourn/Sojourn.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Sojourn/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = app.bizarre.sojourn;
+				PRODUCT_NAME = Sojourn;
+				SDKROOT = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				xcconfig = Sojourn/Config/Debug.xcconfig;
+			};
+			name = Debug;
+		};
+		6F4A34E7C7C687FAC3FB85DA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = app.bizarre.sojourn.tests;
+				SDKROOT = macosx;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Sojourn.app/Contents/MacOS/Sojourn";
+			};
+			name = Release;
+		};
+		735CDFFBC5E8C059EACD4295 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Sojourn/Sojourn.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Sojourn/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = app.bizarre.sojourn;
+				PRODUCT_NAME = Sojourn;
+				SDKROOT = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				xcconfig = Sojourn/Config/Release.xcconfig;
+			};
+			name = Release;
+		};
+		B0212FD4523A6328DF7D5A92 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = app.bizarre.sojourn.tests;
+				SDKROOT = macosx;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Sojourn.app/Contents/MacOS/Sojourn";
+			};
+			name = Debug;
+		};
+		B2154E54E77BEC3B737B2F02 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = app.bizarre.sojourn.uitests;
+				SDKROOT = macosx;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				TEST_TARGET_NAME = Sojourn;
+			};
+			name = Debug;
+		};
+		BF3A7C66B8AE7137C7DC38D6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_UPCOMING_FEATURE_EXISTENTIAL_ANY = YES;
+				SWIFT_UPCOMING_FEATURE_INTERNAL_IMPORTS_BY_DEFAULT = YES;
+				SWIFT_VERSION = 6.1;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		2D4A2A3120869E1A7EFCC9F7 /* Build configuration list for PBXNativeTarget "Sojourn" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5CC4F7F4C027C06BA4EB3D29 /* Debug */,
+				735CDFFBC5E8C059EACD4295 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		B57B0B1BF75E6527A6968C19 /* Build configuration list for PBXProject "Sojourn" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0E9E4FFE30874D4F1DA58569 /* Debug */,
+				BF3A7C66B8AE7137C7DC38D6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		C61FD30EEAA27CE94DB738B9 /* Build configuration list for PBXNativeTarget "SojournTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B0212FD4523A6328DF7D5A92 /* Debug */,
+				6F4A34E7C7C687FAC3FB85DA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		D0C1628D69FE27EBB46460EC /* Build configuration list for PBXNativeTarget "SojournUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B2154E54E77BEC3B737B2F02 /* Debug */,
+				00911198A434F6B629857350 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		1059625C2ECBD3457AD1FA4C /* XCRemoteSwiftPackageReference "swift-subprocess" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/swiftlang/swift-subprocess.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.4.0;
+			};
+		};
+		6604167E2ABE1EBEEF5A47E4 /* XCRemoteSwiftPackageReference "MenuBarExtraAccess" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/orchetect/MenuBarExtraAccess.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		39BF93AAF2A4FCFC7EBAD55E /* Subprocess */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1059625C2ECBD3457AD1FA4C /* XCRemoteSwiftPackageReference "swift-subprocess" */;
+			productName = Subprocess;
+		};
+		B7BF6B03C13860CCD1E85526 /* MenuBarExtraAccess */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6604167E2ABE1EBEEF5A47E4 /* XCRemoteSwiftPackageReference "MenuBarExtraAccess" */;
+			productName = MenuBarExtraAccess;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 8859980E698820D5DE487503 /* Project object */;
+}

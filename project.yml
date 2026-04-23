@@ -1,0 +1,136 @@
+# Sojourn — xcodegen project spec
+# Generate Sojourn.xcodeproj via: xcodegen generate
+# Regenerate after changes: scripts/regenerate-project.sh
+
+name: Sojourn
+options:
+  bundleIdPrefix: app.bizarre
+  deploymentTarget:
+    macOS: "14.0"
+  developmentLanguage: en
+  xcodeVersion: "16.0"
+  createIntermediateGroups: true
+
+packages:
+  swift-subprocess:
+    url: https://github.com/swiftlang/swift-subprocess.git
+    from: 0.4.0
+  MenuBarExtraAccess:
+    url: https://github.com/orchetect/MenuBarExtraAccess.git
+    from: 1.0.0
+
+settings:
+  base:
+    SWIFT_VERSION: "6.1"
+    MACOSX_DEPLOYMENT_TARGET: "14.0"
+    ENABLE_HARDENED_RUNTIME: YES
+    CODE_SIGN_STYLE: Automatic
+    DEVELOPMENT_TEAM: ""  # Set per-user in xcconfig or via xcodebuild
+    SWIFT_STRICT_CONCURRENCY: complete
+    SWIFT_UPCOMING_FEATURE_EXISTENTIAL_ANY: YES
+    SWIFT_UPCOMING_FEATURE_INTERNAL_IMPORTS_BY_DEFAULT: YES
+    ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+    ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+
+targets:
+  Sojourn:
+    type: application
+    platform: macOS
+    sources:
+      - path: Sojourn
+        excludes:
+          - Info.plist
+          - Sojourn.entitlements
+          - Resources/bin
+    resources:
+      - path: Sojourn/Resources/data
+        type: folder
+      - path: Sojourn/Sojourn/Assets.xcassets
+        type: folder
+    dependencies:
+      - package: swift-subprocess
+        product: Subprocess
+      - package: MenuBarExtraAccess
+        product: MenuBarExtraAccess
+    settings:
+      base:
+        PRODUCT_NAME: Sojourn
+        PRODUCT_BUNDLE_IDENTIFIER: app.bizarre.sojourn
+        INFOPLIST_FILE: Sojourn/Info.plist
+        CODE_SIGN_ENTITLEMENTS: Sojourn/Sojourn.entitlements
+        MARKETING_VERSION: 0.1.0
+        CURRENT_PROJECT_VERSION: 1
+        GENERATE_INFOPLIST_FILE: NO
+        SWIFT_EMIT_LOC_STRINGS: YES
+        ENABLE_USER_SCRIPT_SANDBOXING: NO  # scripts/sign.sh needs codesign access
+      configs:
+        Debug:
+          xcconfig: Sojourn/Config/Debug.xcconfig
+        Release:
+          xcconfig: Sojourn/Config/Release.xcconfig
+    preBuildScripts:
+      - name: Re-sign bundled binaries
+        script: |
+          # Re-sign gitleaks and age with hardened runtime
+          # See docs/ARCHITECTURE.md §11 (bundled binaries)
+          if [ -f "${SRCROOT}/scripts/sign.sh" ]; then
+            "${SRCROOT}/scripts/sign.sh" "${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/Contents/Resources/bin"
+          fi
+        inputFiles: []
+        outputFiles: []
+        basedOnDependencyAnalysis: false
+        runOnlyWhenInstalling: false
+
+  SojournTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - path: SojournTests
+        excludes:
+          - Fixtures
+    resources:
+      - path: SojournTests/Fixtures
+        type: folder
+    dependencies:
+      - target: Sojourn
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.bizarre.sojourn.tests
+        BUNDLE_LOADER: $(TEST_HOST)
+        TEST_HOST: $(BUILT_PRODUCTS_DIR)/Sojourn.app/Contents/MacOS/Sojourn
+        SWIFT_EMIT_LOC_STRINGS: NO
+        GENERATE_INFOPLIST_FILE: YES
+
+  SojournUITests:
+    type: bundle.ui-testing
+    platform: macOS
+    sources:
+      - SojournUITests
+    dependencies:
+      - target: Sojourn
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.bizarre.sojourn.uitests
+        TEST_TARGET_NAME: Sojourn
+        SWIFT_EMIT_LOC_STRINGS: NO
+        GENERATE_INFOPLIST_FILE: YES
+
+schemes:
+  Sojourn:
+    build:
+      targets:
+        Sojourn: all
+    run:
+      config: Debug
+    test:
+      config: Debug
+      gatherCoverageData: true
+      targets:
+        - SojournTests
+        - SojournUITests
+    profile:
+      config: Release
+    analyze:
+      config: Debug
+    archive:
+      config: Release

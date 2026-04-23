@@ -1,0 +1,98 @@
+# dotfile_owners.toml --- orphan-detection mapping.
+# See docs/ARCHITECTURE.md section 10.
+#
+# Each key is a home-directory entry (starting with a dot). Each value lists
+# the tool the entry belongs to, and the sources that tool might be installed
+# from. If none of the sources can be found, the entry is a candidate orphan.
+
+[".zshrc"]
+tool = "zsh"
+sources = ["system", "brew"]
+
+[".zprofile"]
+tool = "zsh"
+sources = ["system", "brew"]
+
+[".zshenv"]
+tool = "zsh"
+sources = ["system", "brew"]
+
+[".bashrc"]
+tool = "bash"
+sources = ["system", "brew"]
+
+[".bash_profile"]
+tool = "bash"
+sources = ["system", "brew"]
+
+[".profile"]
+tool = "shell"
+sources = ["system"]
+
+[".gitconfig"]
+tool = "git"
+sources = ["system", "brew"]
+
+[".gitignore_global"]
+tool = "git"
+sources = ["system", "brew"]
+
+[".config/git"]
+tool = "git"
+sources = ["system", "brew"]
+
+[".ssh"]
+tool = "openssh"
+sources = ["system", "brew"]
+
+[".aws"]
+tool = "awscli"
+sources = ["brew", "pip", "pipx"]
+
+[".rbenv"]
+tool = "rbenv"
+sources = ["brew"]
+
+[".pyenv"]
+tool = "pyenv"
+sources = ["brew"]
+
+[".nvm"]
+tool = "nvm"
+sources = ["brew", "manual"]
+
+[".cargo"]
+tool = "cargo"
+sources = ["rustup", "brew"]
+
+[".rustup"]
+tool = "rustup"
+sources = ["rustup", "brew"]
+
+[".config/nvim"]
+tool = "neovim"
+sources = ["brew"]
+
+[".vim"]
+tool = "vim"
+sources = ["system", "brew"]
+
+[".tmux.conf"]
+tool = "tmux"
+sources = ["brew"]
+
+[".config/chezmoi"]
+tool = "chezmoi"
+sources = ["brew", "sojourn"]
+
+[".config/gh"]
+tool = "gh"
+sources = ["brew"]
+
+[".docker"]
+tool = "docker"
+sources = ["brew", "manual"]
+
+[".kube"]
+tool = "kubectl"
+sources = ["brew"]

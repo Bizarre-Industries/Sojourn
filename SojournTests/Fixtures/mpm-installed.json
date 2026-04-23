@@ -1,0 +1,53 @@
+{
+  "brew": {
+    "id": "brew",
+    "name": "Homebrew",
+    "errors": [],
+    "packages": [
+      {
+        "id": "ripgrep",
+        "name": "ripgrep",
+        "installed_version": "14.1.0"
+      },
+      {
+        "id": "fd",
+        "name": "fd",
+        "installed_version": "9.0.0"
+      },
+      {
+        "id": "jq",
+        "name": "jq",
+        "installed_version": "1.7.1"
+      }
+    ]
+  },
+  "cask": {
+    "id": "cask",
+    "name": "Homebrew Cask",
+    "errors": [],
+    "packages": [
+      {
+        "id": "visual-studio-code",
+        "name": "Visual Studio Code",
+        "installed_version": "1.90.0"
+      },
+      {
+        "id": "iterm2",
+        "name": "iTerm2",
+        "installed_version": "3.5.2"
+      }
+    ]
+  },
+  "pip": {
+    "id": "pip",
+    "name": "Python pip",
+    "errors": [],
+    "packages": [
+      {
+        "id": "httpx",
+        "name": null,
+        "installed_version": "0.27.0"
+      }
+    ]
+  }
+}

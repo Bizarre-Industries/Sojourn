@@ -1,0 +1,20 @@
+[
+  {
+    "name": "dot_zshrc",
+    "type": "file",
+    "absPath": "/Users/example/.zshrc",
+    "sourceAbsPath": "/Users/example/.local/share/chezmoi/dot_zshrc"
+  },
+  {
+    "name": "dot_gitconfig.tmpl",
+    "type": "file",
+    "absPath": "/Users/example/.gitconfig",
+    "sourceAbsPath": "/Users/example/.local/share/chezmoi/dot_gitconfig.tmpl"
+  },
+  {
+    "name": "private_dot_ssh",
+    "type": "dir",
+    "absPath": "/Users/example/.ssh",
+    "sourceAbsPath": "/Users/example/.local/share/chezmoi/private_dot_ssh"
+  }
+]

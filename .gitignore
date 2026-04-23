@@ -78,4 +78,3 @@ refs/
 # Bundled binaries (downloaded in build phase; tracked via release pipeline)
 Sojourn/Resources/bin/gitleaks
 Sojourn/Resources/bin/age
-CLAUDE.md

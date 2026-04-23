@@ -1,0 +1,66 @@
+# Sojourn's own CI gitleaks config.
+# Used by `.github/workflows/ci.yml` to scan this repo.
+# NOT the same as `Sojourn/Resources/data/gitleaks.toml`, which is the default
+# bundle shipped to end users for scanning THEIR dotfile repos.
+
+title = "Sojourn CI secret-scan rules"
+
+[extend]
+# Start from gitleaks' built-in rule set, then refine.
+useDefault = true
+
+[allowlist]
+description = "Paths that contain deliberate sample/fixture data."
+paths = [
+  '''SojournTests/Fixtures/.*\.json$''',
+  '''SojournTests/Fixtures/.*\.toml$''',
+  '''docs/.*\.md$''',
+]
+
+# Regex allowlist: obvious sample/placeholder patterns.
+regexes = [
+  '''age1[a-z0-9]{10,}''',           # age recipient examples in docs
+  '''ghp_[A-Z]{36}''',               # all-caps placeholder GitHub PATs
+  '''AKIAIOSFODNN7EXAMPLE''',        # AWS docs canary
+  '''wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY''', # AWS docs canary
+]
+
+# Hard rules on top of defaults — fail PR on these unconditionally.
+# These mirror rules/providers where a real key is never safe to commit.
+[[rules]]
+id = "sojourn-aws-access-key"
+description = "AWS access key ID"
+regex = '''(?i)(AKIA|ASIA)[A-Z0-9]{16}'''
+entropy = 3.0
+keywords = ["AKIA", "ASIA"]
+
+[[rules]]
+id = "sojourn-github-pat"
+description = "GitHub personal access token"
+regex = '''ghp_[A-Za-z0-9]{36}'''
+keywords = ["ghp_"]
+
+[[rules]]
+id = "sojourn-openai-key"
+description = "OpenAI API key"
+regex = '''sk-(proj-)?[A-Za-z0-9]{32,}'''
+keywords = ["sk-"]
+
+[[rules]]
+id = "sojourn-stripe-live"
+description = "Stripe live secret key"
+regex = '''sk_live_[A-Za-z0-9]{24,}'''
+keywords = ["sk_live_"]
+
+[[rules]]
+id = "sojourn-anthropic-key"
+description = "Anthropic API key"
+regex = '''sk-ant-[A-Za-z0-9\-_]{40,}'''
+keywords = ["sk-ant-"]
+
+[[rules]]
+id = "sojourn-apple-app-specific"
+description = "Apple app-specific password (notarization secret)"
+regex = '''[a-z]{4}-[a-z]{4}-[a-z]{4}-[a-z]{4}'''
+entropy = 3.5
+keywords = []

@@ -1,0 +1,21 @@
+[
+  {
+    "Description": "Synthetic GitHub PAT for test",
+    "StartLine": 12,
+    "EndLine": 12,
+    "StartColumn": 5,
+    "EndColumn": 44,
+    "Match": "ghp_EXAMPLE000000000000000000000000000000",
+    "Secret": "ghp_EXAMPLE000000000000000000000000000000",
+    "File": "dotfiles/dot_netrc",
+    "Commit": "0000000000000000000000000000000000000000",
+    "Entropy": 3.1,
+    "Author": "Test User",
+    "Email": "test@example.com",
+    "Date": "2026-04-23T12:00:00Z",
+    "Message": "synthetic fixture",
+    "Tags": [],
+    "RuleID": "github-pat",
+    "Fingerprint": "dotfiles/dot_netrc:github-pat:12"
+  }
+]

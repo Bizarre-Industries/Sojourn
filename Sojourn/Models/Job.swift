@@ -6,26 +6,26 @@
 
 import Foundation
 
-public struct JobID: Sendable, Hashable, Codable, RawRepresentable {
-  public let rawValue: UUID
-  public init(rawValue: UUID) { self.rawValue = rawValue }
-  public init() { self.rawValue = UUID() }
+internal struct JobID: Sendable, Hashable, Codable, RawRepresentable {
+  internal let rawValue: UUID
+  internal init(rawValue: UUID) { self.rawValue = rawValue }
+  internal init() { self.rawValue = UUID() }
 }
 
-public struct LogBufferID: Sendable, Hashable, Codable, RawRepresentable {
-  public let rawValue: UUID
-  public init(rawValue: UUID) { self.rawValue = rawValue }
-  public init() { self.rawValue = UUID() }
+internal struct LogBufferID: Sendable, Hashable, Codable, RawRepresentable {
+  internal let rawValue: UUID
+  internal init(rawValue: UUID) { self.rawValue = rawValue }
+  internal init() { self.rawValue = UUID() }
 }
 
-public enum JobState: Sendable, Equatable {
+internal enum JobState: Sendable, Equatable {
   case pending
   case running
   case succeeded(exitCode: Int32)
   case failed(reason: String)
   case cancelled
 
-  public var isTerminal: Bool {
+  internal var isTerminal: Bool {
     switch self {
     case .pending, .running: return false
     case .succeeded, .failed, .cancelled: return true
@@ -33,17 +33,17 @@ public enum JobState: Sendable, Equatable {
   }
 }
 
-public struct Job: Sendable, Identifiable {
-  public let id: JobID
-  public let label: String
-  public let tool: URL
-  public let args: [String]
-  public var state: JobState
-  public var startedAt: Date?
-  public var finishedAt: Date?
-  public var logBufferID: LogBufferID
+internal struct Job: Sendable, Identifiable {
+  internal let id: JobID
+  internal let label: String
+  internal let tool: URL
+  internal let args: [String]
+  internal var state: JobState
+  internal var startedAt: Date?
+  internal var finishedAt: Date?
+  internal var logBufferID: LogBufferID
 
-  public init(
+  internal init(
     id: JobID = JobID(),
     label: String,
     tool: URL,
@@ -63,7 +63,7 @@ public struct Job: Sendable, Identifiable {
     self.logBufferID = logBufferID
   }
 
-  public var duration: TimeInterval? {
+  internal var duration: TimeInterval? {
     guard let startedAt, let finishedAt else { return nil }
     return finishedAt.timeIntervalSince(startedAt)
   }

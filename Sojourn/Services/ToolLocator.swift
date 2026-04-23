@@ -7,12 +7,12 @@
 
 import Foundation
 
-public struct ToolResolution: Sendable, Hashable, Codable {
-  public let tool: String
-  public let url: URL
-  public let source: Source
+internal struct ToolResolution: Sendable, Hashable, Codable {
+  internal let tool: String
+  internal let url: URL
+  internal let source: Source
 
-  public enum Source: String, Sendable, Codable {
+  internal enum Source: String, Sendable, Codable {
     /// Found via one of the hard-coded candidate paths.
     case candidate
     /// Found under `xcode-select -p`.
@@ -21,16 +21,16 @@ public struct ToolResolution: Sendable, Hashable, Codable {
     case cached
   }
 
-  public init(tool: String, url: URL, source: Source) {
+  internal init(tool: String, url: URL, source: Source) {
     self.tool = tool
     self.url = url
     self.source = source
   }
 }
 
-public actor ToolLocator {
+internal actor ToolLocator {
   /// Ordered candidate directories. See docs/BOOTSTRAP.md Detection section.
-  public static let candidateDirectories: [String] = [
+  internal static let candidateDirectories: [String] = [
     "/opt/homebrew/bin",
     "/opt/homebrew/sbin",
     "/usr/local/bin",
@@ -48,23 +48,23 @@ public actor ToolLocator {
   private let fileManager: FileManager
   private var cache: [String: ToolResolution] = [:]
 
-  public init(fileManager: FileManager = .default) {
+  internal init(fileManager: FileManager = .default) {
     self.fileManager = fileManager
   }
 
   /// Seed the cache with known resolutions (e.g., restored from Settings).
-  public func seed(_ resolutions: [ToolResolution]) {
+  internal func seed(_ resolutions: [ToolResolution]) {
     for r in resolutions { cache[r.tool] = r }
   }
 
   /// Return cached resolutions (for persisting to Settings).
-  public func snapshot() -> [ToolResolution] {
+  internal func snapshot() -> [ToolResolution] {
     Array(cache.values)
   }
 
   /// Locate `name`. Returns `nil` if not found in any candidate dir or
   /// under the current Xcode command line tools. Caches the result.
-  public func locate(_ name: String) -> ToolResolution? {
+  internal func locate(_ name: String) -> ToolResolution? {
     if let cached = cache[name] {
       return cached
     }
@@ -88,7 +88,7 @@ public actor ToolLocator {
   }
 
   /// Probe a list of tool names in sequence (filesystem-only; cheap).
-  public func locateAll(_ names: [String]) -> [String: ToolResolution] {
+  internal func locateAll(_ names: [String]) -> [String: ToolResolution] {
     var out: [String: ToolResolution] = [:]
     for name in names {
       if let r = locate(name) { out[name] = r }
@@ -97,17 +97,17 @@ public actor ToolLocator {
   }
 
   /// True if Xcode Command Line Tools appear installed.
-  public func hasXcodeCLT() -> Bool {
+  internal func hasXcodeCLT() -> Bool {
     xcodeSelectBinDir() != nil
   }
 
   /// Invalidate a single cache entry (after a failed exec, say).
-  public func invalidate(_ name: String) {
+  internal func invalidate(_ name: String) {
     cache.removeValue(forKey: name)
   }
 
   /// Invalidate all cached resolutions.
-  public func invalidateAll() {
+  internal func invalidateAll() {
     cache.removeAll()
   }
 

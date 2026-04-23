@@ -7,15 +7,15 @@
 import Foundation
 import Observation
 
-public struct JobRequest: Sendable {
-  public let label: String
-  public let tool: URL
-  public let args: [String]
-  public let env: [String: String]?
-  public let cwd: URL?
-  public let timeout: TimeInterval?
+internal struct JobRequest: Sendable {
+  internal let label: String
+  internal let tool: URL
+  internal let args: [String]
+  internal let env: [String: String]?
+  internal let cwd: URL?
+  internal let timeout: TimeInterval?
 
-  public init(
+  internal init(
     label: String,
     tool: URL,
     args: [String] = [],
@@ -32,26 +32,26 @@ public struct JobRequest: Sendable {
   }
 }
 
-public struct JobHandle: Sendable {
-  public let id: JobID
-  public let bufferID: LogBufferID
+internal struct JobHandle: Sendable {
+  internal let id: JobID
+  internal let bufferID: LogBufferID
 }
 
 @Observable
 @MainActor
-public final class JobRunner {
-  public private(set) var jobs: [Job] = []
-  public private(set) var buffers: [LogBufferID: LogBuffer] = [:]
+internal final class JobRunner {
+  internal private(set) var jobs: [Job] = []
+  internal private(set) var buffers: [LogBufferID: LogBuffer] = [:]
 
   private let runner: SubprocessRunner
   private var tasks: [JobID: Task<Void, Never>] = [:]
 
-  public init(runner: SubprocessRunner) {
+  internal init(runner: SubprocessRunner) {
     self.runner = runner
   }
 
   @discardableResult
-  public func submit(_ request: JobRequest) -> JobHandle {
+  internal func submit(_ request: JobRequest) -> JobHandle {
     let buffer = LogBuffer()
     let bufferID = buffer.id
     let job = Job(
@@ -94,23 +94,23 @@ public final class JobRunner {
     return JobHandle(id: jobID, bufferID: bufferID)
   }
 
-  public func cancel(_ jobID: JobID) {
+  internal func cancel(_ jobID: JobID) {
     tasks[jobID]?.cancel()
   }
 
-  public func cancelAll() {
+  internal func cancelAll() {
     for task in tasks.values { task.cancel() }
   }
 
-  public func job(_ jobID: JobID) -> Job? {
+  internal func job(_ jobID: JobID) -> Job? {
     jobs.first(where: { $0.id == jobID })
   }
 
-  public func buffer(_ bufferID: LogBufferID) -> LogBuffer? {
+  internal func buffer(_ bufferID: LogBufferID) -> LogBuffer? {
     buffers[bufferID]
   }
 
-  public func purgeTerminal() {
+  internal func purgeTerminal() {
     let terminalIDs = Set(jobs.filter { $0.state.isTerminal }.map(\.id))
     jobs.removeAll { terminalIDs.contains($0.id) }
     for id in terminalIDs { tasks.removeValue(forKey: id) }

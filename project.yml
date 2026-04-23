@@ -14,10 +14,10 @@ options:
 packages:
   swift-subprocess:
     url: https://github.com/swiftlang/swift-subprocess.git
-    from: 0.4.0
+    minorVersion: 0.4.0
   MenuBarExtraAccess:
     url: https://github.com/orchetect/MenuBarExtraAccess.git
-    from: 1.0.0
+    minorVersion: 1.3.0
 
 settings:
   base:

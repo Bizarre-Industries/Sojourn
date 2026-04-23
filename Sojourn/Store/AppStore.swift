@@ -13,14 +13,14 @@ import Observation
 
 @Observable
 @MainActor
-public final class AppStore {
-  public let runner: SubprocessRunner
-  public let jobRunner: JobRunner
-  public let toolLocator: ToolLocator
+internal final class AppStore {
+  internal let runner: SubprocessRunner
+  internal let jobRunner: JobRunner
+  internal let toolLocator: ToolLocator
 
-  public var managers: [String: ManagerSnapshot] = [:]
+  internal var managers: [String: ManagerSnapshot] = [:]
 
-  public init() {
+  internal init() {
     let runner = SubprocessRunner()
     self.runner = runner
     self.jobRunner = JobRunner(runner: runner)

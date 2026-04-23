@@ -10,34 +10,34 @@
 
 import Foundation
 
-public struct SubprocessResult: Sendable {
-  public let exitCode: Int32
-  public let stdout: Data
-  public let stderr: Data
+internal struct SubprocessResult: Sendable {
+  internal let exitCode: Int32
+  internal let stdout: Data
+  internal let stderr: Data
 
-  public var stdoutString: String { String(decoding: stdout, as: UTF8.self) }
-  public var stderrString: String { String(decoding: stderr, as: UTF8.self) }
+  internal var stdoutString: String { String(decoding: stdout, as: UTF8.self) }
+  internal var stderrString: String { String(decoding: stderr, as: UTF8.self) }
 }
 
-public enum StreamTag: String, Sendable, Equatable, Codable {
+internal enum StreamTag: String, Sendable, Equatable, Codable {
   case stdout
   case stderr
 }
 
-public struct StreamChunk: Sendable {
-  public let stream: StreamTag
-  public let data: Data
-  public let timestamp: Date
+internal struct StreamChunk: Sendable {
+  internal let stream: StreamTag
+  internal let data: Data
+  internal let timestamp: Date
 
-  public init(stream: StreamTag, data: Data, timestamp: Date = Date()) {
+  internal init(stream: StreamTag, data: Data, timestamp: Date = Date()) {
     self.stream = stream
     self.data = data
     self.timestamp = timestamp
   }
 }
 
-public actor SubprocessRunner {
-  public init() {}
+internal actor SubprocessRunner {
+  internal init() {}
 
   // MARK: - Run-to-completion
 
@@ -45,7 +45,7 @@ public actor SubprocessRunner {
   /// Throws `SubprocessError` on spawn failure, non-zero exit, timeout, or
   /// task cancellation. `timeout` is optional wall-clock seconds; on expiry
   /// SIGTERM is sent, then SIGKILL after a 5s grace window.
-  public func run(
+  internal func run(
     tool: URL,
     args: [String] = [],
     env: [String: String]? = nil,
@@ -124,7 +124,7 @@ public actor SubprocessRunner {
   /// stream finishes when the child exits with status 0; it throws
   /// `SubprocessError.nonZeroExit` otherwise. Call-site can cancel via the
   /// stream's task; that SIGTERM's the child.
-  public nonisolated func stream(
+  internal nonisolated func stream(
     tool: URL,
     args: [String] = [],
     env: [String: String]? = nil,

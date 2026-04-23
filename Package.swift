@@ -31,7 +31,7 @@ let package = Package(
     ),
     .package(
       url: "https://github.com/orchetect/MenuBarExtraAccess.git",
-      .upToNextMinor(from: "1.0.0")
+      .upToNextMinor(from: "1.3.0")
     )
   ],
   targets: [

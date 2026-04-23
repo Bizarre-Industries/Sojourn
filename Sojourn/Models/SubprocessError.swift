@@ -5,7 +5,7 @@
 
 import Foundation
 
-public enum SubprocessError: Error, Sendable {
+internal enum SubprocessError: Error, Sendable {
   /// `Process.run()` failed before the child started. Usually a missing
   /// executable, permission denied, or bad argv encoding. Contains the
   /// underlying system description.
@@ -24,7 +24,7 @@ public enum SubprocessError: Error, Sendable {
 }
 
 extension SubprocessError: Equatable {
-  public static func == (lhs: SubprocessError, rhs: SubprocessError) -> Bool {
+  internal static func == (lhs: SubprocessError, rhs: SubprocessError) -> Bool {
     switch (lhs, rhs) {
     case (.spawnFailed(let a), .spawnFailed(let b)): return a == b
     case (.nonZeroExit(let a, _, _), .nonZeroExit(let b, _, _)): return a == b

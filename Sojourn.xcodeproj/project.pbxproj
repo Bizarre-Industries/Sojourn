@@ -8,15 +8,24 @@
 
 /* Begin PBXBuildFile section */
 		029D5D5DF9A3AADFEE4746E1 /* MenuBarExtraAccess in Frameworks */ = {isa = PBXBuildFile; productRef = B7BF6B03C13860CCD1E85526 /* MenuBarExtraAccess */; };
-		0CEE25D435216F1CD962C5FA /* SojournApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C51CA305B86C871748E4E6F /* SojournApp.swift */; };
+		09E0C0FA877B857BB17F524D /* ToolLocator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5531EFE3E6A6B9815FE6AA3D /* ToolLocator.swift */; };
+		0ED1AAAEAADA7250AF998BA2 /* JobRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4207776C9EC0D4B31D82E91 /* JobRunner.swift */; };
 		1BC9B5A4FF2718D84D76DD36 /* MPMServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8E05CAA843B5A8B62671E5E /* MPMServiceTests.swift */; };
-		1C9F4FD8DDDFA42090126E5D /* SojournUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB7CC3F3D52767F5904DBEE9 /* SojournUITests.swift */; };
-		3EB86ACC2AEA892CCD8BD29F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C9AEE2DC539EF6F71004D7C9 /* Assets.xcassets */; };
+		2B3E1342F39ED82478E6D339 /* ANSIParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BDD342FB453E37289043AB0 /* ANSIParser.swift */; };
+		4A5F2856940C55ECD4D50CCC /* SojournApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC7AC9EC2C343DE83DB1830A /* SojournApp.swift */; };
+		4DE366BB1A9A86717FCF2ABE /* Job.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0814F9583EAFEE9FAF041AE /* Job.swift */; };
 		508C867592BF7AA7D2D54400 /* SubprocessRunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D717FBA5804F28F8892BC95F /* SubprocessRunnerTests.swift */; };
+		52EDC71EEB3F6B1019200816 /* LogBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75102F527B8749FB644C0444 /* LogBuffer.swift */; };
 		5B90DE31FC7F4180A0AF34B8 /* SojournUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10DD40CBD9A7ADFED1E94D4 /* SojournUITests.swift */; };
-		61ACEEFF3B935E210E841E11 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8D7C1FDC46EC5469FDB9D8B /* ContentView.swift */; };
-		A87693ECF1AD077C66F127F2 /* SojournTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A31C19EA77B9ABFD2803BACE /* SojournTests.swift */; };
-		A97A642A3A1DF2DCAEF5D4BF /* SojournUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEFCBF0D0402541513BB4BF5 /* SojournUITestsLaunchTests.swift */; };
+		6AC8674D8D977F7C108ADF81 /* LogBufferTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DD4943AD10D37C3DB9CFBC9 /* LogBufferTests.swift */; };
+		84ED767DF156511C5A5411CD /* SubprocessError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67A4B09F86913C2562B8AD88 /* SubprocessError.swift */; };
+		8B48C4D2F4994607EAEC16C3 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A48660D88C1608BF1170092 /* ContentView.swift */; };
+		9453FF999E25CAABF33361EC /* AppStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA1C48BDB71227E5F1B7662A /* AppStore.swift */; };
+		96F5B9D644CDA14A4F97D25B /* SubprocessRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22DFD3E375E49A6409AE3812 /* SubprocessRunner.swift */; };
+		AF41D0A179C38D3AFA59E55A /* ANSIParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55D844D1916BAD352E960418 /* ANSIParserTests.swift */; };
+		C6E76168AC77E5F2B66C1A00 /* ToolLocatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3631080B96D92DFD843F72AE /* ToolLocatorTests.swift */; };
+		E50919FD33E2914DF758D069 /* JobRunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72893E315B28B7A4C2D41119 /* JobRunnerTests.swift */; };
+		F40C659088BA7D50CF171576 /* ManagerSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D1CE3F585241A7C3832E1FC /* ManagerSnapshot.swift */; };
 		FEC5097A5FFAE8DAAA7D7B3A /* Subprocess in Frameworks */ = {isa = PBXBuildFile; productRef = 39BF93AAF2A4FCFC7EBAD55E /* Subprocess */; };
 /* End PBXBuildFile section */
 
@@ -38,19 +47,33 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		101837DD34BDE8DB72BE4924 /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
+		1BDD342FB453E37289043AB0 /* ANSIParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANSIParser.swift; sourceTree = "<group>"; };
+		22DFD3E375E49A6409AE3812 /* SubprocessRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubprocessRunner.swift; sourceTree = "<group>"; };
 		27657F22347EC0CCD4B14D5C /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
+		2DD4943AD10D37C3DB9CFBC9 /* LogBufferTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogBufferTests.swift; sourceTree = "<group>"; };
+		3631080B96D92DFD843F72AE /* ToolLocatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolLocatorTests.swift; sourceTree = "<group>"; };
+		3A48660D88C1608BF1170092 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		3D1CE3F585241A7C3832E1FC /* ManagerSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagerSnapshot.swift; sourceTree = "<group>"; };
 		5067374206B171480C067C6A /* SojournTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SojournTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		6C51CA305B86C871748E4E6F /* SojournApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SojournApp.swift; sourceTree = "<group>"; };
-		A31C19EA77B9ABFD2803BACE /* SojournTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SojournTests.swift; sourceTree = "<group>"; };
+		5531EFE3E6A6B9815FE6AA3D /* ToolLocator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolLocator.swift; sourceTree = "<group>"; };
+		55D844D1916BAD352E960418 /* ANSIParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANSIParserTests.swift; sourceTree = "<group>"; };
+		67A4B09F86913C2562B8AD88 /* SubprocessError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubprocessError.swift; sourceTree = "<group>"; };
+		72893E315B28B7A4C2D41119 /* JobRunnerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobRunnerTests.swift; sourceTree = "<group>"; };
+		75102F527B8749FB644C0444 /* LogBuffer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogBuffer.swift; sourceTree = "<group>"; };
 		B10DD40CBD9A7ADFED1E94D4 /* SojournUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SojournUITests.swift; sourceTree = "<group>"; };
+		B155502B536A71BBC60866A8 /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
 		B8E05CAA843B5A8B62671E5E /* MPMServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MPMServiceTests.swift; sourceTree = "<group>"; };
 		BC0CD2FDD4876C335C51A7F6 /* SojournUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SojournUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		BE87553CA8CCFF236BAD7935 /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
+		C0814F9583EAFEE9FAF041AE /* Job.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Job.swift; sourceTree = "<group>"; };
 		C40858EDF69CF14EA473AF3F /* Sojourn.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sojourn.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		C8D7C1FDC46EC5469FDB9D8B /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		C9AEE2DC539EF6F71004D7C9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		CB7CC3F3D52767F5904DBEE9 /* SojournUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SojournUITests.swift; sourceTree = "<group>"; };
-		CEFCBF0D0402541513BB4BF5 /* SojournUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SojournUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		C715FB2104E0602E477DC8AF /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
+		CA1C48BDB71227E5F1B7662A /* AppStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStore.swift; sourceTree = "<group>"; };
+		CC7AC9EC2C343DE83DB1830A /* SojournApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SojournApp.swift; sourceTree = "<group>"; };
 		D717FBA5804F28F8892BC95F /* SubprocessRunnerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubprocessRunnerTests.swift; sourceTree = "<group>"; };
+		EA355F6358F10594B2C15DD3 /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
+		F4207776C9EC0D4B31D82E91 /* JobRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobRunner.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,14 +89,43 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0806AFC7526447A0384BA21B /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				7BA30793C89B86195A203C30 /* data */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		18A462662FCEF16C0D204450 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				CC7AC9EC2C343DE83DB1830A /* SojournApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
 		1EBA80D95A728FBBF2987A09 /* Sojourn */ = {
 			isa = PBXGroup;
 			children = (
-				469E41535DB8CDC34B14CF2A /* Sojourn */,
-				357D8C7F98000A6BD18E0BA2 /* SojournTests */,
-				E0C39F86863F2FCEA972F566 /* SojournUITests */,
+				18A462662FCEF16C0D204450 /* App */,
+				7E4A820C2DD7097CAA0A5747 /* Models */,
+				21C7E80FA257AE52360D6404 /* Persistence */,
+				0806AFC7526447A0384BA21B /* Resources */,
+				A85589FB5353EB5184A159B8 /* Services */,
+				404D9A26341978D5165EA378 /* Store */,
+				97BBF3630EA7774F06D0B51E /* Sync */,
+				2832315DB68369190955BE2E /* UI */,
 			);
 			path = Sojourn;
+			sourceTree = "<group>";
+		};
+		21C7E80FA257AE52360D6404 /* Persistence */ = {
+			isa = PBXGroup;
+			children = (
+				BE87553CA8CCFF236BAD7935 /* .gitkeep */,
+			);
+			path = Persistence;
 			sourceTree = "<group>";
 		};
 		229A8660CAFF1E38993C29D9 /* Products */ = {
@@ -86,22 +138,22 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		357D8C7F98000A6BD18E0BA2 /* SojournTests */ = {
+		2832315DB68369190955BE2E /* UI */ = {
 			isa = PBXGroup;
 			children = (
-				A31C19EA77B9ABFD2803BACE /* SojournTests.swift */,
+				3A48660D88C1608BF1170092 /* ContentView.swift */,
+				F2BC5EEFDA029437BC3C07A9 /* Panes */,
 			);
-			path = SojournTests;
+			path = UI;
 			sourceTree = "<group>";
 		};
-		469E41535DB8CDC34B14CF2A /* Sojourn */ = {
+		404D9A26341978D5165EA378 /* Store */ = {
 			isa = PBXGroup;
 			children = (
-				C9AEE2DC539EF6F71004D7C9 /* Assets.xcassets */,
-				C8D7C1FDC46EC5469FDB9D8B /* ContentView.swift */,
-				6C51CA305B86C871748E4E6F /* SojournApp.swift */,
+				101837DD34BDE8DB72BE4924 /* .gitkeep */,
+				CA1C48BDB71227E5F1B7662A /* AppStore.swift */,
 			);
-			path = Sojourn;
+			path = Store;
 			sourceTree = "<group>";
 		};
 		5BF9F126C4990185AB0C637A /* Sync */ = {
@@ -112,22 +164,63 @@
 			path = Sync;
 			sourceTree = "<group>";
 		};
+		7BA30793C89B86195A203C30 /* data */ = {
+			isa = PBXGroup;
+			children = (
+				9C435BD7B934EECD35FA9373 /* applications */,
+			);
+			path = data;
+			sourceTree = "<group>";
+		};
 		7E06F7AAD39986DE48F7C6C4 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				55D844D1916BAD352E960418 /* ANSIParserTests.swift */,
+				72893E315B28B7A4C2D41119 /* JobRunnerTests.swift */,
+				2DD4943AD10D37C3DB9CFBC9 /* LogBufferTests.swift */,
 				B8E05CAA843B5A8B62671E5E /* MPMServiceTests.swift */,
 				D717FBA5804F28F8892BC95F /* SubprocessRunnerTests.swift */,
+				3631080B96D92DFD843F72AE /* ToolLocatorTests.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
 		};
-		E0C39F86863F2FCEA972F566 /* SojournUITests */ = {
+		7E4A820C2DD7097CAA0A5747 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				CB7CC3F3D52767F5904DBEE9 /* SojournUITests.swift */,
-				CEFCBF0D0402541513BB4BF5 /* SojournUITestsLaunchTests.swift */,
+				C0814F9583EAFEE9FAF041AE /* Job.swift */,
+				3D1CE3F585241A7C3832E1FC /* ManagerSnapshot.swift */,
+				67A4B09F86913C2562B8AD88 /* SubprocessError.swift */,
 			);
-			path = SojournUITests;
+			path = Models;
+			sourceTree = "<group>";
+		};
+		97BBF3630EA7774F06D0B51E /* Sync */ = {
+			isa = PBXGroup;
+			children = (
+				C715FB2104E0602E477DC8AF /* .gitkeep */,
+			);
+			path = Sync;
+			sourceTree = "<group>";
+		};
+		9C435BD7B934EECD35FA9373 /* applications */ = {
+			isa = PBXGroup;
+			children = (
+				EA355F6358F10594B2C15DD3 /* .gitkeep */,
+			);
+			path = applications;
+			sourceTree = "<group>";
+		};
+		A85589FB5353EB5184A159B8 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				1BDD342FB453E37289043AB0 /* ANSIParser.swift */,
+				F4207776C9EC0D4B31D82E91 /* JobRunner.swift */,
+				75102F527B8749FB644C0444 /* LogBuffer.swift */,
+				22DFD3E375E49A6409AE3812 /* SubprocessRunner.swift */,
+				5531EFE3E6A6B9815FE6AA3D /* ToolLocator.swift */,
+			);
+			path = Services;
 			sourceTree = "<group>";
 		};
 		E34DB116FC2DC6D41E6A6108 /* SojournTests */ = {
@@ -155,6 +248,14 @@
 				E7BED3DB067A81B0C64AE9EC /* SojournUITests */,
 				229A8660CAFF1E38993C29D9 /* Products */,
 			);
+			sourceTree = "<group>";
+		};
+		F2BC5EEFDA029437BC3C07A9 /* Panes */ = {
+			isa = PBXGroup;
+			children = (
+				B155502B536A71BBC60866A8 /* .gitkeep */,
+			);
+			path = Panes;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -202,7 +303,6 @@
 			buildPhases = (
 				03461247699E2EA98CD75132 /* Re-sign bundled binaries */,
 				4238063442628CD3CA847C39 /* Sources */,
-				7C1898715F990B521D28067B /* Resources */,
 				9C4284049F2422D90142F370 /* Frameworks */,
 			);
 			buildRules = (
@@ -267,17 +367,6 @@
 		};
 /* End PBXProject section */
 
-/* Begin PBXResourcesBuildPhase section */
-		7C1898715F990B521D28067B /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				3EB86ACC2AEA892CCD8BD29F /* Assets.xcassets in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXResourcesBuildPhase section */
-
 /* Begin PBXShellScriptBuildPhase section */
 		03461247699E2EA98CD75132 /* Re-sign bundled binaries */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -305,11 +394,17 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				61ACEEFF3B935E210E841E11 /* ContentView.swift in Sources */,
-				0CEE25D435216F1CD962C5FA /* SojournApp.swift in Sources */,
-				A87693ECF1AD077C66F127F2 /* SojournTests.swift in Sources */,
-				1C9F4FD8DDDFA42090126E5D /* SojournUITests.swift in Sources */,
-				A97A642A3A1DF2DCAEF5D4BF /* SojournUITestsLaunchTests.swift in Sources */,
+				2B3E1342F39ED82478E6D339 /* ANSIParser.swift in Sources */,
+				9453FF999E25CAABF33361EC /* AppStore.swift in Sources */,
+				8B48C4D2F4994607EAEC16C3 /* ContentView.swift in Sources */,
+				4DE366BB1A9A86717FCF2ABE /* Job.swift in Sources */,
+				0ED1AAAEAADA7250AF998BA2 /* JobRunner.swift in Sources */,
+				52EDC71EEB3F6B1019200816 /* LogBuffer.swift in Sources */,
+				F40C659088BA7D50CF171576 /* ManagerSnapshot.swift in Sources */,
+				4A5F2856940C55ECD4D50CCC /* SojournApp.swift in Sources */,
+				84ED767DF156511C5A5411CD /* SubprocessError.swift in Sources */,
+				96F5B9D644CDA14A4F97D25B /* SubprocessRunner.swift in Sources */,
+				09E0C0FA877B857BB17F524D /* ToolLocator.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -317,8 +412,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AF41D0A179C38D3AFA59E55A /* ANSIParserTests.swift in Sources */,
+				E50919FD33E2914DF758D069 /* JobRunnerTests.swift in Sources */,
+				6AC8674D8D977F7C108ADF81 /* LogBufferTests.swift in Sources */,
 				1BC9B5A4FF2718D84D76DD36 /* MPMServiceTests.swift in Sources */,
 				508C867592BF7AA7D2D54400 /* SubprocessRunnerTests.swift in Sources */,
+				C6E76168AC77E5F2B66C1A00 /* ToolLocatorTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -645,7 +744,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/swiftlang/swift-subprocess.git";
 			requirement = {
-				kind = upToNextMajorVersion;
+				kind = upToNextMinorVersion;
 				minimumVersion = 0.4.0;
 			};
 		};
@@ -653,8 +752,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/orchetect/MenuBarExtraAccess.git";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
+				kind = upToNextMinorVersion;
+				minimumVersion = 1.3.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */

@@ -9,22 +9,22 @@
 
 import Foundation
 
-public struct ANSIAttributes: Sendable, Hashable {
-  public var bold: Bool = false
-  public var dim: Bool = false
-  public var italic: Bool = false
-  public var underline: Bool = false
-  public var inverse: Bool = false
-  public var strikethrough: Bool = false
-  public var foreground: ANSIColor? = nil
-  public var background: ANSIColor? = nil
+internal struct ANSIAttributes: Sendable, Hashable {
+  internal var bold: Bool = false
+  internal var dim: Bool = false
+  internal var italic: Bool = false
+  internal var underline: Bool = false
+  internal var inverse: Bool = false
+  internal var strikethrough: Bool = false
+  internal var foreground: ANSIColor? = nil
+  internal var background: ANSIColor? = nil
 
-  public init() {}
+  internal init() {}
 
-  public static let plain = ANSIAttributes()
+  internal static let plain = ANSIAttributes()
 }
 
-public enum ANSIColor: Sendable, Hashable {
+internal enum ANSIColor: Sendable, Hashable {
   case black, red, green, yellow, blue, magenta, cyan, white
   case brightBlack, brightRed, brightGreen, brightYellow
   case brightBlue, brightMagenta, brightCyan, brightWhite
@@ -32,29 +32,29 @@ public enum ANSIColor: Sendable, Hashable {
   case rgb(r: Int, g: Int, b: Int)
 }
 
-public struct ANSIRun: Sendable, Hashable {
-  public let attrs: ANSIAttributes
-  public let text: String
+internal struct ANSIRun: Sendable, Hashable {
+  internal let attrs: ANSIAttributes
+  internal let text: String
 
-  public init(attrs: ANSIAttributes, text: String) {
+  internal init(attrs: ANSIAttributes, text: String) {
     self.attrs = attrs
     self.text = text
   }
 }
 
-public struct ANSIParser: Sendable {
-  public init() {}
+internal struct ANSIParser: Sendable {
+  internal init() {}
 
   /// Parse `input` into attributed runs. Stateless across calls; use
   /// `StatefulANSIParser` to preserve attribute state across chunks.
-  public func parse(_ input: String) -> [ANSIRun] {
+  internal func parse(_ input: String) -> [ANSIRun] {
     var parser = StatefulANSIParser()
     parser.feed(input)
     return parser.drain()
   }
 }
 
-public struct StatefulANSIParser: Sendable {
+internal struct StatefulANSIParser: Sendable {
   private var current = ANSIAttributes()
   private var pendingRuns: [ANSIRun] = []
   private var textBuffer = ""
@@ -62,9 +62,9 @@ public struct StatefulANSIParser: Sendable {
   private var state: State = .text
   private var csiParams = ""
 
-  public init() {}
+  internal init() {}
 
-  public mutating func feed(_ input: String) {
+  internal mutating func feed(_ input: String) {
     for ch in input {
       switch state {
       case .text:
@@ -95,7 +95,7 @@ public struct StatefulANSIParser: Sendable {
     }
   }
 
-  public mutating func drain() -> [ANSIRun] {
+  internal mutating func drain() -> [ANSIRun] {
     flushText()
     let out = pendingRuns
     pendingRuns.removeAll()

@@ -7,13 +7,13 @@
 
 import Foundation
 
-public struct ManagerSnapshot: Sendable, Codable, Hashable, Identifiable {
-  public let id: String
-  public let name: String
-  public let errors: [String]
-  public let packages: [ManagedPackage]
+internal struct ManagerSnapshot: Sendable, Codable, Hashable, Identifiable {
+  internal let id: String
+  internal let name: String
+  internal let errors: [String]
+  internal let packages: [ManagedPackage]
 
-  public init(
+  internal init(
     id: String,
     name: String,
     errors: [String] = [],
@@ -26,13 +26,13 @@ public struct ManagerSnapshot: Sendable, Codable, Hashable, Identifiable {
   }
 }
 
-public struct ManagedPackage: Sendable, Codable, Hashable, Identifiable {
-  public let id: String
-  public let name: String?
-  public let installedVersion: String?
-  public let latestVersion: String?
+internal struct ManagedPackage: Sendable, Codable, Hashable, Identifiable {
+  internal let id: String
+  internal let name: String?
+  internal let installedVersion: String?
+  internal let latestVersion: String?
 
-  public init(
+  internal init(
     id: String,
     name: String? = nil,
     installedVersion: String? = nil,

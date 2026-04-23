@@ -45,7 +45,12 @@ let package = Package(
       exclude: [
         "Info.plist",
         "Sojourn.entitlements",
-        "Resources/bin"
+        "Resources/bin",
+        // SwiftUI app entry + view layer: built only by Xcode (.app bundle).
+        // SPM library cannot link @main cleanly, and AppKit/SwiftUI requires
+        // an app bundle context that SPM does not provide.
+        "App/SojournApp.swift",
+        "UI"
       ],
       resources: [
         .process("Resources/data")

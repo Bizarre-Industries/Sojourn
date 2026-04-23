@@ -10,19 +10,29 @@ title = "Sojourn CI secret-scan rules"
 useDefault = true
 
 [allowlist]
-description = "Paths that contain deliberate sample/fixture data."
+description = "Paths that contain deliberate sample/fixture data, plus build artifacts."
 paths = [
   '''SojournTests/Fixtures/.*\.json$''',
   '''SojournTests/Fixtures/.*\.toml$''',
+  '''SojournTests/Fixtures/.*\.txt$''',
+  '''SojournTests/Fixtures/.*\.plist$''',
   '''docs/.*\.md$''',
+  '''\.build/.*''',
+  '''\.ruff_cache/.*''',
+  '''\.remember/.*''',
+  '''Sojourn\.xcodeproj/.*''',
 ]
 
 # Regex allowlist: obvious sample/placeholder patterns.
 regexes = [
-  '''age1[a-z0-9]{10,}''',           # age recipient examples in docs
-  '''ghp_[A-Z]{36}''',               # all-caps placeholder GitHub PATs
-  '''AKIAIOSFODNN7EXAMPLE''',        # AWS docs canary
+  '''age1[a-z0-9]{10,}''',                        # age recipient examples
+  '''ghp_[A-Z]{36}''',                            # all-caps placeholder PATs
+  '''ghp_EXAMPLE[A-Za-z0-9]{0,40}''',             # synthetic fixture PATs
+  '''AKIAIOSFODNN7EXAMPLE''',                     # AWS docs canary
+  '''AKIAEXAMPLE[A-Z0-9]{0,16}''',                # synthetic fixture AWS keys
   '''wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY''', # AWS docs canary
+  '''sk-EXAMPLE[A-Za-z0-9]{0,40}''',              # synthetic fixture OpenAI keys
+  '''sk_live_EXAMPLE[A-Za-z0-9]{0,40}''',         # synthetic fixture Stripe keys
 ]
 
 # Hard rules on top of defaults — fail PR on these unconditionally.

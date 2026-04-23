@@ -1,37 +1,81 @@
-# Claude Code
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+Thumbs.db
+
+# Xcode
+build/
+DerivedData/
+*.xcodeproj/xcuserdata/
+*.xcworkspace/xcuserdata/
+*.xcuserstate
+*.xcscmblueprint
+*.xccheckout
+*.moved-aside
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Swift Package Manager
+.build/
+Packages/
+Package.resolved
+.swiftpm/
+.netrc
+
+# CocoaPods / Carthage (not used, but belt-and-braces)
+Pods/
+Carthage/Build/
+
+# Fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/**/*.png
+fastlane/test_output
+
+# Signing / notarization artifacts
+*.p12
+*.cer
+*.provisionprofile
+*.mobileprovision
+AuthKey_*.p8
+notarize-*.json
+*.dmg
+
+# Editor / tooling
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Project-local harness (Claude Code, remember)
 .claude/
 .claude-cache/
 .claude-plans/
 .remember/
 .task/
-CLAUDE.md
 LESSONS.md
 
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Test artifacts
-coverage.out
-*.prof
-
-# Secrets
+# Secrets / env
 *.secret
 *.key
 *.pem
 jwt.secret
-
-# Local environment files
 .env
 .env.local
 .env.*.local
 
 # Misc
+coverage.out
+*.prof
 refs/
+
+# Bundled binaries (downloaded in build phase; tracked via release pipeline)
+Sojourn/Resources/bin/gitleaks
+Sojourn/Resources/bin/age
+CLAUDE.md

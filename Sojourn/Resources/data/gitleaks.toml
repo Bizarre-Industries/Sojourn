@@ -1,0 +1,68 @@
+# Sojourn — bundled gitleaks config (MIT upstream, locally tuned).
+# Consumed by SecretScanService at `Sojourn/Resources/bin/gitleaks dir
+# --config <this>`. See docs/SECURITY.md (Pre-commit secret scanning).
+#
+# Rules are additive on top of gitleaks' built-in set. We only declare
+# the high-confidence provider-key rules Sojourn explicitly blocks for
+# 5s in the UI.
+
+useDefault = true
+
+[allowlist]
+description = "Allow synthetic / fixture data"
+paths = [
+  '''SojournTests/Fixtures/.*''',
+  '''docs/.*''',
+  '''\.build/.*''',
+]
+regexes = [
+  '''ghp_EXAMPLE\d{32,}''',
+  '''sk-ant-EXAMPLE[A-Za-z0-9\-_]{32,}''',
+  '''AKIA[IOASIA]EXAMPLE\d{12,}''',
+  '''sk_live_EXAMPLE[A-Za-z0-9]{20,}''',
+  '''sk-proj-EXAMPLE[A-Za-z0-9]{24,}''',
+]
+
+[[rules]]
+id = "sojourn-aws-access-key"
+description = "AWS access key (AKIA/ASIA prefix)"
+regex = '''(?i)(AKIA|ASIA)[A-Z0-9]{16}'''
+entropy = 3.0
+secretGroup = 0
+tags = ["aws", "sojourn"]
+
+[[rules]]
+id = "sojourn-github-pat"
+description = "GitHub classic personal access token"
+regex = '''ghp_[A-Za-z0-9]{36}'''
+tags = ["github", "sojourn"]
+
+[[rules]]
+id = "sojourn-github-fine-grained-pat"
+description = "GitHub fine-grained PAT"
+regex = '''github_pat_[A-Za-z0-9_]{82}'''
+tags = ["github", "sojourn"]
+
+[[rules]]
+id = "sojourn-openai-key"
+description = "OpenAI API key"
+regex = '''sk-(proj-)?[A-Za-z0-9]{32,}'''
+tags = ["openai", "sojourn"]
+
+[[rules]]
+id = "sojourn-stripe-live"
+description = "Stripe live secret key"
+regex = '''sk_live_[A-Za-z0-9]{24,}'''
+tags = ["stripe", "sojourn"]
+
+[[rules]]
+id = "sojourn-anthropic-key"
+description = "Anthropic API key"
+regex = '''sk-ant-[A-Za-z0-9\-_]{40,}'''
+tags = ["anthropic", "sojourn"]
+
+[[rules]]
+id = "sojourn-slack-bot-token"
+description = "Slack bot token"
+regex = '''xoxb-[0-9]{10,}-[0-9]{10,}-[A-Za-z0-9]{24,}'''
+tags = ["slack", "sojourn"]

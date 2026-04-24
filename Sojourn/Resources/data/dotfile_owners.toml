@@ -1,0 +1,188 @@
+# Sojourn — dotfile ownership registry
+# License: GPL-3.0-or-later (Sojourn original).
+#
+# Each entry maps a path (relative to $HOME) to the tool/manager that
+# typically owns it. Consumed by CleanupService to classify orphan
+# candidates. Values for `owner`: chezmoi / mpm / user / system /
+# third-party / unknown. See docs/ARCHITECTURE.md §10.
+
+[[owner]]
+path = ".zshrc"
+owner = "user"
+notes = "zsh rc; usually hand-managed or via chezmoi"
+
+[[owner]]
+path = ".zshenv"
+owner = "user"
+
+[[owner]]
+path = ".zprofile"
+owner = "user"
+
+[[owner]]
+path = ".bash_profile"
+owner = "user"
+
+[[owner]]
+path = ".bashrc"
+owner = "user"
+
+[[owner]]
+path = ".profile"
+owner = "user"
+
+[[owner]]
+path = ".gitconfig"
+owner = "user"
+
+[[owner]]
+path = ".gitignore_global"
+owner = "user"
+
+[[owner]]
+path = ".gitattributes"
+owner = "user"
+
+[[owner]]
+path = ".tmux.conf"
+owner = "user"
+
+[[owner]]
+path = ".config"
+owner = "user"
+notes = "XDG config root; individual tools live underneath"
+
+[[owner]]
+path = ".local"
+owner = "user"
+notes = "XDG data root"
+
+[[owner]]
+path = ".cache"
+owner = "user"
+notes = "XDG cache root"
+
+[[owner]]
+path = ".ssh"
+owner = "user"
+notes = "SSH keys; Sojourn never touches the contents"
+
+[[owner]]
+path = ".gnupg"
+owner = "user"
+notes = "GPG keys; Sojourn never touches the contents"
+
+[[owner]]
+path = ".netrc"
+owner = "user"
+
+[[owner]]
+path = ".npmrc"
+owner = "mpm"
+manager = "npm"
+
+[[owner]]
+path = ".nvmrc"
+owner = "user"
+
+[[owner]]
+path = ".node_repl_history"
+owner = "third-party"
+
+[[owner]]
+path = ".yarnrc"
+owner = "mpm"
+manager = "yarn"
+
+[[owner]]
+path = ".pnpmfile.cjs"
+owner = "user"
+
+[[owner]]
+path = ".python_history"
+owner = "third-party"
+
+[[owner]]
+path = ".pyenv"
+owner = "third-party"
+
+[[owner]]
+path = ".rbenv"
+owner = "third-party"
+
+[[owner]]
+path = ".gem"
+owner = "mpm"
+manager = "gem"
+
+[[owner]]
+path = ".bundle"
+owner = "mpm"
+manager = "gem"
+
+[[owner]]
+path = ".cargo"
+owner = "mpm"
+manager = "cargo"
+
+[[owner]]
+path = ".rustup"
+owner = "third-party"
+
+[[owner]]
+path = ".composer"
+owner = "mpm"
+manager = "composer"
+
+[[owner]]
+path = ".go"
+owner = "third-party"
+
+[[owner]]
+path = ".docker"
+owner = "third-party"
+
+[[owner]]
+path = ".kube"
+owner = "user"
+
+[[owner]]
+path = ".aws"
+owner = "user"
+
+[[owner]]
+path = ".chezmoi.toml"
+owner = "chezmoi"
+
+[[owner]]
+path = ".local/share/chezmoi"
+owner = "chezmoi"
+notes = "chezmoi source state; owned by chezmoi itself"
+
+[[owner]]
+path = ".hushlogin"
+owner = "user"
+
+[[owner]]
+path = ".viminfo"
+owner = "user"
+
+[[owner]]
+path = ".vim"
+owner = "user"
+
+[[owner]]
+path = ".config/nvim"
+owner = "user"
+
+[[owner]]
+path = ".CFUserTextEncoding"
+owner = "system"
+
+[[owner]]
+path = ".DS_Store"
+owner = "system"
+
+[[owner]]
+path = ".Trash"
+owner = "system"

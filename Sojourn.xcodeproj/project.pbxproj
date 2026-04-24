@@ -29,6 +29,7 @@
 		52EDC71EEB3F6B1019200816 /* LogBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75102F527B8749FB644C0444 /* LogBuffer.swift */; };
 		5B90DE31FC7F4180A0AF34B8 /* SojournUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10DD40CBD9A7ADFED1E94D4 /* SojournUITests.swift */; };
 		6AC8674D8D977F7C108ADF81 /* LogBufferTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DD4943AD10D37C3DB9CFBC9 /* LogBufferTests.swift */; };
+		70AEDCB3E9609070650F669A /* CleanupServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A36CD6BB083EBA6FA642F71F /* CleanupServiceTests.swift */; };
 		735FB5111FAFC6F9433CE554 /* AppSupportPaths.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95E397843E7AA4607A3DD54E /* AppSupportPaths.swift */; };
 		752719910F7FCAAC7519C880 /* SettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C454DA661BE5AA7E7BB4A276 /* SettingsStore.swift */; };
 		7BD820423453D94C76D6AC14 /* PreferenceDomain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92FBF1A32893C79F8C24CC6D /* PreferenceDomain.swift */; };
@@ -36,6 +37,7 @@
 		823B02AD39D276B7611D93C9 /* CooldownGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8327B5FB7E53D45F11AC2FE /* CooldownGate.swift */; };
 		82E2BD848C18FE0B35BA6483 /* SyncTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FD1B4AC2223DF98A4D4AF30 /* SyncTests.swift */; };
 		84ED767DF156511C5A5411CD /* SubprocessError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67A4B09F86913C2562B8AD88 /* SubprocessError.swift */; };
+		88B110F47D49F67CC718D40D /* CleanupService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C198F65D627EB6805DC3C20A /* CleanupService.swift */; };
 		8B48C4D2F4994607EAEC16C3 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A48660D88C1608BF1170092 /* ContentView.swift */; };
 		8FA89585B9D478180E588471 /* ChezmoiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 494B9E3CA3D4138CF9774417 /* ChezmoiService.swift */; };
 		9453FF999E25CAABF33361EC /* AppStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA1C48BDB71227E5F1B7662A /* AppStore.swift */; };
@@ -49,6 +51,9 @@
 		C44DB6B79B4C736DEC87106E /* MachineMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDF057685B19AB3503933B08 /* MachineMetadata.swift */; };
 		C63650F6F57BDB8D36CDC7E9 /* OrphanCandidate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA82E2DC35BD66C0CCB3D31C /* OrphanCandidate.swift */; };
 		C6E76168AC77E5F2B66C1A00 /* ToolLocatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3631080B96D92DFD843F72AE /* ToolLocatorTests.swift */; };
+		CE5FCC9BDF17CB413DB8D8B9 /* dotfile_owners.toml in Resources */ = {isa = PBXBuildFile; fileRef = 78F8EA89B7EACCC554472F02 /* dotfile_owners.toml */; };
+		D7A146F414207538543239AE /* com.apple.Terminal.toml in Resources */ = {isa = PBXBuildFile; fileRef = 924BBBEDA4A6C2D319E16CA3 /* com.apple.Terminal.toml */; };
+		DB122EBACDB6447B5BC32DF5 /* gitleaks.toml in Resources */ = {isa = PBXBuildFile; fileRef = CD603A897526225D6BAE2FEC /* gitleaks.toml */; };
 		DE03A44AB78A511EEE4CD4F1 /* BootstrapService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14A5F035C01184E1BF26CB2F /* BootstrapService.swift */; };
 		DEC7987D1C49E0302153500B /* PersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78D3E34CEC39749CE7D6E198 /* PersistenceTests.swift */; };
 		E50919FD33E2914DF758D069 /* JobRunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72893E315B28B7A4C2D41119 /* JobRunnerTests.swift */; };
@@ -100,12 +105,15 @@
 		72893E315B28B7A4C2D41119 /* JobRunnerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobRunnerTests.swift; sourceTree = "<group>"; };
 		75102F527B8749FB644C0444 /* LogBuffer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogBuffer.swift; sourceTree = "<group>"; };
 		78D3E34CEC39749CE7D6E198 /* PersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceTests.swift; sourceTree = "<group>"; };
+		78F8EA89B7EACCC554472F02 /* dotfile_owners.toml */ = {isa = PBXFileReference; path = dotfile_owners.toml; sourceTree = "<group>"; };
 		7FD1B4AC2223DF98A4D4AF30 /* SyncTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncTests.swift; sourceTree = "<group>"; };
 		85CA5EF14259B836AD6AED4E /* DotfileOwner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DotfileOwner.swift; sourceTree = "<group>"; };
 		8CF3E7F8591B56E1E9859A73 /* PrefService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrefService.swift; sourceTree = "<group>"; };
 		8DED6874FE4B27207A890E6E /* GitHubDeviceAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubDeviceAuth.swift; sourceTree = "<group>"; };
+		924BBBEDA4A6C2D319E16CA3 /* com.apple.Terminal.toml */ = {isa = PBXFileReference; path = com.apple.Terminal.toml; sourceTree = "<group>"; };
 		92FBF1A32893C79F8C24CC6D /* PreferenceDomain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferenceDomain.swift; sourceTree = "<group>"; };
 		95E397843E7AA4607A3DD54E /* AppSupportPaths.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSupportPaths.swift; sourceTree = "<group>"; };
+		A36CD6BB083EBA6FA642F71F /* CleanupServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CleanupServiceTests.swift; sourceTree = "<group>"; };
 		A6DC18B5D24857B171B10510 /* SnapshotService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnapshotService.swift; sourceTree = "<group>"; };
 		A8A0D4248D7F40715D7685E4 /* Conflict.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Conflict.swift; sourceTree = "<group>"; };
 		AA82E2DC35BD66C0CCB3D31C /* OrphanCandidate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrphanCandidate.swift; sourceTree = "<group>"; };
@@ -118,12 +126,14 @@
 		BC0CD2FDD4876C335C51A7F6 /* SojournUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SojournUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		BE87553CA8CCFF236BAD7935 /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
 		C0814F9583EAFEE9FAF041AE /* Job.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Job.swift; sourceTree = "<group>"; };
+		C198F65D627EB6805DC3C20A /* CleanupService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CleanupService.swift; sourceTree = "<group>"; };
 		C40858EDF69CF14EA473AF3F /* Sojourn.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sojourn.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C454DA661BE5AA7E7BB4A276 /* SettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsStore.swift; sourceTree = "<group>"; };
 		C51F95DC3AF05E699D7B7E96 /* BrewService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrewService.swift; sourceTree = "<group>"; };
 		C715FB2104E0602E477DC8AF /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
 		CA1C48BDB71227E5F1B7662A /* AppStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStore.swift; sourceTree = "<group>"; };
 		CC7AC9EC2C343DE83DB1830A /* SojournApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SojournApp.swift; sourceTree = "<group>"; };
+		CD603A897526225D6BAE2FEC /* gitleaks.toml */ = {isa = PBXFileReference; path = gitleaks.toml; sourceTree = "<group>"; };
 		D717FBA5804F28F8892BC95F /* SubprocessRunnerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubprocessRunnerTests.swift; sourceTree = "<group>"; };
 		D8327B5FB7E53D45F11AC2FE /* CooldownGate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CooldownGate.swift; sourceTree = "<group>"; };
 		E9E64BDF45BE87A78922A385 /* HistoryEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryEntry.swift; sourceTree = "<group>"; };
@@ -229,6 +239,8 @@
 		7BA30793C89B86195A203C30 /* data */ = {
 			isa = PBXGroup;
 			children = (
+				78F8EA89B7EACCC554472F02 /* dotfile_owners.toml */,
+				CD603A897526225D6BAE2FEC /* gitleaks.toml */,
 				9C435BD7B934EECD35FA9373 /* applications */,
 			);
 			path = data;
@@ -238,6 +250,7 @@
 			isa = PBXGroup;
 			children = (
 				55D844D1916BAD352E960418 /* ANSIParserTests.swift */,
+				A36CD6BB083EBA6FA642F71F /* CleanupServiceTests.swift */,
 				72893E315B28B7A4C2D41119 /* JobRunnerTests.swift */,
 				2DD4943AD10D37C3DB9CFBC9 /* LogBufferTests.swift */,
 				B8E05CAA843B5A8B62671E5E /* MPMServiceTests.swift */,
@@ -282,6 +295,7 @@
 			isa = PBXGroup;
 			children = (
 				EA355F6358F10594B2C15DD3 /* .gitkeep */,
+				924BBBEDA4A6C2D319E16CA3 /* com.apple.Terminal.toml */,
 			);
 			path = applications;
 			sourceTree = "<group>";
@@ -293,6 +307,7 @@
 				14A5F035C01184E1BF26CB2F /* BootstrapService.swift */,
 				C51F95DC3AF05E699D7B7E96 /* BrewService.swift */,
 				494B9E3CA3D4138CF9774417 /* ChezmoiService.swift */,
+				C198F65D627EB6805DC3C20A /* CleanupService.swift */,
 				8DED6874FE4B27207A890E6E /* GitHubDeviceAuth.swift */,
 				51654B4F53BDA5905226D68E /* GitService.swift */,
 				F4207776C9EC0D4B31D82E91 /* JobRunner.swift */,
@@ -395,6 +410,7 @@
 			buildPhases = (
 				03461247699E2EA98CD75132 /* Re-sign bundled binaries */,
 				4238063442628CD3CA847C39 /* Sources */,
+				7C1898715F990B521D28067B /* Resources */,
 				9C4284049F2422D90142F370 /* Frameworks */,
 			);
 			buildRules = (
@@ -459,6 +475,19 @@
 		};
 /* End PBXProject section */
 
+/* Begin PBXResourcesBuildPhase section */
+		7C1898715F990B521D28067B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D7A146F414207538543239AE /* com.apple.Terminal.toml in Resources */,
+				CE5FCC9BDF17CB413DB8D8B9 /* dotfile_owners.toml in Resources */,
+				DB122EBACDB6447B5BC32DF5 /* gitleaks.toml in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
 /* Begin PBXShellScriptBuildPhase section */
 		03461247699E2EA98CD75132 /* Re-sign bundled binaries */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -495,6 +524,7 @@
 				DE03A44AB78A511EEE4CD4F1 /* BootstrapService.swift in Sources */,
 				247920E87C1C4DE550730A4A /* BrewService.swift in Sources */,
 				8FA89585B9D478180E588471 /* ChezmoiService.swift in Sources */,
+				88B110F47D49F67CC718D40D /* CleanupService.swift in Sources */,
 				37441384AFE282EE64098F7F /* Conflict.swift in Sources */,
 				8B48C4D2F4994607EAEC16C3 /* ContentView.swift in Sources */,
 				823B02AD39D276B7611D93C9 /* CooldownGate.swift in Sources */,
@@ -530,6 +560,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				AF41D0A179C38D3AFA59E55A /* ANSIParserTests.swift in Sources */,
+				70AEDCB3E9609070650F669A /* CleanupServiceTests.swift in Sources */,
 				E50919FD33E2914DF758D069 /* JobRunnerTests.swift in Sources */,
 				6AC8674D8D977F7C108ADF81 /* LogBufferTests.swift in Sources */,
 				1BC9B5A4FF2718D84D76DD36 /* MPMServiceTests.swift in Sources */,

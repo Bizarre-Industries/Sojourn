@@ -21,14 +21,16 @@ case "$ARCH" in
   arm64)
     GLEAKS_ASSET="gitleaks_${GITLEAKS_VERSION}_darwin_arm64.tar.gz"
     AGE_ASSET="age-v${AGE_VERSION}-darwin-arm64.tar.gz"
-    GLEAKS_SHA256="TBD"
-    AGE_SHA256="TBD"
+    # Pinned 2026-04-24 from upstream gitleaks_${GITLEAKS_VERSION}_checksums.txt
+    # + shasum -a 256 on age-${AGE_VERSION} tarball (age ships no checksum file).
+    GLEAKS_SHA256="b40ab0ae55c505963e365f271a8d3846efbc170aa17f2607f13df610a9aeb6a5"
+    AGE_SHA256="cf79875bd5970dc2dac60c87fa50cee1ff1f9a41b0eb273f65e174aff37c367a"
     ;;
   x86_64)
     GLEAKS_ASSET="gitleaks_${GITLEAKS_VERSION}_darwin_x64.tar.gz"
     AGE_ASSET="age-v${AGE_VERSION}-darwin-amd64.tar.gz"
-    GLEAKS_SHA256="TBD"
-    AGE_SHA256="TBD"
+    GLEAKS_SHA256="dfe101a4db2255fc85120ac7f3d25e4342c3c20cf749f2c20a18081af1952709"
+    AGE_SHA256="424e1d64438a730626540b2e01e98d132a64214442ca9465b3e82336d12e633e"
     ;;
   *)
     echo "unsupported arch: $ARCH"

@@ -50,16 +50,43 @@ struct GeneralSettingsTab: View {
 
 struct SyncSettingsTab: View {
   @Environment(AppStore.self) private var store
+  @State private var draftURL: String = ""
 
   var body: some View {
     Form {
-      LabeledContent("Remote repo URL") {
+      TextField("Remote repo URL", text: $draftURL, prompt: Text("git@github.com:you/sojourn-data.git"))
+        .accessibilityIdentifier("settings.remoteURL")
+      HStack {
+        Button("Save + clone") {
+          Task {
+            var snap = await store.settingsStore.value
+            snap.remoteRepoURL = draftURL
+            try? await store.settingsStore.replace(snap)
+            await store.reloadFromDisk()
+            let localRepo = store.paths.config.appendingPathComponent("sojourn-data", isDirectory: true)
+            if !FileManager.default.fileExists(atPath: localRepo.path),
+               let git = store.git {
+              try? await git.clone(url: draftURL, dest: localRepo)
+            }
+            if FileManager.default.fileExists(atPath: localRepo.path) {
+              store.configureSync(repoURL: localRepo)
+            }
+          }
+        }
+        .disabled(draftURL.isEmpty)
+        .accessibilityIdentifier("settings.saveRemote")
+        Spacer()
         Text(store.settings.remoteRepoURL ?? "not configured")
           .font(.caption.monospaced())
           .foregroundStyle(.secondary)
       }
       Toggle("Cooldown gate enabled", isOn: cooldownBinding)
         .accessibilityIdentifier("settings.cooldown")
+    }
+    .onAppear {
+      if draftURL.isEmpty {
+        draftURL = store.settings.remoteRepoURL ?? ""
+      }
     }
   }
 

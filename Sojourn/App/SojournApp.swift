@@ -17,13 +17,20 @@ struct SojournApp: App {
         if let store = storeBox.store {
           MainWindowView()
             .environment(store)
-            .task { await store.reloadFromDisk() }
-        } else {
+            .task {
+              await store.reloadFromDisk()
+              await store.bootstrap.probe()
+              await store.refreshManagers()
+            }
+        } else if storeBox.initError != nil {
           ContentUnavailableView(
             "Sojourn cannot start",
             systemImage: "exclamationmark.triangle",
             description: Text(storeBox.initError ?? "AppStore failed to bootstrap.")
           )
+        } else {
+          ProgressView("Starting Sojourn…")
+            .task { await storeBox.bootstrap() }
         }
       }
     }
@@ -56,9 +63,11 @@ final class AppStoreBox {
   private(set) var store: AppStore?
   private(set) var initError: String?
 
-  init() {
+  init() {}
+
+  func bootstrap() async {
     do {
-      self.store = try AppStore.live()
+      self.store = try await AppStore.live()
     } catch {
       self.initError = "\(error)"
     }

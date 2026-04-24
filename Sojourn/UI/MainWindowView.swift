@@ -49,6 +49,29 @@ struct MainWindowView: View {
       }
       .frame(minWidth: 600, minHeight: 400)
     }
+    .sheet(isPresented: bootstrapSheetPresented) {
+      BootstrapView(
+        state: store.bootstrap.state,
+        onConsent: {
+          Task { await store.bootstrap.proceed() }
+        },
+        onRetry: {
+          Task { await store.bootstrap.probe() }
+        }
+      )
+    }
+  }
+
+  private var bootstrapSheetPresented: Binding<Bool> {
+    Binding(
+      get: {
+        switch store.bootstrap.state {
+        case .ready, .unknown: return false
+        default: return true
+        }
+      },
+      set: { _ in }
+    )
   }
 
   @ViewBuilder

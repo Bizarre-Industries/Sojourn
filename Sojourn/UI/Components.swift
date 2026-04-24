@@ -24,23 +24,44 @@ struct PushPullBar: View {
         Label("Never synced", systemImage: "clock.badge.questionmark")
           .font(.caption).foregroundStyle(.secondary)
       }
+      if let phase = store.sync?.phase {
+        Text(phaseLabel(phase))
+          .font(.caption.monospaced())
+          .foregroundStyle(.secondary)
+      }
       Spacer()
       Button {
-        // Wired in Phase 7 once SyncCoordinator is injected into AppStore.
+        Task { await store.sync?.pull() }
       } label: {
         Label("Pull", systemImage: "arrow.down.circle")
       }
+      .disabled(store.sync == nil)
       .accessibilityIdentifier("pushpull.pull")
 
       Button {
-        // Wired in Phase 7 once SyncCoordinator is injected into AppStore.
+        Task {
+          await store.sync?.push(message: "sojourn: auto-sync")
+        }
       } label: {
         Label("Push", systemImage: "arrow.up.circle")
       }
+      .disabled(store.sync == nil)
       .accessibilityIdentifier("pushpull.push")
     }
     .padding(.horizontal, 12)
     .padding(.vertical, 6)
+  }
+
+  private func phaseLabel(_ phase: SyncPhase) -> String {
+    switch phase {
+    case .idle: return "idle"
+    case .pulling: return "pulling…"
+    case .resolvingConflicts: return "resolving conflicts"
+    case .scanningSecrets: return "gitleaks scan"
+    case .pushing: return "pushing…"
+    case .done(let kind): return "done: \(kind.rawValue)"
+    case .failed(let reason): return "failed: \(reason.prefix(50))"
+    }
   }
 }
 

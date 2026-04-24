@@ -106,18 +106,19 @@ struct MachinesPane: View {
 }
 
 struct CleanupPane: View {
-  @State private var candidates: [OrphanCandidate] = []
+  @Environment(AppStore.self) private var store
+  @State private var scanning = false
 
   var body: some View {
     VStack(spacing: 0) {
-      if candidates.isEmpty {
+      if store.orphans.isEmpty {
         ContentUnavailableView(
           "Cleanup",
           systemImage: "trash",
           description: Text("Press Scan to find orphan files in ~/Library.")
         )
       } else {
-        List(candidates) { candidate in
+        List(store.orphans) { candidate in
           HStack {
             VStack(alignment: .leading) {
               Text(candidate.path.lastPathComponent).font(.body)
@@ -129,13 +130,27 @@ struct CleanupPane: View {
               .padding(.horizontal, 6).padding(.vertical, 2)
               .background(color(for: candidate.category).opacity(0.15))
               .clipShape(Capsule())
+            Button("Trash") {
+              Task { try? await store.cleanup.trash(candidate) }
+            }
+            .controlSize(.small)
           }
         }
       }
       Divider()
       HStack {
-        Button("Scan") { candidates = [] }
+        Button(scanning ? "Scanning…" : "Scan") {
+          Task {
+            scanning = true
+            await store.rescanOrphans()
+            scanning = false
+          }
+        }
+        .disabled(scanning)
+        .accessibilityIdentifier("pane.cleanup.scan")
         Spacer()
+        Text("\(store.orphans.count) candidate(s)")
+          .font(.caption).foregroundStyle(.secondary)
       }
       .padding()
     }

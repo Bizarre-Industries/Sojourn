@@ -1,11 +1,11 @@
 # Sojourn — application preference registry entry
 # Upstream source: Mackup (GPL-3.0-or-later),
-# https://github.com/lra/mackup/blob/master/mackup/applications/terminal.cfg
+# https://github.com/lra/mackup/blob/master/mackup/applications/navicat.cfg
 # Re-classified for Sojourn's plist-layer model per docs/ARCHITECTURE.md §8.
 
 [application]
-bundle_id = "com.apple.terminal"
-domain = "com.apple.terminal"
+bundle_id = "com.prect.navicat"
+domain = "com.prect.navicat"
 layer = "user"
 syncable = true
-display_name = "Terminal"
+display_name = "Navicat"

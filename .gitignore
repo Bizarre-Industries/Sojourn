@@ -75,6 +75,9 @@ coverage.out
 *.prof
 refs/
 
+# Registry conversion staging (lra/mackup clone)
+staging/
+
 # Bundled binaries (downloaded in build phase; tracked via release pipeline)
 Sojourn/Resources/bin/gitleaks
 Sojourn/Resources/bin/age

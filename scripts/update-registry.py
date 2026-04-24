@@ -59,6 +59,17 @@ def extract_domain(paths: list[str], bundle_id: str) -> str:
     return bundle_id
 
 
+def derive_bundle_id(prefs: list[str]) -> str | None:
+    """Pull a bundle ID out of the first Library/Preferences/*.plist path."""
+    for p in prefs:
+        if "library/preferences/" in p.lower() and p.endswith(".plist"):
+            leaf = p.rsplit("/", 1)[-1][: -len(".plist")]
+            # strip .LSSharedFileList and similar per-feature suffixes
+            if leaf.count(".") >= 2:
+                return leaf
+    return None
+
+
 def convert(cfg_path: Path, out_dir: Path, ref: str) -> Path | None:
     parser = configparser.ConfigParser(allow_no_value=True, strict=False)
     parser.read(cfg_path, encoding="utf-8")
@@ -66,14 +77,15 @@ def convert(cfg_path: Path, out_dir: Path, ref: str) -> Path | None:
     if "application" not in parser:
         return None
     name = parser["application"].get("name") or cfg_path.stem
-    bundle_id = parser["application"].get("bundle_id")
-    if not bundle_id:
-        return None
 
     prefs: list[str] = []
     for section in ("configuration_files", "xdg_configuration_files"):
         if section in parser:
             prefs.extend(k.strip() for k in parser[section] if k.strip())
+
+    bundle_id = parser["application"].get("bundle_id") or derive_bundle_id(prefs)
+    if not bundle_id:
+        return None
 
     domain = extract_domain(prefs, bundle_id)
     layer = classify_layer(prefs[0]) if prefs else "user"
@@ -114,9 +126,16 @@ def main(argv: list[str]) -> int:
             check=True,
         )
 
-    cfg_root = staging / "mackup" / "applications"
-    if not cfg_root.exists():
-        print(f"error: expected {cfg_root} to exist", file=sys.stderr)
+    # Mackup moved its sources from `mackup/applications` to
+    # `src/mackup/applications` circa 2024 — check both.
+    candidates = [
+        staging / "src" / "mackup" / "applications",
+        staging / "mackup" / "applications",
+    ]
+    cfg_root = next((c for c in candidates if c.exists()), None)
+    if cfg_root is None:
+        joined = ", ".join(str(c) for c in candidates)
+        print(f"error: no applications dir found (tried: {joined})", file=sys.stderr)
         return 1
 
     written = 0

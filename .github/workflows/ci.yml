@@ -80,3 +80,15 @@ jobs:
         run: brew install swiftlint
       - name: Lint
         run: swiftlint lint --strict --reporter github-actions-logging || true
+
+  format-check:
+    name: swift-format (advisory)
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install swift-format
+        run: brew install swift-format
+      - name: Check
+        run: |
+          swift-format lint --recursive Sojourn SojournTests SojournUITests \
+            --parallel --configuration .swift-format || true

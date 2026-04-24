@@ -68,9 +68,15 @@ internal actor SubprocessRunner {
     let exitBox = ExitBox()
     process.terminationHandler = { _ in exitBox.fire() }
 
+    SojournLog.subprocess.debug(
+      "run start tool=\(tool.lastPathComponent, privacy: .public) argc=\(args.count)"
+    )
     do {
       try process.run()
     } catch {
+      SojournLog.subprocess.error(
+        "spawn failed: \(error.localizedDescription, privacy: .public)"
+      )
       throw SubprocessError.spawnFailed(error.localizedDescription)
     }
 

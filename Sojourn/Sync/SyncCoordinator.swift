@@ -55,6 +55,10 @@ internal final class SyncCoordinator {
   // MARK: - Pull
 
   internal func pull(branch: String = "main") async {
+    let signpost = SojournSignpost.sync
+    let state = signpost.beginInterval("pull", id: signpost.makeSignpostID())
+    SojournLog.sync.info("pull start branch=\(branch, privacy: .public)")
+
     phase = .pulling
     do {
       _ = try await snapshots.capture(operation: .syncPull, sources: [repoURL])
@@ -69,26 +73,38 @@ internal final class SyncCoordinator {
         }
       }
       phase = .done(.syncPull)
+      SojournLog.sync.info("pull done")
     } catch {
       phase = .failed("pull failed: \(error)")
+      SojournLog.sync.error("pull failed: \(String(describing: error), privacy: .public)")
     }
+    signpost.endInterval("pull", state)
   }
 
   // MARK: - Push
 
   internal func push(branch: String = "main", message: String) async {
+    let signpost = SojournSignpost.sync
+    let state = signpost.beginInterval("push", id: signpost.makeSignpostID())
+    defer { signpost.endInterval("push", state) }
+    SojournLog.sync.info("push start branch=\(branch, privacy: .public)")
+
     phase = .scanningSecrets
     if let secrets {
       do {
         let findings = try await secrets.scanStaged(cwd: repoURL)
         let highConfidence = findings.filter(\.isHighConfidence)
         if !highConfidence.isEmpty {
+          SojournLog.secrets.error(
+            "blocked push: \(highConfidence.count) high-confidence finding(s)"
+          )
           phase = .failed(
             "\(highConfidence.count) high-confidence secret(s) — resolve via SecretFindingsModal"
           )
           return
         }
       } catch {
+        SojournLog.secrets.error("gitleaks failed: \(String(describing: error), privacy: .public)")
         phase = .failed("gitleaks failed: \(error)")
         return
       }

@@ -57,6 +57,11 @@ internal final class BootstrapService {
   internal static let probeTools = ["brew", "git", "mpm", "chezmoi", "age", "gitleaks"]
 
   internal func probe() async {
+    let signpost = SojournSignpost.bootstrap
+    let state0 = signpost.beginInterval("probe", id: signpost.makeSignpostID())
+    defer { signpost.endInterval("probe", state0) }
+    SojournLog.bootstrap.info("probe start")
+
     state = .probingSystem
     let resolutions = await locator.locateAll(Self.probeTools)
     let hasCLT = await locator.hasXcodeCLT()
@@ -65,6 +70,9 @@ internal final class BootstrapService {
       tools[name] = resolutions[name]?.url
     }
     let inv = BootstrapState.Inventory(tools: tools, hasCLT: hasCLT)
+    SojournLog.bootstrap.info(
+      "probe result: missing=\(inv.missing, privacy: .public) hasCLT=\(inv.hasCLT)"
+    )
     if inv.missing.isEmpty && inv.hasCLT {
       state = .ready
     } else {

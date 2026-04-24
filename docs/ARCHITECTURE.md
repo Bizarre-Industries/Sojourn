@@ -648,4 +648,53 @@ The full `CLAUDE.md` is committed at repo root. See [/CLAUDE.md](../CLAUDE.md) f
 
 ---
 
+## 17. Testing
+
+Sojourn's test contract is fixture-backed and Apple-first.
+
+- **Unit tests** — every `Service` actor ships with a `.mock(response:)`
+  factory that takes a `@Sendable (Args) -> Data` closure. Tests inject
+  fixture JSON/TOML from `SojournTests/Fixtures/`. No live brew, mpm,
+  chezmoi, or network calls in unit tests.
+- **Integration tests** — `SyncCoordinatorTests` spin up a local bare
+  git repo under `FileManager.default.temporaryDirectory` and drive a
+  full push cycle. `DeletionsDBTests` use a temp SQLite file. Nothing
+  outside of `FileManager.default.temporaryDirectory` is mutated.
+- **Snapshot-of-UI tests** (Phase 9) compare logical accessibility
+  snapshots, not raw screenshots. Every view that users navigate to has
+  an `.accessibilityIdentifier("…")` declared; UI tests assert on those
+  strings rather than pixels.
+- **No stdout-snapshot tests** — per CLAUDE.md, mpm/brew output is
+  unstable across minor versions.
+- **Coverage target** — unit + integration combined ≥ 75% line coverage
+  on `Sojourn/` excluding `UI/`. UI coverage is logical-accessibility
+  only.
+- **Test tooling** — Swift Testing (`import Testing`, `@Test`) for new
+  tests. Pre-existing XCTest stays. See [CONTRIBUTING.md](../CONTRIBUTING.md).
+
+## 18. Observability
+
+Logging is OSLog-first.
+
+- **Categories:** `sync`, `subprocess`, `bootstrap`, `secrets`,
+  `cleanup`, `ui`. Each service declares a `private static let log =
+  Logger(subsystem: "app.bizarre.sojourn", category: "<name>")`.
+- **Levels:** `.debug` for high-volume pipe chatter; `.info` for job
+  start/end; `.error` for recoverable failures; `.fault` for invariant
+  breaks (these also trigger a user-visible alert).
+- **User-exportable bundle:** Settings → Security tab offers "Export
+  diagnostics bundle" which writes `AppSupportPaths.logs/<ts>.json`
+  with the last 24h of OSLog entries + `AppStore.history`. Redacted
+  via gitleaks-like patterns before write.
+- **Signpost regions** (tentative v2): `os_signpost` around
+  `SyncCoordinator.pull` and `SyncCoordinator.push` so Instruments can
+  show per-phase wall-clock cost.
+- **Crash reports:** stay local (macOS submits to Apple; Sojourn never
+  collects them).
+- **Retention:** OSLog is Apple-managed; we do not explicitly rotate.
+  Diagnostics bundles under `AppSupportPaths.logs/` inherit the 30-day
+  GC policy that `BackupsDirectory` uses for snapshots.
+
+---
+
 *End of document. v0.1, April 2026. Revise after v1 ship; re-verify mpm, chezmoi, Homebrew, macOS Tahoe behaviors before each major release.*

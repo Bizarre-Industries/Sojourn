@@ -5,7 +5,13 @@ Thanks for the interest. Sojourn is GPL-3.0-or-later and actively accepts contri
 ## Before you start
 
 1. Read [CLAUDE.md](CLAUDE.md) — the invariants and "do not do" list apply to humans too.
-2. Read [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — especially §11 (module layout) and §13 (licensing). If your change conflicts with a listed invariant, open an issue for discussion first.
+2. Read [docs/reference/architecture.md](docs/reference/architecture.md) and
+   [docs/reference/modules.md](docs/reference/modules.md) (module layout). For
+   licensing, see [docs/decisions/0004-gpl-3-or-later.md](docs/decisions/0004-gpl-3-or-later.md)
+   and [docs/decisions/0001-ipc-not-linking.md](docs/decisions/0001-ipc-not-linking.md).
+   If your change conflicts with an ADR or
+   [docs/process/DOCS_POLICY.md](docs/process/DOCS_POLICY.md), open an issue
+   for discussion first.
 3. Make sure your `git` user info matches the commit you plan to sign: `git config user.email` and `git config user.name`. Sojourn requires Developer Certificate of Origin sign-offs (`git commit -s`).
 
 ## Development setup
@@ -60,7 +66,7 @@ No `Co-authored-by` trailers. No `Generated with Claude` trailers. Sign-off trai
 
 1. Open the PR against `main`.
 2. CI runs: `swift test`, `xcodebuild test`, `gitleaks`, CodeQL.
-3. A maintainer (see `MAINTAINERS.md` when it exists) reviews for architecture alignment with `docs/ARCHITECTURE.md` and invariants in `CLAUDE.md`.
+3. A maintainer (see [MAINTAINERS.md](MAINTAINERS.md)) reviews for architecture alignment with `docs/reference/architecture.md` + ADRs and invariants in `CLAUDE.md`.
 4. Squash-merge is default. Use merge-commit only when preserving a bisectable sequence matters.
 
 ## Things that will get your PR rejected fast
@@ -79,7 +85,11 @@ Open an issue with: macOS version, Xcode version, Sojourn version, reproduction 
 
 ## Security
 
-See [docs/SECURITY.md](docs/SECURITY.md) for the threat model. Report security-sensitive issues privately to the maintainer email in `SECURITY.md`, not in a public issue.
+See [SECURITY.md](SECURITY.md) at the repo root for the disclosure
+policy + [docs/explain/threat-model.md](docs/explain/threat-model.md)
+for the threat model (lands in Phase 8). Report security-sensitive
+issues privately to the maintainer email in `SECURITY.md`, not in a
+public issue.
 
 ## License
 

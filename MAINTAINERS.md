@@ -15,7 +15,9 @@ maintainer at the address above.
 
 Expected response time: 72 hours. Disclosure timeline: coordinated with
 reporter, default 90 days after a fixed release. See
-[docs/SECURITY.md](docs/SECURITY.md) for the full policy.
+[SECURITY.md](SECURITY.md) at the repo root for the disclosure policy +
+[docs/explain/threat-model.md](docs/explain/threat-model.md) for the
+threat model (lands in Phase 8 of the docs rework).
 
 ## Release authority
 
@@ -30,6 +32,8 @@ maintainer holds:
 
 ## Decision log
 
-Architectural decisions are tracked in PR descriptions and in
-[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). Material changes to the
-"Do not do" list in [CLAUDE.md](CLAUDE.md) require an explicit PR.
+Architectural decisions are tracked in
+[docs/decisions/](docs/decisions/) (immutable ADR log) and in
+[docs/reference/architecture.md](docs/reference/architecture.md).
+Material changes to the "Do not do" list in [CLAUDE.md](CLAUDE.md)
+require an explicit PR plus a new ADR if architectural.

@@ -4,7 +4,7 @@ Sojourn is GPL-3.0-or-later. Full license text in [/LICENSE](LICENSE).
 
 This file inventories every third-party component Sojourn ships with, links
 to, or invokes at runtime, per the policy in
-[docs/LICENSING.md](docs/LICENSING.md). It is regenerated on each release and
+[docs/reference/licensing.md](docs/reference/licensing.md). It is regenerated on each release and
 shipped alongside the notarized DMG.
 
 ## Bundled binaries (`Sojourn/Resources/bin/`)
@@ -20,7 +20,7 @@ repo.
 ## Invoked (not bundled)
 
 Discovered or installed on the user's system via the bootstrap flow described
-in [docs/BOOTSTRAP.md](docs/BOOTSTRAP.md). Sojourn invokes these as separate
+in [docs/reference/bootstrap-flow.md](docs/reference/bootstrap-flow.md). Sojourn invokes these as separate
 processes only (see
 [docs/LICENSING.md](docs/LICENSING.md#the-ipc-not-linking-invariant)).
 
@@ -36,14 +36,14 @@ processes only (see
 
 | Path | Source | License | Status |
 |---|---|---|---|
-| `Sojourn/Resources/data/applications/*.toml` | Derived from [lra/mackup](https://github.com/lra/mackup) | GPL-3.0-or-later | Fork, re-classified per [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). Mackup credited in each file header. |
+| `Sojourn/Resources/data/applications/*.toml` | Derived from [lra/mackup](https://github.com/lra/mackup) | GPL-3.0-or-later | Fork, re-classified per [docs/reference/architecture.md](docs/reference/architecture.md). Mackup credited in each file header. |
 | `Sojourn/Resources/data/gitleaks.toml` | Derived from gitleaks defaults | MIT (upstream) | Locally tuned. |
 | `Sojourn/Resources/data/dotfile_owners.toml` | Original to Sojourn | GPL-3.0-or-later | Hand-curated. |
 
 ## Swift packages
 
 Declared in [Package.swift](Package.swift) and [project.yml](project.yml).
-Minor-version pinned per [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+Minor-version pinned per [docs/reference/architecture.md](docs/reference/architecture.md).
 
 | Package | Upstream | License | Pinned version |
 |---|---|---|---|

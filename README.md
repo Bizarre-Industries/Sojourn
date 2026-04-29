@@ -13,9 +13,10 @@ and automatic cleanup of dotfile cruft from uninstalled tools.
 
 **v0.1 scaffold**, pre-alpha. Not yet shippable as a notarized DMG; the
 code landed per the phased implementation in
-[docs/IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md) and every
-subsystem is fixture-backed tested. See
-[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full spec.
+[docs/process/implementation-plan.md](docs/process/implementation-plan.md)
+and every subsystem is fixture-backed tested. See
+[docs/reference/architecture.md](docs/reference/architecture.md) for
+the full spec.
 
 ## Features (v0.1)
 
@@ -26,7 +27,7 @@ subsystem is fixture-backed tested. See
   auto-commit.
 - **Packages** via mpm: brew, cask, mas, pip, pipx, uvx, npm, yarn, cargo,
   gem, composer, vscode. Per-manager cooldown tiers (A–E) per
-  [docs/SECURITY.md](docs/SECURITY.md).
+  [docs/reference/cooldown-policy.md](docs/reference/cooldown-policy.md).
 - **Dotfiles** via chezmoi with ownership-registry-classified orphan
   cleanup.
 - **Preferences** via `defaults export` + `plutil -convert xml1`; no
@@ -63,16 +64,49 @@ make leaks             # gitleaks dir --config=.gitleaks.toml
 
 ## Docs
 
-- [Architecture](docs/ARCHITECTURE.md) — full design, subsystems, invariants.
-- [Implementation plan](docs/IMPLEMENTATION_PLAN.md) — phased delivery.
-- [Bootstrap flow](docs/BOOTSTRAP.md) — first-run state machine.
-- [Licensing](docs/LICENSING.md) — GPL-3.0-or-later, IPC-not-linking rationale.
-- [Security](docs/SECURITY.md) — secret scanning, cooldown, threat model.
-- [Supported managers](docs/SUPPORTED_MANAGERS.md) — coverage table + tiers.
-- [Conflicts](docs/CONFLICTS.md) — sync-merge shapes.
-- [Preference domains](docs/PREFS_DOMAINS.md) — plist layer model.
-- [Release runbook](docs/RELEASE.md) — maintainer-only.
-- [Future](docs/FUTURE.md) — v2 deferred scope + ideas.
+Sojourn's docs follow [Diátaxis](https://diataxis.fr) — start here:
+[docs/README.md](docs/README.md).
+
+**Reference** (look up exact facts):
+
+- [Architecture](docs/reference/architecture.md) — top-down system spec.
+- [Modules](docs/reference/modules.md) — Sojourn/ directory layout.
+- [Bootstrap flow](docs/reference/bootstrap-flow.md) — first-run state machine.
+- [Sync model](docs/reference/sync-model.md) — push/pull semantics.
+- [Cooldown policy](docs/reference/cooldown-policy.md) — supply-chain tiers.
+- [Conflict shapes](docs/reference/conflict-shapes.md) — sync-merge shapes.
+- [Preference sync](docs/reference/preference-sync.md) +
+  [Preference domains](docs/reference/preference-domains.md) — plist round-trip.
+- [Cleanup](docs/reference/cleanup.md) — orphan detection.
+- [Licensing](docs/reference/licensing.md) — GPL-3.0-or-later, IPC-not-linking.
+- [Testing](docs/reference/testing.md), [Observability](docs/reference/observability.md).
+- [Backends](docs/reference/backends/) — mpm, chezmoi, gitleaks, git.
+- [Managers](docs/reference/managers/) — per-manager pages + matrix.
+- [Externals](docs/reference/externals.md), [SSH config](docs/reference/ssh-config.md),
+  [Secret brokers](docs/reference/secret-brokers.md),
+  [Extra config](docs/reference/extra-config.md),
+  [Plugin protocol](docs/reference/plugin-protocol.md).
+
+**Explain** (understand the why):
+
+- [Why Sojourn](docs/explain/competitive-landscape.md),
+  [Risks](docs/explain/risks.md),
+  [Why no symlink prefs](docs/explain/why-no-symlink-prefs.md),
+  [State management](docs/explain/state-management.md),
+  [Future work](docs/explain/future-work.md).
+
+**Decisions** (immutable ADR log):
+
+- [Decisions index](docs/decisions/README.md) — 14 ADRs.
+
+**Process** (contributor/maintainer):
+
+- [Implementation plan](docs/process/implementation-plan.md) — phases 0–14.
+- [Audit 2026-04](docs/process/audit-2026-04.md) — gap analysis.
+- [Open questions](docs/process/open-questions.md) — deferred to maintainer.
+- [Release](docs/process/release.md), [Docs policy](docs/process/DOCS_POLICY.md).
+
+**Security** policy: [SECURITY.md](SECURITY.md) at repo root.
 
 ## Contributing
 

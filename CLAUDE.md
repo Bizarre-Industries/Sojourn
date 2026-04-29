@@ -104,30 +104,8 @@ and app-preference sync across Macs. It is a GUI layer over `mpm`, `chezmoi`,
 
 ## How to add support for a new package manager
 
-mpm already covers the reliable set (brew, cask, mas, pip, pipx, npm, cargo,
-gem, composer, yarn, vscode, uvx). To add one that mpm does not support (e.g.,
-`pnpm`):
-
-1. Add a `PackageManager` case in `Models/PackageManager.swift` with id, name,
-   CLI binary name, typical install path candidates.
-2. Add detection logic in `ToolLocator` with hardcoded candidate paths.
-3. If the manager is supported by mpm: add it to the list of managers
-   `MPMService` fans out to. No new code.
-4. If the manager is NOT supported by mpm: create `PnpmService` actor
-   parallel to `MPMService`. Implement the minimum surface: `installed()`,
-   `outdated()`, `install(pkgs:)`, `remove(pkgs:)`, `upgrade(pkgs:)`. Return
-   the same `ManagerSnapshot` shape.
-5. Wire into `PackageStore` aggregation so UI sees uniform results.
-6. Add a classification to the auto-update tier table in `Settings.swift`
-   (default: "User prompt" if unknown risk profile).
-7. Add golden fixtures under `SojournTests/Fixtures/<manager>-*.json`.
-8. Update `data/applications/README.md` with the new manager's signature files
-   (lockfiles, config paths) so orphan detection can factor it in.
-9. Add to `BootstrapService` as an on-demand install option (don't install
-   upfront).
-10. Document in `docs/SUPPORTED_MANAGERS.md`.
-
-Do not add a new manager without steps 6, 7, and 9.
+See [docs/how-to/development/add-package-manager.md](docs/how-to/development/add-package-manager.md)
+for the full flow (mpm-covered vs not, native actor vs plugin).
 
 ## Releasing
 

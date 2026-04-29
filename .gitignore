@@ -59,8 +59,8 @@ notarize-*.json
 .claude-plans/
 .remember/
 .task/
-CLAUDE.md
 LESSONS.md
+CLAUDE.md
 
 # Secrets / env
 *.secret

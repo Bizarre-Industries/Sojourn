@@ -132,6 +132,7 @@ Do not add a new manager without steps 6, 7, and 9.
 ## Releasing
 
 Tags `v*` trigger `notarize.yml`. The workflow:
+
 1. Builds Sojourn.app with Xcode.
 2. Re-signs bundled `gitleaks` and `age` with `--options=runtime`.
 3. Codesigns Sojourn.app with Developer ID Application.

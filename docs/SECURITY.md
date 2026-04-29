@@ -20,7 +20,7 @@ Hard rules:
 
 - **Tier A (mas)**: auto, 0 cooldown. Apple reviews.
 - **Tier B (brew formulae, cargo)**: auto, 7 day cooldown.
-- **Tier C (casks, pinned pip/uv project deps)**: user prompt, 3–7 day cooldown.
+- **Tier C (casks, pinned pip/uv project deps)**: user prompt, 7 day cooldown.
 - **Tier D (global pip/pipx)**: user prompt, 7 day cooldown.
 - **Tier E (global npm)**: **never auto-update silently**, 14 day cooldown, user must approve each version.
 

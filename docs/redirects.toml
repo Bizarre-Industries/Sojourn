@@ -1,0 +1,68 @@
+# Sojourn docs redirects map
+#
+# Machine-readable record of every doc that moved during the Diátaxis
+# restructure. CI uses this to allowlist redirect stubs in markdown-link-check.
+# Stubs at the `from` path will be removed at the `sunset_version` release.
+#
+# Schema:
+#   [[redirect]]
+#   from = "<repo-relative path>"
+#   to = "<repo-relative path>"
+#   sunset_version = "vX.Y"
+#   phase = <0-9>      # which restructure phase moved it
+#   note = "<optional>"
+#
+# Add entries when moving files; never delete entries until the sunset_version
+# ships and the stub is removed.
+
+# Phase 2 — verbatim moves
+#
+[[redirect]]
+from = "docs/PREFS_DOMAINS.md"
+to = "docs/reference/preference-domains.md"
+sunset_version = "v0.3"
+phase = 2
+
+[[redirect]]
+from = "docs/CONFLICTS.md"
+to = "docs/reference/conflict-shapes.md"
+sunset_version = "v0.3"
+phase = 2
+
+[[redirect]]
+from = "docs/LICENSING.md"
+to = "docs/reference/licensing.md"
+sunset_version = "v0.3"
+phase = 2
+
+[[redirect]]
+from = "docs/RELEASE.md"
+to = "docs/process/release.md"
+sunset_version = "v0.3"
+phase = 2
+
+[[redirect]]
+from = "docs/AUDIT.md"
+to = "docs/process/audit-2026-04.md"
+sunset_version = "n/a"   # was untracked; no public refs
+phase = 2
+note = "Originally untracked; archived under process/ per audit retention policy."
+
+# Phase 3 — ARCHITECTURE.md split + BOOTSTRAP.md merge
+#
+# ARCHITECTURE.md is preserved at _legacy_architecture.md so `git log --follow`
+# walks the rename history. The stub at the original path maps every old §X
+# anchor to its new home so external blog links keep working.
+
+[[redirect]]
+from = "docs/ARCHITECTURE.md"
+to = "docs/reference/architecture.md"   # primary destination; full anchor map in stub body
+sunset_version = "v0.4"
+phase = 3
+note = "Long stub with anchor map. High inbound-link density; one minor later sunset than other Phase 2/3 stubs."
+
+[[redirect]]
+from = "docs/BOOTSTRAP.md"
+to = "docs/reference/bootstrap-flow.md"
+sunset_version = "v0.3"
+phase = 3

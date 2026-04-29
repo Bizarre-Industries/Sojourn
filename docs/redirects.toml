@@ -75,3 +75,12 @@ to = "docs/reference/managers/README.md"
 sunset_version = "v0.3"
 phase = 5
 note = "Coverage matrix + 18 per-manager detail pages. Adding-a-manager section moved to how-to/development/."
+
+# Phase 6 — IMPLEMENTATION_PLAN rewrite + open-questions
+
+[[redirect]]
+from = "docs/IMPLEMENTATION_PLAN.md"
+to = "docs/process/implementation-plan.md"
+sunset_version = "v0.3"
+phase = 6
+note = "Rewritten with phases 10-14 (audit-driven). Old phases 0-9 stay; audit slot-ins added. open-questions.md tracks AUDIT §8 maintainer decisions."

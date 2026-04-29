@@ -84,3 +84,12 @@ to = "docs/process/implementation-plan.md"
 sunset_version = "v0.3"
 phase = 6
 note = "Rewritten with phases 10-14 (audit-driven). Old phases 0-9 stay; audit slot-ins added. open-questions.md tracks AUDIT §8 maintainer decisions."
+
+# Phase 7 — root SECURITY.md + CODE_OF_CONDUCT.md + threat model split
+
+[[redirect]]
+from = "docs/SECURITY.md"
+to = "docs/explain/threat-model.md"
+sunset_version = "v0.3"
+phase = 7
+note = "Split: disclosure policy moved to root SECURITY.md (GH-recognized); substantive threat model moved to docs/explain/threat-model.md."

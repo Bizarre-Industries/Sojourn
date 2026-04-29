@@ -66,3 +66,12 @@ from = "docs/BOOTSTRAP.md"
 to = "docs/reference/bootstrap-flow.md"
 sunset_version = "v0.3"
 phase = 3
+
+# Phase 5 — net-new audit docs + per-manager pages
+
+[[redirect]]
+from = "docs/SUPPORTED_MANAGERS.md"
+to = "docs/reference/managers/README.md"
+sunset_version = "v0.3"
+phase = 5
+note = "Coverage matrix + 18 per-manager detail pages. Adding-a-manager section moved to how-to/development/."

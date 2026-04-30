@@ -13,7 +13,7 @@ concurrency:
 jobs:
   swift-test:
     name: swift test
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
 
@@ -36,7 +36,7 @@ jobs:
 
   xcodebuild:
     name: xcodebuild test
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
 
@@ -72,16 +72,22 @@ jobs:
         with:
           fetch-depth: 0
 
+      # Use the gitleaks binary directly. The marketplace action requires
+      # a paid license for organization repos as of 2024-08; the binary
+      # is unaffected (MIT licensed) and exits non-zero on findings.
+      - name: Install gitleaks
+        run: |
+          GITLEAKS_VERSION=8.30.1
+          curl -fsSL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" \
+            | tar -xz -C /usr/local/bin gitleaks
+          gitleaks version
+
       - name: Run gitleaks
-        uses: gitleaks/gitleaks-action@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          config-path: .gitleaks.toml
+        run: gitleaks dir --config=.gitleaks.toml --verbose
 
   lint:
     name: SwiftLint (advisory)
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
       - name: Install swiftlint
@@ -91,7 +97,7 @@ jobs:
 
   format-check:
     name: swift-format (advisory)
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
       - name: Install swift-format

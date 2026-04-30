@@ -8,7 +8,7 @@ on:
 jobs:
   build-sign-notarize:
     name: Build, sign, notarize
-    runs-on: macos-14
+    runs-on: macos-15
     environment: release
     steps:
       - uses: actions/checkout@v4

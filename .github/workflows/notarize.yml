@@ -73,6 +73,9 @@ jobs:
       - name: Download bundled binaries (gitleaks, age)
         env:
           STRICT_CHECKSUMS: "1"
+          GITLEAKS_CONFIG: .gitleaks.toml
+          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: bash scripts/download-bundled-bins.sh
 
       - name: Re-sign bundled binaries

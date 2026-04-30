@@ -1,25 +1,21 @@
 #!/usr/bin/env bash
-# scripts/notarize.sh -- submit the DMG to Apple notary and staple.
-# Requires env: APPLE_ID, APPLE_APP_SPECIFIC_PASSWORD, DEVELOPMENT_TEAM.
-
 set -euo pipefail
 
 DMG="${1:?usage: notarize.sh <path/to/Sojourn.dmg>}"
 
-: "${APPLE_ID:?APPLE_ID is required}"
-: "${APPLE_APP_SPECIFIC_PASSWORD:?APPLE_APP_SPECIFIC_PASSWORD is required}"
-: "${DEVELOPMENT_TEAM:?DEVELOPMENT_TEAM is required}"
+: "${APPSTORE_API_KEY_ID:?required}"
+: "${APPSTORE_API_ISSUER_ID:?required}"
+: "${APPSTORE_API_KEY_P8:?required}"
 
-echo "submitting $DMG to notary service..."
+KEY_FILE="$(mktemp -t sojourn-notary.XXXX).p8"
+trap 'rm -f "$KEY_FILE"' EXIT
+printf '%s' "$APPSTORE_API_KEY_P8" > "$KEY_FILE"
+
 xcrun notarytool submit "$DMG" \
-  --apple-id "$APPLE_ID" \
-  --password "$APPLE_APP_SPECIFIC_PASSWORD" \
-  --team-id "$DEVELOPMENT_TEAM" \
-  --wait \
-  --timeout 30m
+  --key "$KEY_FILE" \
+  --key-id "$APPSTORE_API_KEY_ID" \
+  --issuer "$APPSTORE_API_ISSUER_ID" \
+  --wait --timeout 30m
 
-echo "stapling ticket to $DMG..."
 xcrun stapler staple "$DMG"
 xcrun stapler validate "$DMG"
-
-echo "notarization complete."

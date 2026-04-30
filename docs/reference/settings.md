@@ -37,7 +37,8 @@ expand as `SettingsStore` lands new keys.
 | `sync.cooldown_default_days` | `7` | `0`–`30` | Tier-A through Tier-D base cooldown. ADR-0003. |
 | `sync.cooldown_npm_days` | `14` | `7`–`30` | Tier-E (global npm) override. |
 | `sync.advisory_bypass_enabled` | `true` | bool | Allow OSV/GHSA to skip cooldown for known-vulnerable installed versions. |
-| `sync.background_refresh_interval_hours` | `1` | `0.25`–`24` | `NSBackgroundActivityScheduler` cadence for `mpm outdated` + advisory fetch. |
+| `mpm.outdated_refresh_hours` | `1` | `0.25`–`24` | `NSBackgroundActivityScheduler` cadence for `mpm outdated`. |
+| `network.osv_refresh_interval_hours` | `6` | `1`–`24` | OSV/GHSA advisory feed cadence. 6h cuts worst-case staleness vs the 24h in v0.1; see [reference/cooldown-policy.md](cooldown-policy.md) and [process/open-questions.md](../process/open-questions.md) §7 (closed). |
 | `sync.preview_default_layout` | `side-by-side` | `side-by-side` \| `unified` | Default diff layout. |
 | `sync.confirm_before_apply` | `true` | bool | Require explicit confirm even after preview. |
 
@@ -49,6 +50,18 @@ expand as `SettingsStore` lands new keys.
 | `scan.allow_low_confidence_bypass` | `true` | bool | If false, even entropy-only findings need user click. |
 | `scan.user_rules_path` | `<data-repo>/.gitleaks.toml` | path | Override file merged with bundled rules. |
 
+### Secret brokers
+
+ADR-0011 + ADR-0016. Cache + timeout exist to keep `chezmoi apply` from
+stalling on transient 1Password unreachability.
+
+| Key | Default | Range | Notes |
+|---|---|---|---|
+| `secret_broker.read_timeout_seconds` | `5` | `1`–`60` | Per-secret timeout for broker reads (`op`, `bw`, `keyring`, etc.). |
+| `secret_broker.cache_ttl_days` | `7` | `0`–`90` | Per-secret last-success cache TTL in Keychain. `0` disables cache. |
+| `secret_broker.cache_fallback_enabled` | `true` | bool | On read timeout, serve cached value with banner. False = fail-closed. |
+| `secret_broker.preferred` | (auto) | `1password` \| `keychain` \| `age` \| `prompt` | First-run prompt sets this. |
+
 ### Cleanup
 
 | Key | Default | Range | Notes |
@@ -59,10 +72,18 @@ expand as `SettingsStore` lands new keys.
 
 ### History
 
+ADR-aligned with [process/open-questions.md](../process/open-questions.md) §5
+(closed): `history.db` is forensic data, not recoverability data, so the
+retention horizon is the attack window (see
+[explain/threat-model.md](../explain/threat-model.md) — xz-style multi-year
+infiltration cases need 12–24 month lookback).
+
 | Key | Default | Range | Notes |
 |---|---|---|---|
-| `history.retention_days` | `30` | `7`–`365` | `history.db` row retention. Open question — see [process/open-questions.md](../process/open-questions.md) §5. |
+| `history.retention_days_jobs` | `365` | `30`–`3650` | `jobs` row retention. ~700KB/year at 5 ops/day; trivial cost. |
+| `history.retention_days_logs` | `90` | `7`–`365` | `job_logs` row retention. Heavier; capped further by `max_log_lines_per_job`. |
 | `history.max_log_lines_per_job` | `10000` | `1000`–`100000` | Per-job log truncation. |
+| `history.max_db_size_mb` | `500` | `100`–`5000` | Hard backstop. Oldest-first eviction across both tables when exceeded. |
 
 ### UI
 
@@ -76,7 +97,8 @@ expand as `SettingsStore` lands new keys.
 
 | Key | Default | Range | Notes |
 |---|---|---|---|
-| `network.osv_endpoint` | `https://api.osv.dev` | URL | OSV advisory feed. |
+| `network.osv_endpoint` | `https://api.osv.dev` | URL | OSV advisory query API (per-package lookups). |
+| `network.osv_modified_id_base_url` | `https://storage.googleapis.com/osv-vulnerabilities` | URL | OSV per-ecosystem `modified_id.csv` delta-fetch base. |
 | `network.timeout_seconds` | `30` | `5`–`300` | Default network timeout. |
 | `network.subprocess_timeout_seconds` | `90` | `5`–`600` | Per-subprocess timeout. |
 
@@ -84,7 +106,7 @@ expand as `SettingsStore` lands new keys.
 
 | Key | Default | Range | Notes |
 |---|---|---|---|
-| `diagnostics.bundle_includes_history_db` | `true` | bool | Copy `history.db` into the export bundle. |
+| `diagnostics.bundle_includes_history_db` | `true` | bool | Copy `history.db` into the export bundle. With 365d job retention this carries useful debugging history; previous 30d default made the bundle near-useless for week-old reports. |
 | `diagnostics.bundle_includes_deletions_db` | `true` | bool | Copy `deletions.db` into the export bundle. |
 | `diagnostics.redact_paths_in_export` | `true` | bool | Apply path-redaction rules ([explain/observability.md](../explain/observability.md)). |
 
@@ -117,6 +139,10 @@ Service: `app.bizarre.sojourn`. Items:
 | `age-recipient-public-key` | public key | Per-Mac identity for `age` encryption. |
 | `age-identity-private-key` | private key | Owner-only ACL. Required on import. |
 
+Companion service: `app.bizarre.sojourn.secret-cache` (per-secret broker
+cache, ADR-0016). Owner-only ACL. Cache entries keyed by template-function
+call site hash.
+
 Sojourn never stores git credentials in this Keychain service — it
 inherits the user's existing `git-credential-osxkeychain` items.
 
@@ -127,5 +153,7 @@ inherits the user's existing `git-credential-osxkeychain` items.
 - [explain/threat-model.md](../explain/threat-model.md) — secret
   material handling.
 - [reference/cooldown-policy.md](cooldown-policy.md) — cooldown
-  setting effects.
+  setting effects + OSV refresh mechanism.
+- [reference/secret-brokers.md](secret-brokers.md) — broker order +
+  cache details.
 - [reference/cli.md](cli.md) — eventual CLI flag mapping.

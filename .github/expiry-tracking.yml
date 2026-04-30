@@ -1,0 +1,86 @@
+# Tracked secret/cert expiry items for the Phase 12 expiry-check workflow.
+#
+# Schema validated by .github/scripts/check-expiry.py --validate
+# (run as part of `make ci-local` to catch errors before commit).
+#
+# Each item:
+#   id                unique snake_case identifier (used in issue titles)
+#   description       human-readable; shown in issue body
+#   query             apple_cert | github_pat | manual
+#   apple_cert_type   when query=apple_cert: certificate type filter
+#                     (DEVELOPER_ID_APPLICATION, DEVELOPMENT, DISTRIBUTION,
+#                     DEVELOPER_ID_KEXT, MAC_APP_DISTRIBUTION,
+#                     MAC_INSTALLER_DISTRIBUTION, …)
+#   manual_expiry     when query=manual: ISO-8601 date (YYYY-MM-DD)
+#   thresholds        days at which to open/escalate; default [60, 30, 14, 7, 0]
+#   rotation_notes    free text; shown in issue body so the rotation
+#                     instructions are right where they're needed
+
+items:
+  - id: developer_id_app_cert
+    description: Developer ID Application certificate (codesigning)
+    query: apple_cert
+    apple_cert_type: DEVELOPER_ID_APPLICATION
+    rotation_notes: |
+      1. Xcode → Settings → Accounts → team → Manage Certificates → +
+         → Developer ID Application
+      2. Re-export .p12 (`docs/process/maintainer-setup.md` Phase 6)
+      3. base64-encode: `base64 -i ~/Desktop/dev-id.p12 | pbcopy`
+      4. `gh secret set DEVELOPER_ID_P12_BASE64 --body "$(pbpaste)"`
+      5. `gh secret set DEVELOPER_ID_P12_PASSWORD --body "<new-pw>"`
+      6. Update DEVELOPER_ID_IDENTITY if cert serial changed:
+         `security find-identity -v -p codesigning`
+      7. Update 1Password vault item with new dates
+      8. `gh workflow run expiry-check.yml` to verify auto-close
+
+  - id: homebrew_tap_pat
+    description: HOMEBREW_TAP_TOKEN — fine-grained PAT for tap repo
+    query: github_pat
+    rotation_notes: |
+      1. https://github.com/settings/personal-access-tokens/new
+      2. Token name: "Sojourn release → homebrew-sojourn"
+      3. Resource owner: Bizarre-Industries
+      4. Repository access: Only homebrew-sojourn
+      5. Permissions: Contents read+write, Metadata read
+      6. Expiration: 1 year
+      7. `gh secret set HOMEBREW_TAP_TOKEN --body "<new-token>"`
+      8. Update 1Password vault item with new dates
+      9. Revoke the old token at the same URL
+      10. `gh workflow run expiry-check.yml` to verify auto-close
+
+  - id: appstore_connect_api_key
+    description: App Store Connect API key for notarytool + expiry checks
+    query: manual
+    manual_expiry: "2031-04-30"  # 5y rotation cadence; key has no real expiry
+    thresholds: [90, 30, 7, 0]   # longer thresholds; rotation isn't urgent
+    rotation_notes: |
+      App Store Connect API keys don't expire. This item tracks
+      maintainer-set rotation cadence (recommended 5y).
+
+      1. https://appstoreconnect.apple.com/access/integrations/api
+      2. Generate new key, role Developer
+      3. Download .p8 (one-time)
+      4. Note new Key ID + Issuer ID
+      5. `gh secret set APPSTORE_API_KEY_ID --body "<new-id>"`
+      6. `gh secret set APPSTORE_API_ISSUER_ID --body "<issuer>"`  # rarely changes
+      7. `gh secret set APPSTORE_API_KEY_P8 < ~/Downloads/AuthKey_<new-id>.p8`
+      8. Revoke old key at same URL
+      9. Update manual_expiry in this YAML and commit
+      10. Update 1Password vault item
+
+  - id: developer_program_membership
+    description: Apple Developer Program enrollment
+    query: manual
+    manual_expiry: "2027-04-30"  # set to your renewal date; auto-renew if billing current
+    thresholds: [30, 14, 7, 0]   # short — Apple notifies, but redundancy is good
+    rotation_notes: |
+      1. https://developer.apple.com/account/membership
+      2. Verify auto-renew is on; verify card on file
+      3. If renewing manually, complete the renewal flow
+      4. Update manual_expiry in this YAML and commit
+      5. Update 1Password vault item
+
+# Issues opened in the last N days are not re-opened for the same item
+# even if the API still reports the old expiry (deals with API caching
+# delays after rotation).
+last_rotation_grace_days: 7

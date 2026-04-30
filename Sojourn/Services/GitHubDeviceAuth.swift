@@ -55,7 +55,7 @@ internal struct GitHubTokenResponse: Sendable, Codable {
 }
 
 internal actor GitHubDeviceAuth {
-  internal static let clientID = "SOJOURN_OAUTH_CLIENT_ID_PLACEHOLDER"
+  internal static let clientID = "Ov23liJHlZmTgqGBZRSe"
   internal static let keychainService = "app.bizarre.sojourn"
   internal static let keychainAccount = "github-device"
 

@@ -77,8 +77,10 @@ Keychain-stored token.
 [reference/sync-model.md](../reference/sync-model.md). `CooldownGate`
 with OSV advisory bypass per
 [reference/cooldown-policy.md](../reference/cooldown-policy.md).
-`BackgroundActivity` with `NSBackgroundActivityScheduler`
-(`app.bizarre.sojourn.refresh-outdated`, 1h/15m tolerance).
+`BackgroundActivity` with `NSBackgroundActivityScheduler`. Two
+scheduled tasks: `app.bizarre.sojourn.refresh-outdated` (1h cadence)
+and `app.bizarre.sojourn.refresh-advisories` (6h cadence; per
+[process/open-questions.md](open-questions.md) §7 closeout).
 
 **Audit slot-in §2.5.1**: write default `.chezmoiignore` boilerplate
 (`known_hosts*`, `.DS_Store`, `*.swp`) on first push.
@@ -101,7 +103,7 @@ tests. (Audit GUI gaps §4 land progressively in phases 11–14.)
 
 ## Phase 7 — Release pipeline
 
-Real `download-bundled-bins.sh` (gitleaks + age via `gh release download`,
+Real `download-bundled-bins.sh` (gitleaks + age + cosign via `gh release download`,
 codesign `--options=runtime`). Real sign/notarize/dmg/cask scripts. CI
 workflows: ci.yml (swift test + xcodebuild test + gitleaks), notarize.yml
 (tag-triggered full release), codeql.yml weekly. MAINTAINERS.md,
@@ -132,7 +134,7 @@ Audit §3.2 protocols. Introduce:
   (`MPMService`, future `BrewService`/`CaskService`/`MasService`) conform.
 - `DotfileBackend` — `chezmoi`-shaped surface; future-proofs alternates.
 - `PrefBackend` — `defaults`-shaped surface; future-proofs alternates.
-- `SecretBroker` — backs ADR-0011; per-provider actors conform.
+- `SecretBroker` — backs ADR-0011 + ADR-0016; per-provider actors conform.
 - `BackendRegistry` — discovers + dispatches per `ManagerID`. Hybrid:
   protocol-witness for compile-time built-ins, actor-with-discovery for
   runtime plugins.
@@ -157,9 +159,12 @@ Audit §3.1. Land the module-level changes:
 - §3.1.5 New `Diagnostics/` module — `LogExporter`, `Redactor`,
   `DiagnosticBundle`.
 - §3.1.6 Split `Job` (in-flight) from `HistoryEntry` (persisted). History
-  → SQLite (`history.db`). Audit §3.3.1.
-- §3.1.7 New `Secrets/` module — backs ADR-0011.
-- §3.1.9 New `Plugins/` module — backs ADR-0013.
+  → SQLite (`history.db`). Audit §3.3.1. Retention per
+  [process/open-questions.md](open-questions.md) §5: `jobs` 365d,
+  `job_logs` 90d, 500MB cap.
+- §3.1.7 New `Secrets/` module — backs ADR-0011 + ADR-0016. Cache layer
+  in Keychain (`app.bizarre.sojourn.secret-cache`).
+- §3.1.9 New `Plugins/` module — backs ADR-0013 + ADR-0015.
 
 ## Phase 12 — mpm + chezmoi feature gap (v1.x)
 
@@ -168,10 +173,11 @@ Sojourn doesn't surface:
 
 - §2.1.1 Wire `mpm sbom --cyclonedx` into every push. Commit
   `sbom.cyclonedx.json` alongside `packages.toml`. Cross-reference with
-  OSV.
+  OSV (delta-fetch via `modified_id.csv` per
+  [reference/cooldown-policy.md](../reference/cooldown-policy.md)).
 - §2.1.2 PURL specifiers (`pkg:npm/left-pad`) in `packages.toml`
   per-machine override schema.
-- §2.1.3 `mpm sync` (registry metadata refresh) wired into daily
+- §2.1.3 `mpm sync` (registry metadata refresh) wired into the hourly
   background activity.
 - §2.2.1 `.chezmoiexternal.toml` first-class UX. See
   [reference/externals.md](../reference/externals.md). Pane: §4.1.1.
@@ -185,13 +191,21 @@ Sojourn doesn't surface:
   §4.1.5.
 - §2.2.14 `chezmoi update` wrap (refreshes externals).
 
+**Discover pane (§1.5 / §4.2.9 / §4.2.10): deferred to v1.1.** Spec at
+[explain/discover-pane.md](../explain/discover-pane.md) (record-session
+mode, not cfprefsd watcher) per
+[process/open-questions.md](open-questions.md) §4 closeout. Phase 12
+otherwise unblocked.
+
 ## Phase 13 — Native backends + extra config (v1.x; closes ADR-0010)
 
 Audit §2.3, §2.4. Build the native backends + capture extra config
 surfaces:
 
-- §2.3 Native `BrewService`, `CaskService`, `MasService` per
+- §2.3 Native `BrewService`, `CaskService` per
   [decisions/0010-native-brew-keep-mpm.md](../decisions/0010-native-brew-keep-mpm.md).
+  Native `MasService` opportunistic (~80 LOC; ships with brew/cask, not a
+  separate milestone).
 - §2.4.1 Brew taps capture + UI subsection.
 - §2.4.2 Brew services capture + UI subsection (running/loaded/stopped).
 - §2.4.3 LaunchAgents promoted from cleanup orphan to first-class
@@ -200,24 +214,36 @@ surfaces:
 - §2.4.8 Tool version managers (mise, asdf, rustup, sdkman, volta) as
   dotfile-classified.
 
+**Native `CargoService` dropped** per
+[process/open-questions.md](open-questions.md) §1: cargo is a wash vs
+mpm (audit §2.3) and does not validate the plugin protocol — that's the
+job of the `mise` reference plugin in Phase 14. Re-evaluated for v1.x if
+dotfile-classification of `~/.cargo/config.toml` proves insufficient.
+
 ## Phase 14 — Plugin host + secret broker (v1.x; promotes ADR-0011 + ADR-0013)
 
 Audit §2.6, §2.7. Build the extension surface + secret-broker abstraction:
 
-- §2.6 Secret broker abstraction per ADR-0011. Detection ladder
-  (1Password → Bitwarden → Keychain → age → plaintext refused).
-  "Insert secret reference" wizard. Common configs (`.aws/credentials`,
-  `.npmrc`, etc.) become `op://` references by default.
+- §2.6 Secret broker abstraction per ADR-0011 + ADR-0016. Detection
+  ladder (1Password → Keychain → age → plaintext refused). Bitwarden
+  deferred to v1.1+. Per-secret cache in Keychain
+  (`app.bizarre.sojourn.secret-cache`). `read_timeout_seconds` default
+  5. First-run prompt for default broker. "Insert secret reference"
+  wizard. Common configs (`.aws/credentials`, `.npmrc`, etc.) become
+  `op://` references by default.
 - §2.7 Plugin protocol per
   [reference/plugin-protocol.md](../reference/plugin-protocol.md). JSON-RPC
-  over stdio. cosign signature verification. Reference plugins: mise,
-  gh extension, krew/helm-plugin.
+  over stdio. **Keyless cosign verification by default** per ADR-0015,
+  static-key fallback. Reference plugins: `mise` (first; protocol
+  validator), `gh extension` (shape-flexibility test), `krew` /
+  `helm-plugin` (k8s users).
 - §3.4 Plugin host module (already created in Phase 11).
 - §4.1.11 Plugins pane in UI.
 
 Promotes [decisions/0011-secret-broker-abstraction.md](../decisions/0011-secret-broker-abstraction.md)
 and [decisions/0013-out-of-process-plugins.md](../decisions/0013-out-of-process-plugins.md)
-to Accepted.
+to Accepted. ADR-0015 + ADR-0016 + ADR-0017 already Accepted as of
+2026-04-30.
 
 ---
 
@@ -239,10 +265,12 @@ to Accepted.
 | `SMAppService.agent` (background-only LaunchAgent) | [process/future.md](../process/future.md) |
 | Mac App Store distribution | sandbox conflicts with subprocess invocation |
 | Non-macOS platforms | [decisions/0014-no-linux-no-helling-plugin.md](../decisions/0014-no-linux-no-helling-plugin.md) |
-| Hosted backend | local-only by design |
-| Discover pane (cfprefsd watcher) | [process/open-questions.md](open-questions.md) §4 — maintainer decision |
+| Discover pane (record-session mode) | v1.1 — spec at [explain/discover-pane.md](../explain/discover-pane.md) |
+| Bitwarden secret broker | v1.1+ — protocol surface ready, [decisions/0016-secret-broker-order-and-cache.md](../decisions/0016-secret-broker-order-and-cache.md) |
+| Native `CargoService` | v1.x re-evaluation only — see [process/open-questions.md](open-questions.md) §1 |
 
 ## Open questions
 
-Decisions deferred to the maintainer block phases 12–14 progress. Tracked
-in [process/open-questions.md](open-questions.md).
+All eight audit §8 questions closed 2026-04-30. See
+[process/open-questions.md](open-questions.md) for the closeout record
+and which ADRs (0015, 0016, 0017) anchor the decisions.

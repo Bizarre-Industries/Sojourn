@@ -23,7 +23,6 @@ DerivedData/
 # Swift Package Manager
 .build/
 Packages/
-Package.resolved
 .swiftpm/
 .netrc
 
@@ -92,3 +91,4 @@ Sojourn/Resources/bin/age
 # Docs how-to subdir; not the same as Swift packages
 !docs/how-to/packages/
 !docs/how-to/packages/*
+Sojourn/Config/local.xcconfig

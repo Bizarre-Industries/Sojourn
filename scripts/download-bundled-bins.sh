@@ -86,3 +86,27 @@ mv "$TMP/age/age" "$BIN_DIR/age"
 chmod +x "$BIN_DIR/age"
 
 echo "downloaded and extracted to $BIN_DIR"
+
+COSIGN_VERSION="3.0.3"  # or latest stable; check https://github.com/sigstore/cosign/releases
+
+case "$ARCH" in
+  arm64)
+    COSIGN_ASSET="cosign-darwin-arm64"
+    COSIGN_SHA256="TBD"  # fill from upstream checksums.txt at the version you pin
+    ;;
+  x86_64)
+    COSIGN_ASSET="cosign-darwin-amd64"
+    COSIGN_SHA256="TBD"
+    ;;
+esac
+
+echo "downloading cosign ${COSIGN_VERSION}..."
+gh release download "v${COSIGN_VERSION}" \
+  --repo sigstore/cosign \
+  --pattern "${COSIGN_ASSET}" \
+  --pattern "${COSIGN_ASSET}.sig" \
+  --pattern "${COSIGN_ASSET}.pem" \
+  --dir "$TMP"
+verify_sha "$TMP/${COSIGN_ASSET}" "$COSIGN_SHA256"
+mv "$TMP/${COSIGN_ASSET}" "$BIN_DIR/cosign"
+chmod +x "$BIN_DIR/cosign"

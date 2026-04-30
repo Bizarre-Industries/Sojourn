@@ -23,28 +23,19 @@ post-`Accepted`; supersede via a new ADR. See
 | [0008](0008-no-curl-bash-for-brew.md) | No `curl \| bash` for brew install | Accepted | — | — |
 | [0009](0009-bundle-binary-policy.md) | Bundle gitleaks + age, not mpm + chezmoi | Accepted | — | — |
 | [0010](0010-native-brew-keep-mpm.md) | Native brew/cask/mas; keep mpm for the rest | Proposed | — | — |
-| [0011](0011-secret-broker-abstraction.md) | Secret broker abstraction (1Password primary, age fallback) | Proposed | — | — |
+| [0011](0011-secret-broker-abstraction.md) | Secret broker abstraction (1Password primary, age fallback) | Proposed | — | Supplemented by [0016](0016-secret-broker-order-and-cache.md) |
 | [0012](0012-cooperative-writer-lock.md) | Cooperative writer lock | Accepted | — | — |
-| [0013](0013-out-of-process-plugins.md) | Out-of-process plugin protocol | Proposed | — | — |
+| [0013](0013-out-of-process-plugins.md) | Out-of-process plugin protocol | Proposed | — | Supplemented by [0015](0015-keyless-cosign-plugin-trust.md) |
 | [0014](0014-no-linux-no-helling-plugin.md) | No Linux; no Helling plugin | Proposed | — | — |
+| [0015](0015-keyless-cosign-plugin-trust.md) | Keyless Sigstore as default for plugin trust; static-key fallback | Accepted | — | — |
+| [0016](0016-secret-broker-order-and-cache.md) | Secret broker order: 1Password primary with cache + timeout, Keychain promoted, Bitwarden deferred | Accepted | — | — |
+| [0017](0017-keep-machines-toml-fleet-metadata.md) | Keep `.sojourn/machines/<id>.toml`; coexist with chezmoi `promptOnce` | Accepted | — | — |
 
-## Status meanings
+---
 
-- **Proposed** — decision drafted; code not yet merged. Cite the
-  [implementation plan](../process/implementation-plan.md) phase that promotes
-  it to Accepted.
-- **Accepted** — decision implemented; this is the current state.
-- **Superseded by NNNN** — replaced by a later ADR. The historical reasoning
-  stays intact in this file.
-- **Deprecated** — no longer applies; nothing replaces it.
-
-## Adding a new ADR
-
-1. Pick the next number (`max(current) + 1`). Never reuse a number.
-2. `cp _template.md NNNN-kebab-case.md`.
-3. Fill in Context, Decision, Consequences, Alternatives.
-4. Set status:
-   - `Proposed` if implementation lands later (cite the IMPL_PLAN phase).
-   - `Accepted` if implementation lands in the same PR.
-5. Add a row above.
-6. Cross-link from the source-content reference page.
+> **Note on "Supplemented by"**: ADRs 0011 and 0013 remain valid as the
+> abstract decisions (broker abstraction; out-of-process plugin host).
+> 0015 and 0016 add the implementation details that the maintainer
+> deferred to [process/open-questions.md](../process/open-questions.md)
+> §8 Q2 / Q3 — keyless cosign as default, broker order / cache / timeout.
+> 0011 and 0013 will be promoted Proposed → Accepted when Phase 14 lands.

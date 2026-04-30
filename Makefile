@@ -83,3 +83,9 @@ act-build:
 	@echo 'NOTE: build.yml runs on macos-15 — act cannot virtualize macOS.'
 	@echo '      Use `make test` (swift test) and `make xcodebuild` instead.'
 	@echo '      To still attempt: act push --job swift-test --workflows .github/workflows/build.yml -P macos-15=-self-hosted'
+
+ci-local: actionlint leaks
+	-swiftlint lint --strict --reporter emoji
+	-swift-format lint --recursive Sojourn SojournTests SojournUITests \
+		--parallel --configuration .swift-format
+	@command -v python3 >/dev/null && python3 .github/scripts/check-expiry.py --validate

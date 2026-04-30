@@ -23,7 +23,7 @@ if [[ ! -d "$BIN_DIR" ]]; then
   exit 0
 fi
 
-for binary in "$BIN_DIR"/gitleaks "$BIN_DIR"/age; do
+for binary in "$BIN_DIR"/gitleaks "$BIN_DIR"/age "$BIN_DIR"/cosign; do
   if [[ ! -f "$binary" ]]; then
     echo "warn: $binary missing, skipping"
     continue

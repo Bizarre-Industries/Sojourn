@@ -41,25 +41,37 @@ Collision risk on 4-hex is ~1 in 65k. On collision the user is
 prompted to extend the suffix to 8 hex. The `machine_id` is opaque to
 the user but visible in the Machines pane.
 
-## Open question — chezmoi-native migration
+## Why this format (not chezmoi `promptOnce`)
 
-[`process/open-questions.md`](../../process/open-questions.md) §6
-flags this file as a candidate for migration to chezmoi's native
-`promptOnce` / `promptStringOnce` / `promptBoolOnce` mechanism. v1
-ships the Sojourn-side TOML; v1.x may collapse into chezmoi state if
-the maintainer decides the chezmoi-native path beats Sojourn-side
-metadata.
+Decided in
+[decisions/0017-keep-machines-toml-fleet-metadata.md](../../decisions/0017-keep-machines-toml-fleet-metadata.md)
+(closes audit §2.2.9 +
+[process/open-questions.md](../../process/open-questions.md) §6).
 
-If migration happens:
+`promptOnce` is a chezmoi-state-cached prompt; the value lives **locally**
+on each Mac, isn't tracked, isn't fleet-visible. `.sojourn/machines/<id>.toml`
+lives **in the data repo** (git-tracked) and powers Sojourn surfaces that
+require cross-machine visibility:
 
-- Per-machine overrides move into chezmoi `.chezmoi.yaml` `data`
-  blocks.
-- `machines.toml` files become chezmoi-state-cached prompts.
-- Bootstrap on a fresh Mac without Sojourn still works (plain
-  `chezmoi init` re-prompts).
+- Machines pane (audit §4.1) — fleet list with hostname, model,
+  last-seen timestamp, age recipient, `last-push` SHA per Mac.
+- Per-machine package overrides
+  ([reference/sync-model.md](../sync-model.md))
+  — `[brew.only."work-mbp"]` / `[brew.exclude."personal-mini"]`
+  reference the `machine_id` defined here.
+- Refuse-push-on-mismatch validation (see "Format constraints" below).
+- Fresh-Mac onboarding context — new Mac pulls the repo and
+  immediately knows the rest of the fleet.
 
-The v1 TOML approach is simpler today; the chezmoi-native path is
-better for fleet-management UX once the friction is justified.
+`promptOnce` does none of that, so migrating would delete the
+Machines-pane data model. Sojourn keeps `.sojourn/machines/<id>.toml`
+for fleet metadata + per-machine package overrides, and **also**
+supports `promptOnce` inside chezmoi templates for genuinely-local
+template values that don't belong in fleet metadata (per-machine API
+endpoints, per-machine local paths, interactive first-run prompts).
+
+Both formats coexist; they solve different problems. The how-to in
+`docs/how-to/dotfiles/per-machine-values.md` documents which to reach for.
 
 ## Format constraints
 
@@ -76,6 +88,8 @@ better for fleet-management UX once the friction is justified.
 - [active-toml.md](active-toml.md) — the writer-lock file uses
   `machine_id` to identify the active writer.
 - [reference/backends/chezmoi.md](../backends/chezmoi.md) —
-  `promptOnce` mechanism that may replace this file in v1.x.
+  `promptOnce` mechanism that coexists for local-only template values.
+- [decisions/0017-keep-machines-toml-fleet-metadata.md](../../decisions/0017-keep-machines-toml-fleet-metadata.md)
+  — the decision record.
 - [process/open-questions.md](../../process/open-questions.md) §6 —
-  chezmoi-native migration question.
+  closeout.

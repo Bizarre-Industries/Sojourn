@@ -44,12 +44,31 @@ CREATE INDEX idx_job_logs_job_id_seq ON job_logs(job_id, seq);
 
 ## Retention
 
-Open question (see
-[process/open-questions.md](../../process/open-questions.md) §5):
+Per [process/open-questions.md](../../process/open-questions.md) §5
+(closed 2026-04-30): `history.db` is forensic data, not recoverability
+data, so retention horizon is the attack window — not the
+`deletions.db` 30-day window which matches Trash recoverability.
 
-- `deletions.db` is 30 days.
-- Default for `history.db` is also 30 days for consistency.
-- Maintainer may extend to 90 days or unbounded.
+| Table | Retention | Rationale |
+|---|---|---|
+| `jobs` | **365 days** (default) | xz precedent: ~24-month maintainer-infiltration ramp. Need 12–24 month lookback to trace "when did this version land?" Cost is trivial — ~700KB/year at 5 ops/day. |
+| `job_logs` | **90 days** (default) | Heavier rows. 10000 lines/job × 100 bytes × 5 jobs/day × 90 days ≈ 450MB worst-case; capped further by `history.max_log_lines_per_job`. |
+
+Backstop: `history.max_db_size_mb` (default 500MB). Oldest-first eviction
+across both tables when exceeded.
+
+User-configurable via [reference/settings.md](../settings.md):
+`history.retention_days_jobs`, `history.retention_days_logs`,
+`history.max_db_size_mb`.
+
+A daily background activity (`app.bizarre.sojourn.history-prune`) runs
+both retention sweeps and writes a `'prune'` row per sweep so the user
+can see eviction in the History pane.
+
+Side effect of the 365d default: `diagnostics.bundle_includes_history_db`
+(default `true`) carries useful debugging history when users export a
+diagnostic bundle for support. The previous 30d window made bundles
+near-useless for week-old bug reports.
 
 ## Invariants
 
@@ -61,6 +80,9 @@ Open question (see
   operation.
 - A `Job` whose subprocess hangs / is killed gets `exit_code = NULL`
   and `error_message = "killed: timeout"` or similar.
+- Retention sweeps never delete `jobs` rows that have a non-NULL
+  `backup_path` pointing at a snapshot directory that still exists —
+  prevents orphaning backup metadata.
 
 ## Querying
 
@@ -82,6 +104,23 @@ WHERE job_id = ?
 ORDER BY seq;
 ```
 
+Forensic query — "when did `xz-utils` first land on this Mac?":
+
+```sql
+SELECT j.started_at, j.operation, jl.body
+FROM jobs j
+JOIN job_logs jl ON jl.job_id = j.id
+WHERE jl.body LIKE '%xz-utils%'
+  AND j.operation IN ('pull', 'restore', 'apply')
+ORDER BY j.started_at ASC
+LIMIT 1;
+```
+
+This query depends on `job_logs` retention being long enough; with the
+default 90d, the lookback window for log-text grep is 90d. The `jobs`
+table itself retains for 365d so `started_at` history is queryable
+even after log lines have been pruned.
+
 ## See also
 
 - [deletions-db.md](deletions-db.md) — sibling DB.
@@ -90,4 +129,4 @@ ORDER BY seq;
 - [process/audit-2026-04.md §3.3](../../process/audit-2026-04.md#33-models)
   — original gap analysis.
 - [process/open-questions.md](../../process/open-questions.md) §5 —
-  retention policy (open).
+  retention policy decision (closed).

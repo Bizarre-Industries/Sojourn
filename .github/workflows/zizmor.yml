@@ -8,10 +8,9 @@ name: Zizmor
 #   - Cache-poisoning patterns.
 #
 # Install path: zizmor is published to PyPI as `zizmor`. Install via
-# `uv tool` (Astral's fast Python package manager) — pre-compiled wheels,
-# no Rust toolchain required at runtime, no fragile binary-release URL
-# to maintain. This is the canonical path per the zizmor docs:
-# https://docs.zizmor.sh/integrations/
+# `uv tool` (Astral's fast Python package manager) — pre-compiled
+# wheels, no Rust toolchain required at runtime. This is the canonical
+# path per https://docs.zizmor.sh/integrations/.
 
 on:
   pull_request:
@@ -46,24 +45,26 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v8.1.0 # PIN-SHA-AFTER
         with:
-          # Pin the uv version so a runner-side uv update doesn't
-          # silently change behaviour. Bumped by Dependabot.
           version: "0.5.x"
 
-      - name: Run zizmor (SARIF + console)
+      - name: Run zizmor
         env:
           # Some zizmor audits (e.g. impostor-commit detection) call
-          # the GitHub API. Without GH_TOKEN these audits are skipped
-          # silently. Provide the workflow token.
+          # the GitHub API. Without GH_TOKEN those audits are skipped
+          # silently — provide the workflow token.
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # SARIF for Security tab. Pin zizmor version explicitly so
-          # the workflow's findings stay reproducible.
-          uvx zizmor@1.24.1 --format=sarif --output=zizmor.sarif .github/
+          # zizmor writes its report to stdout; redirect to capture.
+          # There is no --output flag (zizmor 1.x).
+          # --format=sarif always exits 0 even with findings, per the
+          # zizmor docs; the SARIF upload step routes findings into
+          # the Security tab.
+          uvx zizmor@1.24.1 --format=sarif .github/ > zizmor.sarif
 
-          # Plain output for the Actions log so you can read findings
-          # without round-tripping through the Security tab. Don't fail
-          # the job on findings — SARIF upload handles that pathway.
+          # Plain output for the Actions log so findings are readable
+          # without round-tripping through the Security tab. Plain
+          # format exits non-zero on findings — `|| true` keeps the
+          # step green so SARIF upload runs.
           uvx zizmor@1.24.1 --format=plain .github/ || true
 
       - name: Upload SARIF

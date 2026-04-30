@@ -41,7 +41,7 @@ xcodebuild: generate
 	xcodebuild -scheme Sojourn -destination 'platform=macOS' test
 
 leaks:
-	gitleaks dir --config=.gitleaks.toml
+	gitleaks dir --config=.gitleaks.toml -v
 
 lint:
 	-swiftlint
@@ -84,8 +84,26 @@ act-build:
 	@echo '      Use `make test` (swift test) and `make xcodebuild` instead.'
 	@echo '      To still attempt: act push --job swift-test --workflows .github/workflows/build.yml -P macos-15=-self-hosted'
 
-ci-local: actionlint leaks
+ci-local: actionlint leaks verify-pins zizmor
 	-swiftlint lint --strict --reporter emoji
 	-swift-format lint --recursive Sojourn SojournTests SojournUITests \
 		--parallel --configuration .swift-format
 	@command -v python3 >/dev/null && python3 .github/scripts/check-expiry.py --validate
+
+.PHONY: pin-actions verify-pins zizmor
+
+# Pin every action in .github/ to a commit SHA + # vX.Y.Z comment
+pin-actions:
+	@command -v pinact >/dev/null 2>&1 || { echo "install: brew install pinact"; exit 1; }
+	pinact run --update
+	@echo "review: git diff .github/"
+
+# CI-style verification — fail if anything is unpinned
+verify-pins:
+	@command -v pinact >/dev/null 2>&1 || { echo "install: brew install pinact"; exit 1; }
+	pinact run --check
+
+# Workflow security lint
+zizmor:
+	@command -v zizmor >/dev/null 2>&1 || { echo "install: brew install zizmor"; exit 1; }
+	zizmor .github/

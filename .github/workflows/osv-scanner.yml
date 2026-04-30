@@ -1,0 +1,54 @@
+name: OSV-Scanner
+
+# Supply-chain vulnerability scanning via Google's OSV-Scanner. Reads
+# Package.resolved, requirements.txt, and any other lockfiles in the
+# repo; cross-references against OSV.dev (which aggregates GHSA, RustSec,
+# PyPA, npm advisories, etc.).
+#
+# Synergistic with cooldown-policy.md: we cite OSV.dev as the source of
+# truth for advisory-aware cooldown bypass, and dogfood it here for our
+# own dependency hygiene.
+#
+# Triggers:
+#   - PR to main           — block merges that introduce vulnerable deps
+#   - push to main         — record state at HEAD
+#   - weekly cron          — catch newly-disclosed CVEs in unchanged deps
+#   - workflow_dispatch    — manual audit
+#
+# Findings land as SARIF in the Security tab alongside CodeQL.
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  schedule:
+    # Tuesday 07:00 UTC — offset from CodeQL's Monday so they don't
+    # contend for runner pool / API rate limits.
+    - cron: '0 7 * * 2'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+jobs:
+  scan-scheduled:
+    name: Scheduled scan
+    if: github.event_name == 'schedule' || github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    uses: google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@c51854704019a247608d928f370c98740469d4b5 # v2.3.5
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+
+  scan-pr:
+    name: PR scan
+    if: github.event_name == 'pull_request'
+    uses: google/osv-scanner-action/.github/workflows/osv-scanner-reusable-pr.yml@c51854704019a247608d928f370c98740469d4b5 # v2.3.5
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+      pull-requests: write

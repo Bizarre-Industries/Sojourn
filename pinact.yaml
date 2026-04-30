@@ -1,0 +1,22 @@
+# Pinact configuration.
+# https://github.com/suzuki-shunsuke/pinact
+#
+# Pin every action reference to a 40-char commit SHA, with a trailing
+# `# vX.Y.Z` comment that Dependabot reads to track upstream releases.
+
+version: 3
+
+files:
+  - pattern: .github/workflows/*.yml
+  - pattern: .github/workflows/*.yaml
+  - pattern: .github/actions/**/*.yml
+  - pattern: .github/actions/**/*.yaml
+
+# Don't pin local action references (those starting with `./` —
+# they're path-resolved within the repo, no SHA applies).
+ignore_actions: []
+
+# Version comment format. `tag` writes `# v5.0.0` (the released tag);
+# `version` writes `# 5.0.0`. Tag form is the convention Dependabot
+# expects.
+version_format: tag

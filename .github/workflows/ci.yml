@@ -10,6 +10,10 @@ on:
   pull_request:
     branches: [ main ]
 
+# All jobs are read-only quality/security gates. No writes anywhere.
+permissions:
+  contents: read
+
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
@@ -19,9 +23,10 @@ jobs:
     name: gitleaks scan
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       # Use the gitleaks binary directly. The marketplace action requires
       # a paid license for organization repos as of 2024-08; the binary
@@ -35,7 +40,6 @@ jobs:
 
       - name: Run gitleaks
         run: gitleaks dir --config=.gitleaks.toml --verbose
-
         env:
           GITLEAKS_CONFIG: .gitleaks.toml
           GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
@@ -45,7 +49,9 @@ jobs:
     name: SwiftLint (advisory)
     runs-on: macos-15
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
       - name: Install swiftlint
         run: brew install swiftlint
       - name: Lint
@@ -55,7 +61,9 @@ jobs:
     name: swift-format (advisory)
     runs-on: macos-15
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
       - name: Install swift-format
         run: brew install swift-format
       - name: Check

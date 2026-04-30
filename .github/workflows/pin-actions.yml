@@ -1,0 +1,98 @@
+name: Pin actions
+
+# One-time + on-demand SHA pinning of GitHub Actions. Runs `pinact`
+# across all workflow files, then opens a PR with the SHA-pinned
+# results. Dependabot maintains them after that.
+#
+# Trigger:
+#   - workflow_dispatch    — maintainer clicks Run from the Actions tab
+#   - cron: monthly        — sweep for any unpinned action that slipped in
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 10 1-7 * 1'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  pin:
+    name: Pin actions to SHAs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5 # PIN-SHA-AFTER
+        with:
+          # Need full history so we can create a branch + push a PR.
+          fetch-depth: 0
+          # peter-evans/create-pull-request takes its token via the
+          # `token:` input below; it doesn't depend on creds persisted
+          # in .git/config. Keep credentials out of the worktree.
+          persist-credentials: false
+
+      - name: Install pinact
+        run: |
+          set -euo pipefail
+          PINACT_VERSION="3.5.0"
+          curl -sSL -o /tmp/pinact.tar.gz \
+            "https://github.com/suzuki-shunsuke/pinact/releases/download/v${PINACT_VERSION}/pinact_linux_amd64.tar.gz"
+          tar -xzf /tmp/pinact.tar.gz -C /tmp
+          sudo mv /tmp/pinact /usr/local/bin/pinact
+          chmod +x /usr/local/bin/pinact
+          pinact --version
+
+      - name: Run pinact
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          pinact run --update
+
+      - name: Check for changes
+        id: diff
+        run: |
+          if git diff --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "no changes"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            git diff --stat
+          fi
+
+      - name: Create PR
+        if: steps.diff.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v7 # PIN-SHA-AFTER
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore(security): pin actions to commit SHAs"
+          branch: chore/pin-actions
+          delete-branch: true
+          title: "chore(security): pin actions to commit SHAs"
+          labels: |
+            dependencies
+            github-actions
+            security
+          body: |
+            Automated PR from `.github/workflows/pin-actions.yml`.
+
+            `pinact` resolved all `uses:` refs to immutable commit SHAs
+            and added trailing `# vX.Y.Z` comments that Dependabot
+            uses to track upstream releases.
+
+            ## Why
+            Tag references (e.g. `@v5`) are mutable: anyone with write
+            access to the action's repo can re-point a tag to a new
+            commit. SHA pins are immutable. See
+            `docs/process/security-tooling.md` "SHA pinning" for the
+            full rationale.
+
+            ## How to verify
+            - Every `uses:` line should now have a 40-char SHA followed
+              by `# v...` comment.
+            - `make zizmor` should report zero unpinned-action findings
+              after merge.
+
+            ## Maintenance
+            Dependabot's `gh-actions-all` group will weekly bump these
+            SHAs as upstream tags advance. No manual intervention needed.

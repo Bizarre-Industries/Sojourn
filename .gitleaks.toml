@@ -21,6 +21,7 @@ paths = [
   '''\.ruff_cache/.*''',
   '''\.remember/.*''',
   '''Sojourn\.xcodeproj/.*''',
+  '''Sojourn/Config/.*''',
 ]
 
 # Regex allowlist: obvious sample/placeholder patterns.

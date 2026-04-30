@@ -1,49 +1,92 @@
 name: CodeQL
 
-# CodeQL Swift analysis requires `swift build`, which is the heavy path
-# we deliberately keep out of per-commit CI. Trigger only on:
-#   - release tag push (correlates findings to a shipped version)
-#   - weekly cron (catches new advisories independently of releases)
-#   - manual dispatch (maintainer audit on demand)
+# CodeQL across all of Sojourn's source: Swift app code, Python helper
+# scripts, the GitHub Actions workflow files themselves, and any
+# inline JavaScript (actions/github-script blocks).
+#
+# Triggers:
+#   - push to main           — fast feedback on every merge
+#   - pull_request to main   — gate merges on no new high-severity findings
+#   - tag push v*            — correlate findings to a shipped version
+#   - weekly cron Mon 06:00  — catch new advisories independently of code
+#   - workflow_dispatch      — maintainer audit on demand
+#
+# Swift requires `swift build` (heavy; macos-15 runner; ~10 min). Other
+# languages run on ubuntu with build-mode=none (~2 min each). Matrix
+# fans them out in parallel.
+
 on:
   push:
-    tags:
-      - 'v*'
+    branches: [ main ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main ]
   schedule:
     - cron: '0 6 * * 1'
   workflow_dispatch:
 
+
+permissions:
+  actions: read
+  contents: read
+  security-events: write
+
 jobs:
   analyze:
     name: Analyze (${{ matrix.language }})
-    runs-on: macos-15
-    permissions:
-      actions: read
-      contents: read
-      security-events: write
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: ${{ matrix.timeout }}
 
     strategy:
       fail-fast: false
       matrix:
-        language: [swift]
+        include:
+          - language: swift
+            runner: macos-15
+            build-mode: manual
+            timeout: 60
+          - language: python
+            runner: ubuntu-latest
+            build-mode: none
+            timeout: 30
+          - language: actions
+            runner: ubuntu-latest
+            build-mode: none
+            timeout: 30
+          - language: javascript-typescript
+            runner: ubuntu-latest
+            build-mode: none
+            timeout: 30
 
     steps:
-      - uses: actions/checkout@v5
+      - name: Checkout repository
+        # Pinned to actions/checkout v5 — Dependabot will refresh the SHA
+        # and the # comment together. Run `make pin-actions` to regenerate
+        # this trailing comment if the version drifts.
+        uses: actions/checkout@v5 # PIN-SHA-AFTER: pinact will resolve
+        with:
+          persist-credentials: false
 
-      - name: Select Xcode
-        uses: maxim-lobanov/setup-xcode@v1
+      - name: Select Xcode (Swift only)
+        if: matrix.language == 'swift'
+        uses: maxim-lobanov/setup-xcode@v1 # PIN-SHA-AFTER
         with:
           xcode-version: '^16.0'
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v4
+        uses: github/codeql-action/init@v4 # PIN-SHA-AFTER
         with:
           languages: ${{ matrix.language }}
+          build-mode: ${{ matrix.build-mode }}
+          config-file: ./.github/codeql/codeql-config.yml
+          queries: security-extended
 
-      - name: Build (manual, SPM)
+      - name: Build Swift target (manual)
+        if: matrix.language == 'swift'
         run: swift build -c debug
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v4
+        uses: github/codeql-action/analyze@v4 # PIN-SHA-AFTER
         with:
           category: /language:${{ matrix.language }}
+          upload: always

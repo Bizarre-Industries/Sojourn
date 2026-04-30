@@ -1,0 +1,172 @@
+# Sojourn — Dependabot configuration
+#
+# Strategy:
+#   - Group all version updates per ecosystem into ONE PR per week.
+#     Mixing ecosystems in one PR is a bad idea; see
+#     docs/process/security-tooling.md "Why per-ecosystem grouping" for
+#     the rationale (atomic merge/revert + isolated CI failure surface).
+#   - Security updates (vulnerability fixes) bypass groups so they ship
+#     as fast as possible — one PR per CVE, mergeable independently.
+#   - Cooldown delays version-update PRs by N days after a release lands
+#     upstream. Mirrors Sojourn's own cooldown-policy.md applied to our
+#     own deps. Security updates ALWAYS bypass cooldown — Dependabot
+#     handles this automatically.
+#   - SHA pinning is mandatory for github-actions. The one-time pinning
+#     pass is handled by the `pin-actions.yml` workflow (pinact).
+#     Dependabot then maintains SHAs based on the trailing `# vX.Y.Z`
+#     comment that pinact writes.
+#   - Limit of 1 open version-update PR per ecosystem at a time. Closes
+#     to "all updates in one PR" without crossing ecosystem boundaries.
+#
+# Required repo settings (one-time, in repo Settings → Code security):
+#   - Dependency graph: ON
+#   - Dependabot alerts: ON
+#   - Dependabot security updates: ON
+#   - Dependabot version updates: ON (this file enables them per-ecosystem)
+#   - Grouped security updates: ON
+
+version: 2
+
+# Cooldown values (per Sojourn's own cooldown-policy.md; matches the
+# 7-day Tier-B default applied to brew formulae, plus extra caution on
+# major bumps which carry breaking-change risk).
+#
+# Reference: https://nesbitt.io/2026/03/04/package-managers-need-to-cool-down.html
+# (Dependabot shipped cooldown July 2025; zizmor's dependabot-cooldown
+# audit rule defaults to flagging anything below 7 days.)
+#
+# These are duplicated per ecosystem because Dependabot's config schema
+# doesn't support a top-level shared default. Keep them in sync.
+
+updates:
+  # ----------------------------------------------------------------------- #
+  # GitHub Actions — workflows + composite actions
+  # ----------------------------------------------------------------------- #
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: UTC
+    open-pull-requests-limit: 1
+    labels:
+      - dependencies
+      - github-actions
+    commit-message:
+      prefix: "chore(deps)"
+      include: scope
+    reviewers:
+      - "binGhzal" # @maintainer; replace with your handle
+    cooldown:
+      default-days: 7
+      semver-major-days: 14
+      semver-minor-days: 7
+      semver-patch-days: 3
+    groups:
+      gh-actions-all:
+        applies-to: version-updates
+        patterns:
+          - "*"
+      gh-actions-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  # ----------------------------------------------------------------------- #
+  # Swift Package Manager — Sojourn deps
+  # ----------------------------------------------------------------------- #
+  # NOTE: requires `Package.resolved` to be committed (see
+  # docs/process/security-tooling.md "Package.resolved").
+  - package-ecosystem: swift
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: UTC
+    open-pull-requests-limit: 1
+    labels:
+      - dependencies
+      - swift
+    commit-message:
+      prefix: "chore(deps)"
+      include: scope
+    reviewers:
+      - "binGhzal"
+    versioning-strategy: increase
+    cooldown:
+      default-days: 7
+      semver-major-days: 14
+      semver-minor-days: 7
+      semver-patch-days: 3
+    groups:
+      swift-all:
+        applies-to: version-updates
+        patterns:
+          - "*"
+      swift-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  # ----------------------------------------------------------------------- #
+  # Python — .github/scripts/ (expiry-check.py + helpers)
+  # ----------------------------------------------------------------------- #
+  - package-ecosystem: pip
+    directory: /.github/scripts
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: UTC
+    open-pull-requests-limit: 1
+    labels:
+      - dependencies
+      - python
+    commit-message:
+      prefix: "chore(deps)"
+      include: scope
+    reviewers:
+      - "binGhzal"
+    cooldown:
+      default-days: 7
+      semver-major-days: 14
+      semver-minor-days: 7
+      semver-patch-days: 3
+    groups:
+      pip-all:
+        applies-to: version-updates
+        patterns:
+          - "*"
+      pip-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+  # ----------------------------------------------------------------------- #
+  # Docker — for any future Dockerfiles (not currently in use)
+  # ----------------------------------------------------------------------- #
+  # Currently no Dockerfile in the repo. When one lands, uncomment.
+  # - package-ecosystem: docker
+  #   directory: /
+  #   schedule:
+  #     interval: weekly
+  #     day: monday
+  #     time: "09:00"
+  #     timezone: UTC
+  #   open-pull-requests-limit: 1
+  #   labels:
+  #     - dependencies
+  #     - docker
+  #   cooldown:
+  #     default-days: 7
+  #     semver-major-days: 14
+  #     semver-minor-days: 7
+  #     semver-patch-days: 3
+  #   groups:
+  #     docker-all:
+  #       applies-to: version-updates
+  #       patterns: ["*"]
+  #     docker-security:
+  #       applies-to: security-updates
+  #       patterns: ["*"]

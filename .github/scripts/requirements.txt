@@ -1,0 +1,18 @@
+# Pinned dependencies for .github/scripts/check-expiry.py
+#
+# Versions are pinned to exact releases. Dependabot tracks updates via
+# the `pip` ecosystem entry in `.github/dependabot.yml` and opens a
+# weekly grouped PR with bumps + a security PR per CVE.
+#
+# When updating manually:
+#   pip install --upgrade pip-tools
+#   pip-compile --upgrade --resolver=backtracking \
+#       --output-file=.github/scripts/requirements.txt \
+#       .github/scripts/requirements.in
+# (We don't currently ship `requirements.in` because the dep set is
+# minimal; if it grows, switch to that two-file pattern.)
+
+pyjwt==2.10.1          # JWT for App Store Connect ES256 auth
+cryptography==44.0.0   # ES256 signing backend for pyjwt
+pyyaml==6.0.2          # config parsing
+requests==2.32.3       # HTTP client

@@ -1,0 +1,70 @@
+# Sojourn — CodeQL configuration.
+#
+# Multi-language scans require this config-file approach (per
+# https://docs.github.com/en/code-security/code-scanning/creating-an-advanced-setup-for-code-scanning/customizing-your-advanced-setup-for-code-scanning).
+#
+# Coverage:
+#   - swift                 — main app code under Sojourn/
+#   - python                — .github/scripts/ + scripts/
+#   - actions               — workflow files themselves (CodeQL Actions language)
+#   - javascript-typescript — inline scripts in actions/github-script steps,
+#                             plus any web-content artefacts
+#
+# Pack stack per language:
+#   - codeql/<lang>-queries:codeql-suites/<lang>-security-extended.qls
+#       — official extended pack: adds 35 CWE coverage beyond default
+#   - codeql/<lang>-queries:codeql-suites/<lang>-security-and-quality.qls
+#       — adds maintainability / quality alerts (lower priority but
+#       valuable for an early-stage codebase)
+#   - githubsecuritylab/codeql-<lang>-queries
+#       — community pack from GitHub Security Lab. Higher precision
+#       experimental queries, often catch issues default packs miss.
+
+name: "Sojourn CodeQL config"
+
+# Disable the default queries so we explicitly control the pack set
+# below. The default query suite is included by referencing both
+# security-extended and security-and-quality, which superset it.
+disable-default-queries: false
+
+queries:
+  # Official extended security suites are added per-language via the
+  # `packs:` block below; `queries:` here is reserved for any custom
+  # local queries we ship in `.github/codeql/queries/` (none yet).
+
+# Per-language pack stack. Run all four languages with the same level
+# of rigor. Swift's pack from githubsecuritylab is comparatively new;
+# if false-positive rate is high we can drop it from this list.
+packs:
+  swift:
+    - codeql/swift-queries:codeql-suites/swift-security-and-quality.qls
+    - githubsecuritylab/codeql-swift-queries
+  python:
+    - codeql/python-queries:codeql-suites/python-security-and-quality.qls
+    - githubsecuritylab/codeql-python-queries
+  actions:
+    - codeql/actions-queries:codeql-suites/actions-security-and-quality.qls
+    - githubsecuritylab/codeql-actions-queries
+  javascript-typescript:
+    - codeql/javascript-queries:codeql-suites/javascript-security-and-quality.qls
+    - githubsecuritylab/codeql-javascript-queries
+
+# Path filters — exclude bundled binaries, build outputs, and any
+# generated files. CodeQL skips these directories entirely.
+paths-ignore:
+  - "Sojourn/Resources/bin/**" # bundled gitleaks/age/cosign binaries
+  - ".build/**" # SPM artefacts
+  - "build/**" # xcodebuild artefacts
+  - "DerivedData/**" # Xcode artefacts
+  - "**/*.xcodeproj/**" # generated Xcode project (xcodegen)
+  - "vendor/**"
+  - "third_party/**"
+  - "node_modules/**"
+
+# Path filters — explicitly include source dirs. Empty `paths` means
+# "everything that isn't excluded above"; add explicit entries here
+# only if we want to scope down further.
+# paths:
+#   - "Sojourn/**"
+#   - ".github/**"
+#   - "scripts/**"

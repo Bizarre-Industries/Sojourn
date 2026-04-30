@@ -5,26 +5,30 @@ on:
     tags:
       - 'v*'
 
+# Default to read-only at the workflow level. The single job below
+# overrides with `contents: write` because it creates a GitHub release.
+permissions:
+  contents: read
+
 jobs:
   build-sign-notarize:
     name: Build, sign, notarize
     runs-on: macos-15
     environment: release
+    permissions:
+      contents: write # softprops/action-gh-release creates the release
     steps:
-      - uses: actions/checkout@v5
-
-      - name: Inject Local.xcconfig
-        env:
-          OAUTH_CLIENT_ID: ${{ secrets.SOJOURN_OAUTH_CLIENT_ID }}
-          DEVELOPMENT_TEAM: ${{ secrets.DEVELOPMENT_TEAM }}
-        run: |
-          cat > Sojourn/Config/Local.xcconfig <<EOF
-          DEVELOPMENT_TEAM = $DEVELOPMENT_TEAM
-          SOJOURN_OAUTH_CLIENT_ID = $OAUTH_CLIENT_ID
-          EOF
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          # The release creation uses softprops/action-gh-release which
+          # takes its own token via the `GITHUB_TOKEN` env it inherits;
+          # it doesn't depend on creds persisted in .git/config. The
+          # Homebrew tap publish uses HOMEBREW_TAP_TOKEN (separate PAT),
+          # not the workflow's GITHUB_TOKEN. So no need to persist creds.
+          persist-credentials: false
 
       - name: Select Xcode
-        uses: maxim-lobanov/setup-xcode@v1
+        uses: maxim-lobanov/setup-xcode@v1 # PIN-SHA-AFTER
         with:
           xcode-version: '^16.0'
 
@@ -39,10 +43,20 @@ jobs:
           security set-keychain-settings -lut 43200 build.keychain
           security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
           security import /tmp/dev-id.p12 -P "$DEVELOPER_ID_P12_PASSWORD" -A -t cert -f pkcs12 -k build.keychain
-          # shellcheck disable=SC2046  # intentional word split: list-keychains needs each keychain path as separate arg
+          # shellcheck disable=SC2046  # intentional word split
           security list-keychains -d user -s build.keychain $(security list-keychains -d user | sed 's/\"//g')
           security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PASSWORD" build.keychain
           rm /tmp/dev-id.p12
+
+      - name: Inject Local.xcconfig
+        env:
+          OAUTH_CLIENT_ID: ${{ secrets.SOJOURN_OAUTH_CLIENT_ID }}
+          DEVELOPMENT_TEAM: ${{ secrets.DEVELOPMENT_TEAM }}
+        run: |
+          cat > Sojourn/Config/Local.xcconfig <<EOF
+          DEVELOPMENT_TEAM = $DEVELOPMENT_TEAM
+          SOJOURN_OAUTH_CLIENT_ID = $OAUTH_CLIENT_ID
+          EOF
 
       - name: Download bundled binaries (gitleaks, age)
         env:
@@ -55,6 +69,9 @@ jobs:
         run: bash scripts/sign.sh
 
       - name: Build Sojourn.app
+        env:
+          DEVELOPER_ID_IDENTITY: ${{ secrets.DEVELOPER_ID_IDENTITY }}
+          DEVELOPMENT_TEAM: ${{ secrets.DEVELOPMENT_TEAM }}
         run: |
           xcodebuild -project Sojourn.xcodeproj \
             -scheme Sojourn \
@@ -65,9 +82,6 @@ jobs:
             DEVELOPMENT_TEAM="$DEVELOPMENT_TEAM" \
             OTHER_CODE_SIGN_FLAGS="--timestamp --options=runtime" \
             clean build
-        env:
-          DEVELOPER_ID_IDENTITY: ${{ secrets.DEVELOPER_ID_IDENTITY }}
-          DEVELOPMENT_TEAM: ${{ secrets.DEVELOPMENT_TEAM }}
 
       - name: Create DMG
         run: bash scripts/make-dmg.sh build/Build/Products/Release/Sojourn.app
@@ -85,7 +99,7 @@ jobs:
           spctl --assess --type install --verbose=4 Sojourn.dmg
 
       - name: Upload release artifact
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda # v3.0.0
         with:
           files: Sojourn.dmg
           generate_release_notes: true

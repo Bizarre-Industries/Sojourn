@@ -1,6 +1,9 @@
 import XCTest
 
 /// UI smoke tests. Runs against the built Sojourn.app from the Xcode project.
+/// `@MainActor` because XCUIApplication APIs are MainActor-isolated under
+/// Swift 6 strict concurrency.
+@MainActor
 final class SojournUITests: XCTestCase {
   override func setUpWithError() throws {
     continueAfterFailure = false

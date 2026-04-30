@@ -99,6 +99,8 @@ jobs:
             clean build
 
       - name: Create DMG
+        env:
+          DEVELOPER_ID_IDENTITY: ${{ secrets.DEVELOPER_ID_IDENTITY }}
         run: bash scripts/make-dmg.sh build/Build/Products/Release/Sojourn.app
 
       # Upload the signed-but-not-yet-notarized DMG. If notarization

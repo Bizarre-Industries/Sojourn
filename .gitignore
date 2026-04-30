@@ -87,6 +87,7 @@ staging/
 # Bundled binaries (downloaded in build phase; tracked via release pipeline)
 Sojourn/Resources/bin/gitleaks
 Sojourn/Resources/bin/age
+Sojourn/Resources/bin/cosign
 
 # Docs how-to subdir; not the same as Swift packages
 !docs/how-to/packages/

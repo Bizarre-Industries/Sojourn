@@ -45,11 +45,16 @@ targets:
           - Resources/data
           - Resources/Fonts
           - Config
-    resources:
+      # Folder references — bundled as `data/` and `Fonts/` directories
+      # at the .app's Resources root. xcodegen 2.45+ ignores
+      # `resources:` entries with `type: folder`, so these live under
+      # `sources` with an explicit buildPhase.
       - path: Sojourn/Resources/data
         type: folder
+        buildPhase: resources
       - path: Sojourn/Resources/Fonts
         type: folder
+        buildPhase: resources
     dependencies:
       - package: swift-subprocess
         product: Subprocess
@@ -91,9 +96,9 @@ targets:
       - path: SojournTests
         excludes:
           - Fixtures
-    resources:
       - path: SojournTests/Fixtures
         type: folder
+        buildPhase: resources
     dependencies:
       - target: Sojourn
     settings:

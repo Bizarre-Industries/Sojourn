@@ -23,11 +23,10 @@ struct GitServiceTests {
 
 struct MPMServiceMockTests {
   @Test func mockDecodesInstalled() async throws {
-    let url = Bundle.sojournFixtures.url(
-      forResource: "mpm-installed",
-      withExtension: "json",
-      subdirectory: "Fixtures"
-    )!
+    let url = try #require(
+      Bundle.sojournFixtureURL(name: "mpm-installed", ext: "json"),
+      "mpm-installed.json fixture not found in test bundle"
+    )
     let data = try Data(contentsOf: url)
     let mpm = MPMService.mock { _ in data }
     let snap = try await mpm.installed()
@@ -51,11 +50,10 @@ struct MPMServiceMockTests {
 
 struct ChezmoiServiceTests {
   @Test func decodesManagedFixture() async throws {
-    let url = Bundle.sojournFixtures.url(
-      forResource: "chezmoi-managed",
-      withExtension: "json",
-      subdirectory: "Fixtures"
-    )!
+    let url = try #require(
+      Bundle.sojournFixtureURL(name: "chezmoi-managed", ext: "json"),
+      "chezmoi-managed.json fixture not found in test bundle"
+    )
     let data = try Data(contentsOf: url)
     let ch = ChezmoiService.mock { _ in data }
     let entries = try await ch.managed()
@@ -77,11 +75,10 @@ struct PrefServiceTests {
 
 struct SecretScanServiceTests {
   @Test func decodesFixtureReport() async throws {
-    let url = Bundle.sojournFixtures.url(
-      forResource: "gitleaks-report",
-      withExtension: "json",
-      subdirectory: "Fixtures"
-    )!
+    let url = try #require(
+      Bundle.sojournFixtureURL(name: "gitleaks-report", ext: "json"),
+      "gitleaks-report.json fixture not found in test bundle"
+    )
     let data = try Data(contentsOf: url)
     let scanner = SecretScanService.mock { _ in data }
     let findings = try await scanner.scanDirectory(URL(fileURLWithPath: "/tmp"))

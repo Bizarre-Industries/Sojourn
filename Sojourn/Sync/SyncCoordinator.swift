@@ -64,6 +64,20 @@ internal final class SyncCoordinator {
       _ = try await snapshots.capture(operation: .syncPull, sources: [repoURL])
       try await git.pull(remote: "origin", branch: branch, cwd: repoURL)
       if let chezmoi {
+        // Audit §2.2.3 — three-way merge text dotfiles via the user's
+        // configured `merge.command` before falling back to `apply`.
+        // Binaries / plists keep the apply path because chezmoi merge
+        // doesn't handle them.
+        let status = (try? await chezmoi.status(cwd: nil)) ?? ""
+        for target in Self.textMergeTargets(fromStatus: status) {
+          do {
+            try await chezmoi.merge(target: target, cwd: nil)
+          } catch {
+            SojournLog.sync.error(
+              "merge failed for \(target, privacy: .public): \(String(describing: error), privacy: .public)"
+            )
+          }
+        }
         try await chezmoi.apply(dryRun: false, cwd: nil)
       }
       if let mpm {
@@ -132,6 +146,41 @@ internal final class SyncCoordinator {
 
   internal func reset() {
     phase = .idle
+  }
+
+  // MARK: - Status parsing
+
+  /// Extensions chezmoi cannot mergefully (binary/plist) — these paths
+  /// stay in the `apply` path. Everything else is treated as text.
+  internal nonisolated static let nonMergeableExtensions: Set<String> = [
+    "plist", "png", "jpg", "jpeg", "gif", "tiff", "bmp", "icns", "heic",
+    "pdf", "zip", "tar", "gz", "bz2", "xz", "7z",
+    "dmg", "pkg",
+    "so", "dylib", "a", "o",
+    "bin", "exe", "app", "car",
+    "sqlite", "db", "ico", "woff", "woff2", "ttf", "otf"
+  ]
+
+  /// Parse `chezmoi status` output into the subset of modified targets
+  /// suitable for `chezmoi merge`. Audit §2.2.3.
+  ///
+  /// chezmoi status format: 2-char status code, space, target path. The
+  /// first column is source state, second is target state. Either being
+  /// `M` (modified) means a merge is potentially useful.
+  internal nonisolated static func textMergeTargets(fromStatus status: String) -> [String] {
+    var out: [String] = []
+    for raw in status.split(separator: "\n") {
+      let line = String(raw)
+      guard line.count > 3 else { continue }
+      let prefix = line.prefix(2)
+      let path = String(line.dropFirst(3)).trimmingCharacters(in: .whitespaces)
+      guard !path.isEmpty else { continue }
+      guard prefix.contains("M") else { continue }
+      let ext = (path as NSString).pathExtension.lowercased()
+      if nonMergeableExtensions.contains(ext) { continue }
+      out.append(path)
+    }
+    return out
   }
 
   // MARK: - Cooldown gate

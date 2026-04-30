@@ -34,6 +34,12 @@ internal final class AppStore {
   internal let bootstrap: BootstrapService
   internal let backgroundActivity: BackgroundActivity
 
+  // Audit phases 10–11: scaffolded modules wired pure-additively for v0.1.0.
+  // Concrete actors above stay primary; v0.2.0 callers switch to these.
+  internal let registry: BackendRegistry
+  internal let historyDB: HistoryDB?
+  internal let bootstrapCoordinator: BootstrapCoordinator
+
   internal var sync: SyncCoordinator?
   internal var settings: Settings = .empty
   internal var managers: [String: ManagerSnapshot] = [:]
@@ -44,6 +50,7 @@ internal final class AppStore {
     paths: AppSupportPaths,
     settingsStore: SettingsStore,
     deletionsDB: DeletionsDB,
+    historyDB: HistoryDB?,
     mpm: MPMService?,
     git: GitService?,
     chezmoi: ChezmoiService?,
@@ -70,6 +77,12 @@ internal final class AppStore {
     self.cleanup = CleanupService(deletionsDB: deletionsDB)
     self.bootstrap = BootstrapService(locator: toolLocator, brew: brew, subprocess: runner)
     self.backgroundActivity = BackgroundActivity()
+    self.historyDB = historyDB
+    self.registry = BackendRegistry()
+    self.bootstrapCoordinator = BootstrapCoordinator(
+      probe: ToolProbe(locator: toolLocator),
+      installer: ToolInstaller(brew: brew)
+    )
   }
 
   /// Bootstrap convenience — build and wire every persistence piece
@@ -79,6 +92,8 @@ internal final class AppStore {
     let settings = try SettingsStore(paths: paths)
     let deletionsURL = paths.config.appendingPathComponent("deletions.sqlite")
     let deletions = try DeletionsDB(url: deletionsURL)
+    let historyURL = paths.config.appendingPathComponent("history.sqlite")
+    let history = try? HistoryDB(url: historyURL)
 
     let runner = SubprocessRunner()
     let locator = ToolLocator()
@@ -87,16 +102,28 @@ internal final class AppStore {
     let chezmoi = await ChezmoiService.live(runner: runner, locator: locator)
     let secrets = SecretScanService.live(runner: runner)
 
-    return AppStore(
-      paths: paths, settingsStore: settings, deletionsDB: deletions,
+    let store = AppStore(
+      paths: paths, settingsStore: settings, deletionsDB: deletions, historyDB: history,
       mpm: mpm, git: git, chezmoi: chezmoi, secrets: secrets
     )
+    if let mpm {
+      for managerID in MPMPackageBackend.knownManagerIDs {
+        await store.registry.register(MPMPackageBackend(managerID: managerID, mpm: mpm))
+      }
+    }
+    return store
   }
 
   /// Hydrate in-memory snapshots from disk. Safe to call multiple times.
   internal func reloadFromDisk() async {
     self.settings = await settingsStore.value
-    self.history = settings.history
+    // Prefer HistoryDB; fall back to legacy Settings.history during the
+    // v0.1 migration window. v0.2 removes the legacy mirror.
+    if let historyDB, let rows = try? await historyDB.list(limit: 200) {
+      self.history = rows
+    } else {
+      self.history = settings.history
+    }
     await toolLocator.seed(settings.toolLocations)
     await cleanup.loadBundledRegistry()
   }
@@ -118,9 +145,15 @@ internal final class AppStore {
     )
   }
 
-  /// Append a history entry and persist it.
+  /// Append a history entry and persist it. Writes to `HistoryDB`
+  /// (canonical) and mirrors into `Settings.history` for v0.1
+  /// backwards compatibility — the mirror is dropped in v0.2.
   internal func recordHistory(_ entry: HistoryEntry) async {
     history.append(entry)
+    if let historyDB {
+      try? await historyDB.insert(entry)
+    }
+    // Legacy mirror — deprecated, removed in v0.2.0.
     var snapshot = await settingsStore.value
     snapshot.history.append(entry)
     try? await settingsStore.replace(snapshot)

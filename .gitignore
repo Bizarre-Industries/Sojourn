@@ -54,7 +54,13 @@ notarize-*.json
 *~
 
 # Project-local harness (Claude Code, remember)
-.claude/
+# .claude/ tracks settings.json + hooks/ (replan-on-ship infra), but
+# ignores per-clone state (last-shipped-tag marker, local settings).
+.claude/*
+!.claude/settings.json
+!.claude/hooks/
+.claude/.last-shipped-tag
+.claude/settings.local.json
 .claude-cache/
 .claude-plans/
 .remember/

@@ -8,6 +8,44 @@ All notable changes to Sojourn. Follows
 
 ### Added
 
+- (next version)
+
+### Planned
+
+- See `docs/process/implementation-plan.md` phases 11–14 for the
+  v0.2.0 → v0.5.0 ladder. The replan-on-ship hook
+  (`.claude/hooks/replan-on-ship.sh`) prompts a fresh plan whenever a
+  new `v*` tag lands.
+
+## [0.1.0] — 2026-04-30
+
+### Added
+
+- **Audit-driven module wiring**:
+  - `BackendRegistry` actor + `MPMPackageBackend` adapter wired into
+    `AppStore.live()` (audit §3.2.5, ADR-0010 promoted).
+  - `HistoryDB` SQLite-backed history log replacing
+    `Settings.history` (legacy mirror retained for v0.1 backwards
+    compat; removed in v0.2.0). Audit §3.1.6 / §3.3.1.
+  - `BootstrapCoordinator` + `ToolProbe` + `ToolInstaller` wired
+    alongside the legacy `BootstrapService`. Audit §3.1.3.
+- **Sync improvements**:
+  - `chezmoi merge` invoked for text dotfiles in the pull path before
+    `apply` (audit §2.2.3). Binaries / plists keep `apply --force`.
+    `SyncCoordinator.textMergeTargets(fromStatus:)` parser + tests.
+- **Settings**:
+  - `Settings.githubClientID` field for BYO GitHub OAuth client_id.
+    Sojourn-owned default ships in v0.1.1; v0.1.0 users register
+    their own at <https://github.com/settings/developers>.
+- **Replan-on-ship Claude hooks**: `.claude/settings.json` +
+  `.claude/hooks/{replan-on-ship,mark-replanned}.sh`. SessionStart +
+  Stop hooks compare `git tag -l 'v*'` against
+  `.claude/.last-shipped-tag` (per-clone, gitignored) and inject a
+  replan instruction when a new tag is found. Documented in
+  `docs/process/release.md` "Replan-on-ship hook" + `AGENTS.md`.
+- **New tests**: `BackendRegistryTests`, `HistoryDBTests`,
+  `RedactorTests`, `ToolProbeTests`, `KeychainBrokerTests`,
+  `SyncMergeTargetTests`. swift test now runs 81 tests in 28 suites.
 - Phase 1 core infra: `SubprocessRunner`, `JobRunner`, `LogBuffer`,
   `ANSIParser`, `ToolLocator`.
 - Phase 2 models + persistence: `AutoUpdateTier`, `Conflict`,
@@ -105,8 +143,3 @@ All notable changes to Sojourn. Follows
 - Supply-chain cooldown tiers gate auto-updates per
   `docs/reference/cooldown-policy.md`; Tier E (`npm`) never
   auto-updates silently.
-
-## [0.1.0] — TBD
-
-Initial notarized DMG ship per
-[docs/process/release.md](docs/process/release.md).

@@ -17,6 +17,10 @@ points at the canonical sources rather than duplicating them.
    the active gap analysis driving v1 → v1.x.
 5. [docs/process/implementation-plan.md](docs/process/implementation-plan.md)
    — phased delivery sequence (phases 0–14).
+6. [.claude/hooks/replan-on-ship.sh](.claude/hooks/replan-on-ship.sh) —
+   replan-on-ship hook. Fires on `SessionStart` + `Stop`; prompts a fresh
+   plan whenever a new `v*` tag is pushed. See
+   [docs/process/release.md](docs/process/release.md) "Replan-on-ship hook".
 
 ## When in doubt
 

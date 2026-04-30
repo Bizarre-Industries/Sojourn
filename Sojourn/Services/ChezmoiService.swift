@@ -112,4 +112,12 @@ internal actor ChezmoiService {
   internal func forget(path: String, cwd: URL? = nil) async throws {
     _ = try await runCommand(["forget", path], cwd)
   }
+
+  /// Three-way merge a single managed target via the user's configured
+  /// `merge.command` (default ladder: opendiff → kdiff3 → vimdiff).
+  /// Audit §2.2.3 — preferred over `apply --force` for text dotfiles in
+  /// the pull conflict path. Binaries and plists keep `apply --force`.
+  internal func merge(target: String, cwd: URL? = nil) async throws {
+    _ = try await runCommand(["merge", target], cwd)
+  }
 }

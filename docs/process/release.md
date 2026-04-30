@@ -57,6 +57,26 @@ Release authority: the Sojourn maintainer only. See
 - Update `docs/reference/third-party.md` if dep versions changed.
 - Update `docs/SUPPORTED_MANAGERS.md` if manager coverage changed.
 
+### Replan-on-ship hook
+
+Opening a Claude Code session in this repo after a `v*` tag is pushed
+fires `.claude/hooks/replan-on-ship.sh` (wired via `.claude/settings.json`
+on `SessionStart` + `Stop`). The hook compares `git tag -l 'v*'` against
+the per-clone marker `.claude/.last-shipped-tag` (gitignored). If a new
+tag is found it injects a system-context message instructing Claude to
+reanalyze the repo, docs, and `docs/process/implementation-plan.md` and
+write a new plan at `~/.claude/plans/sojourn-post-<tag>.md` toward the
+next version per the phase ladder.
+
+After the new plan is written and approved, Claude advances the marker
+with `bash .claude/hooks/mark-replanned.sh <tag>` so subsequent sessions
+start clean. The marker is **per-clone, never committed** — each
+maintainer workstation re-prompts independently.
+
+Manual override: edit `.claude/.last-shipped-tag` directly (or `rm` it to
+re-trigger), or write a tag string the hook should treat as "already
+replanned."
+
 ## Troubleshooting
 
 - **Notarize stalls:** inspect logs with

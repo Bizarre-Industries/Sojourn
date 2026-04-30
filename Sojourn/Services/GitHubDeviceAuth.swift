@@ -70,9 +70,19 @@ internal actor GitHubDeviceAuth {
   }
 
   internal static func live() -> GitHubDeviceAuth {
-    GitHubDeviceAuth(fetch: { request in
-      try await URLSession.shared.data(for: request)
-    })
+    live(clientID: nil)
+  }
+
+  /// Build with a user-supplied `client_id` from Settings (BYO OAuth
+  /// app for v0.1.0). When `nil`, falls back to the build-time
+  /// placeholder, which v0.1.1 replaces with a Sojourn-owned default.
+  internal static func live(clientID: String?) -> GitHubDeviceAuth {
+    GitHubDeviceAuth(
+      clientID: clientID ?? GitHubDeviceAuth.clientID,
+      fetch: { request in
+        try await URLSession.shared.data(for: request)
+      }
+    )
   }
 
   // MARK: - Device flow

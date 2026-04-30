@@ -52,6 +52,15 @@ Sojourn offers two paths for git auth:
   shows a one-time code; you paste it into github.com/login/device.
   Token lives in macOS Keychain under `app.bizarre.sojourn`.
 
+  > **v0.1.0 caveat**: Sojourn does not yet ship a project-owned
+  > GitHub OAuth App. To use the Device Flow, register your own at
+  > <https://github.com/settings/developers> (any name, any homepage
+  > URL, no callback URL needed for device flow), then paste the
+  > resulting `client_id` into Settings → Integrations → GitHub
+  > client_id. v0.1.1 ships a Sojourn-owned default. Until then, BYO
+  > is the only working path; you can also just use the
+  > git-credential-osxkeychain path above.
+
 Pick whichever you prefer. Tutorial 03 needs git auth working too.
 
 ### 4. Initial backup

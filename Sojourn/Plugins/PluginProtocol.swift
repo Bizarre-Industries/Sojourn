@@ -63,7 +63,7 @@ internal indirect enum PluginValue: Sendable, Codable, Hashable {
   case array([PluginValue])
   case object([String: PluginValue])
 
-  internal init(from decoder: Decoder) throws {
+  internal init(from decoder: any Decoder) throws {
     let c = try decoder.singleValueContainer()
     if c.decodeNil()                                     { self = .null;       return }
     if let v = try? c.decode(Bool.self)                  { self = .bool(v);    return }
@@ -75,7 +75,7 @@ internal indirect enum PluginValue: Sendable, Codable, Hashable {
     throw DecodingError.dataCorruptedError(in: c, debugDescription: "PluginValue")
   }
 
-  internal func encode(to encoder: Encoder) throws {
+  internal func encode(to encoder: any Encoder) throws {
     var c = encoder.singleValueContainer()
     switch self {
     case .null:           try c.encodeNil()

@@ -48,7 +48,7 @@ internal actor PluginHost {
       return []
     }
 
-    var found: [PluginManifest] = []
+    let found: [PluginManifest] = []
     for url in entries {
       guard url.pathExtension == "sojourn-plugin" else { continue }
       let manifestURL = url.appendingPathComponent("manifest.toml")

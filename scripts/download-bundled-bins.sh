@@ -92,11 +92,12 @@ COSIGN_VERSION="3.0.3"  # or latest stable; check https://github.com/sigstore/co
 case "$ARCH" in
   arm64)
     COSIGN_ASSET="cosign-darwin-arm64"
-    COSIGN_SHA256="TBD"  # fill from upstream checksums.txt at the version you pin
+    # From sigstore/cosign v3.0.3 cosign_checksums.txt
+    COSIGN_SHA256="38349e45a8bb0d1ed3a7affb8bdd2e9d597cee08b6800c395a926b4d9adb84d2"
     ;;
   x86_64)
     COSIGN_ASSET="cosign-darwin-amd64"
-    COSIGN_SHA256="TBD"
+    COSIGN_SHA256="6c75981e85e081a73f0b4087f58e0ad5fd4712c71b37fa0b6ad774c1f965bafa"
     ;;
 esac
 

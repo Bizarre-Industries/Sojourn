@@ -31,17 +31,51 @@ All notable changes to Sojourn. Follows
 - Phase 8 docs: `SUPPORTED_MANAGERS`, `CONFLICTS`, `PREFS_DOMAINS`,
   `RELEASE`, `FUTURE`; `ARCHITECTURE.md` §17 Testing + §18 Observability.
 - Phase 9 tooling: `.swift-format`, `.swiftlint.yml`.
-- **Audit-driven docs restructure (Diátaxis)**:
-  Phases 0–8 of the docs rework — full Diátaxis tree under `docs/`
-  (`start/`, `how-to/`, `reference/`, `explain/` + `decisions/`,
-  `process/`, `design/`, `assets/`); 14 ADRs at `docs/decisions/`;
-  ARCHITECTURE.md split into 14 destinations preserved at
-  `docs/_legacy_architecture.md`; SUPPORTED_MANAGERS.md split into
-  18 per-manager pages + index; 5 net-new audit docs (externals,
-  secret-brokers, ssh-config, extra-config, plugin-protocol);
-  `redirects.toml` tracks every move with sunset version. See
-  `docs/process/audit-2026-04.md` for the audit and
-  `docs/process/implementation-plan.md` for sequencing.
+- **Audit-driven docs restructure (Diátaxis)** — phases 0–12 of the
+  docs rework now shipped:
+  - Tree skeleton (`start/`, `how-to/`, `reference/`, `explain/` +
+    `decisions/`, `process/`, `design/`, `assets/`).
+  - 14 ADRs at `docs/decisions/`.
+  - `ARCHITECTURE.md` split into 14 destinations; legacy preserved
+    at `docs/_legacy_architecture.md` for `git log --follow`.
+  - `SUPPORTED_MANAGERS.md` split into 18 per-manager pages under
+    `docs/reference/package-managers/` + `index.md`.
+  - 5 net-new audit reference docs (externals, secret-brokers,
+    ssh-config, extra-config, plugin-protocol).
+  - **Phase 7**: root `SECURITY.md` + `CODE_OF_CONDUCT.md` +
+    `docs/explain/threat-model.md` substantive split.
+  - **Phase 7.5**: strict proposal §3 naming applied — 9 renames
+    via `git mv` (managers/ → package-managers/, preference-domains
+    → pref-domains, bootstrap-flow → explain/bootstrap-state-machine,
+    observability → explain/observability, competitive-landscape
+    → why-sojourn, future-work → process/future, THIRDPARTY.md →
+    docs/reference/third-party.md with 1-line root pointer); new
+    `docs/reference/chezmoi-features.md` feature-surface index.
+  - **Phase 8**: 10 net-new explain pages (why-sojourn,
+    design-philosophy, trade-offs, ipc-not-linking, tier-model,
+    cooperative-locking, threat-model, carry-vs-sync,
+    bootstrap-state-machine, observability).
+  - **Phase 9**: 9 net-new reference pages (6 file-formats specs
+    `packages-toml`, `machines-toml`, `active-toml`, `version-toml`,
+    `deletions-db`, `history-db`; plus `settings`,
+    `keyboard-shortcuts`, `cli` placeholders).
+  - **Phase 10**: 27 net-new how-to guides across `secrets/` (4),
+    `dotfiles/` (7), `sync/` (4), `packages/` (5),
+    `preferences/` (3), `diagnostics/` (2), `development/` (2 new).
+  - **Phase 11**: 4 net-new tutorials in `start/` (install,
+    first-push, second-machine, recover-from-loss).
+  - **Phase 12**: audit coverage map appended to
+    `process/audit-2026-04.md` linking every audit ID to its
+    closing doc URL.
+  - `redirects.toml` records every move with sunset version
+    (`v0.3` for most, `v0.4` for `ARCHITECTURE.md`).
+  - All 7 docs-rework `process/open-questions.md` §11 sub-questions
+    closed; `AGENTS.md` ratified as canonical entry.
+  - Total: 106 files, +5514 / −630 LOC.
+
+  See `docs/process/audit-2026-04.md` for the audit, `docs/process/implementation-plan.md`
+  for code-side sequencing, and `docs/redirects.toml` for the
+  rename log.
 
 ### Planned (post-v1)
 

@@ -1,0 +1,27 @@
+# zizmor configuration — workflow-security audit suppressions
+# https://docs.zizmor.sh/configuration/
+#
+# All rules suppressed below are scoped to release-only or
+# tag-only workflows. None run on `pull_request` events, so the
+# canonical attack vector (PR-scoped cache writes poisoning a
+# trusted-context release run) does not apply here.
+
+rules:
+  cache-poisoning:
+    # build.yml + codeql.yml analyze-swift + notarize.yml run only on
+    # tag push / weekly cron / workflow_dispatch. No PR trigger means
+    # no untrusted-context cache writes that could poison subsequent
+    # trusted-context reads. Cache key is bound to Package.resolved
+    # which limits lateral movement between dep graphs.
+    ignore:
+      - build.yml
+      - codeql.yml
+      - notarize.yml
+
+  superfluous-actions:
+    # softprops/action-gh-release packages checksum + asset upload +
+    # release-notes glue into one step. Replacing with a `gh release`
+    # script costs more than the action saves; informational finding
+    # only.
+    ignore:
+      - notarize.yml

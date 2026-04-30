@@ -31,6 +31,9 @@ jobs:
       # we don't cache), but `swift package resolve` is fast on cache
       # hit and primes the workspace.
       - name: Cache SPM
+        # zizmor: ignore[cache-poisoning]
+        # notarize.yml runs only on tag push — no PR vector. Cache key
+        # is bound to Package.resolved.
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: |
@@ -123,6 +126,10 @@ jobs:
           spctl --assess --type install --verbose=4 Sojourn.dmg
 
       - name: Upload release artifact
+        # zizmor: ignore[superfluous-actions]
+        # action handles checksum + asset upload + release-note glue
+        # in one step; replacing with `gh release` script costs more
+        # than the action saves. Informational finding only.
         uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda # v3.0.0
         with:
           files: Sojourn.dmg

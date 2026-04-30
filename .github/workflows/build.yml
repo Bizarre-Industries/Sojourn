@@ -40,6 +40,10 @@ jobs:
       # Requires Package.resolved committed (see
       # docs/process/security-tooling.md Bootstrap step 1).
       - name: Cache SPM
+        # zizmor: ignore[cache-poisoning]
+        # Tag/dispatch only — no PR write path that could poison this
+        # cache. Lateral movement between tag runs is bounded by the
+        # Package.resolved hash key.
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: |

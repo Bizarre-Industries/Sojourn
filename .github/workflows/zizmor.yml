@@ -44,7 +44,7 @@ jobs:
           persist-credentials: false
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v8 # PIN-SHA-AFTER
+        uses: astral-sh/setup-uv@v8.1.0 # PIN-SHA-AFTER
         with:
           # Pin the uv version so a runner-side uv update doesn't
           # silently change behaviour. Bumped by Dependabot.

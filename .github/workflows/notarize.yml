@@ -5,8 +5,6 @@ on:
     tags:
       - 'v*'
 
-# Default to read-only at the workflow level. The single job below
-# overrides with `contents: write` because it creates a GitHub release.
 permissions:
   contents: read
 
@@ -16,21 +14,32 @@ jobs:
     runs-on: macos-15
     environment: release
     permissions:
-      contents: write # softprops/action-gh-release creates the release
+      contents: write
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
-          # The release creation uses softprops/action-gh-release which
-          # takes its own token via the `GITHUB_TOKEN` env it inherits;
-          # it doesn't depend on creds persisted in .git/config. The
-          # Homebrew tap publish uses HOMEBREW_TAP_TOKEN (separate PAT),
-          # not the workflow's GITHUB_TOKEN. So no need to persist creds.
           persist-credentials: false
 
       - name: Select Xcode
         uses: maxim-lobanov/setup-xcode@v1 # PIN-SHA-AFTER
         with:
           xcode-version: '^16.0'
+
+      # Cache resolved SPM packages. Same key as build.yml + codeql.yml
+      # so all three jobs share the cache. xcodebuild's package
+      # resolution still runs (it uses DerivedData/SourcePackages which
+      # we don't cache), but `swift package resolve` is fast on cache
+      # hit and primes the workspace.
+      - name: Cache SPM
+        uses: actions/cache@v4 # PIN-SHA-AFTER
+        with:
+          path: |
+            .build
+            ~/Library/Caches/org.swift.swiftpm
+            ~/Library/org.swift.swiftpm
+          key: ${{ runner.os }}-spm-${{ hashFiles('Package.resolved') }}
+          restore-keys: |
+            ${{ runner.os }}-spm-
 
       - name: Import Developer ID certificate
         env:
@@ -85,6 +94,21 @@ jobs:
 
       - name: Create DMG
         run: bash scripts/make-dmg.sh build/Build/Products/Release/Sojourn.app
+
+      # Upload the signed-but-not-yet-notarized DMG. If notarization
+      # fails or the queue is slow, you can download this and re-run
+      # `xcrun notarytool submit` locally without rebuilding (~15 min
+      # saved). 30-day retention covers any reasonable retry window.
+      #
+      # Order matters: this step is BEFORE notarization, so even if
+      # notarization fails the DMG is preserved.
+      - name: Upload pre-notarize DMG
+        uses: actions/upload-artifact@v4 # PIN-SHA-AFTER
+        with:
+          name: sojourn-dmg-pre-notarize-${{ github.ref_name }}
+          path: Sojourn.dmg
+          retention-days: 30
+          if-no-files-found: error
 
       - name: Notarize DMG
         env:

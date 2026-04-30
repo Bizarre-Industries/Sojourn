@@ -32,6 +32,12 @@ permissions:
   security-events: write
   actions: read
 
+# Cancel stacked runs on PRs (force-pushes, rebases). Push/cron/dispatch
+# always complete.
+concurrency:
+  group: zizmor-${{ github.ref }}-${{ github.event_name }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   zizmor:
     name: Lint workflows
@@ -49,22 +55,9 @@ jobs:
 
       - name: Run zizmor
         env:
-          # Some zizmor audits (e.g. impostor-commit detection) call
-          # the GitHub API. Without GH_TOKEN those audits are skipped
-          # silently — provide the workflow token.
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # zizmor writes its report to stdout; redirect to capture.
-          # There is no --output flag (zizmor 1.x).
-          # --format=sarif always exits 0 even with findings, per the
-          # zizmor docs; the SARIF upload step routes findings into
-          # the Security tab.
           uvx zizmor@1.24.1 --format=sarif .github/ > zizmor.sarif
-
-          # Plain output for the Actions log so findings are readable
-          # without round-tripping through the Security tab. Plain
-          # format exits non-zero on findings — `|| true` keeps the
-          # step green so SARIF upload runs.
           uvx zizmor@1.24.1 --format=plain .github/ || true
 
       - name: Upload SARIF

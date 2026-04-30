@@ -1,98 +1,99 @@
-name: Pin actions
+name: Pin Actions
 
-# One-time + on-demand SHA pinning of GitHub Actions. Runs `pinact`
-# across all workflow files, then opens a PR with the SHA-pinned
-# results. Dependabot maintains them after that.
+# Resolves all GitHub Actions references in .github/workflows/* to
+# immutable commit SHAs via pinact. Opens a PR with the changes.
 #
-# Trigger:
-#   - workflow_dispatch    — maintainer clicks Run from the Actions tab
-#   - cron: monthly        — sweep for any unpinned action that slipped in
+# Why a dedicated PAT (WORKFLOWS_PAT):
+#   GITHUB_TOKEN cannot modify files under .github/workflows/ even
+#   with `contents: write` — GitHub rejects the push server-side as
+#   privilege-escalation prevention. A fine-grained PAT with
+#   `Workflows: Read and write` is required for both the checkout
+#   (so the post-job push uses the right credential) and for
+#   peter-evans/create-pull-request (so the PR-creating push has
+#   workflow scope).
+#
+# This workflow is belt-and-braces. The primary defenses are:
+#   1. Local pre-commit (`make pin-actions` runs `pinact run --update`)
+#   2. zizmor.yml PR gate (fails if unpinned actions land)
+#   3. Dependabot weekly bumps SHAs and refreshes # comments
+#
+# This cron sweep catches drift if a commit lands without local
+# pinning. If WORKFLOWS_PAT becomes a maintenance burden, this
+# workflow can be deleted with no loss of correctness — the three
+# layers above cover all cases.
 
 on:
-  workflow_dispatch:
   schedule:
-    - cron: '0 10 1-7 * 1'
+    - cron: '0 10 1 * *' # 1st of each month, 10:00 UTC
+  workflow_dispatch:
+
 
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
+
+concurrency:
+  group: pin-actions
+  cancel-in-progress: false
 
 jobs:
   pin:
     name: Pin actions to SHAs
     runs-on: ubuntu-latest
+    permissions:
+      contents: read # PAT supplies write
+      pull-requests: read # PAT supplies write
     steps:
-      - name: Checkout
-        uses: actions/checkout@v5 # PIN-SHA-AFTER
+      - uses: actions/checkout@v6 # PIN-SHA-AFTER
         with:
-          # Need full history so we can create a branch + push a PR.
-          fetch-depth: 0
-          # peter-evans/create-pull-request takes its token via the
-          # `token:` input below; it doesn't depend on creds persisted
-          # in .git/config. Keep credentials out of the worktree.
-          persist-credentials: false
+          # PAT instead of GITHUB_TOKEN — needed because the post-job
+          # cleanup step and any subsequent git push must be allowed
+          # to modify .github/workflows/. persist-credentials: true
+          # so the token sticks for the create-pull-request step's
+          # implicit branch operations.
+          token: ${{ secrets.WORKFLOWS_PAT }}
+          persist-credentials: true
 
       - name: Install pinact
         run: |
-          set -euo pipefail
           PINACT_VERSION="3.5.0"
           curl -sSL -o /tmp/pinact.tar.gz \
             "https://github.com/suzuki-shunsuke/pinact/releases/download/v${PINACT_VERSION}/pinact_linux_amd64.tar.gz"
           tar -xzf /tmp/pinact.tar.gz -C /tmp
-          sudo mv /tmp/pinact /usr/local/bin/pinact
-          chmod +x /usr/local/bin/pinact
+          sudo install /tmp/pinact /usr/local/bin/pinact
           pinact --version
 
       - name: Run pinact
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          pinact run --update
+        run: pinact run --update
 
       - name: Check for changes
-        id: diff
+        id: changes
         run: |
-          if git diff --quiet; then
-            echo "changed=false" >> "$GITHUB_OUTPUT"
-            echo "no changes"
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
           else
-            echo "changed=true" >> "$GITHUB_OUTPUT"
-            git diff --stat
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Create PR
-        if: steps.diff.outputs.changed == 'true'
-        uses: peter-evans/create-pull-request@v7 # PIN-SHA-AFTER
+      - name: Create Pull Request
+        if: steps.changes.outputs.has_changes == 'true'
+        uses: peter-evans/create-pull-request@v8 # PIN-SHA-AFTER
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "chore(security): pin actions to commit SHAs"
+          # Same WORKFLOWS_PAT — peter-evans/create-pull-request needs
+          # workflow scope to push the branch with workflow file diffs.
+          token: ${{ secrets.WORKFLOWS_PAT }}
           branch: chore/pin-actions
           delete-branch: true
-          title: "chore(security): pin actions to commit SHAs"
-          labels: |
-            dependencies
-            github-actions
-            security
+          base: main
+          commit-message: 'chore: pin actions to immutable SHAs'
+          title: 'chore: pin actions to immutable SHAs'
           body: |
-            Automated PR from `.github/workflows/pin-actions.yml`.
+            Automated SHA pinning sweep via [pinact](https://github.com/suzuki-shunsuke/pinact).
 
-            `pinact` resolved all `uses:` refs to immutable commit SHAs
-            and added trailing `# vX.Y.Z` comments that Dependabot
-            uses to track upstream releases.
+            All GitHub Actions references in `.github/workflows/` resolved to immutable commit SHAs with trailing `# v<tag>` comments for human readability.
 
-            ## Why
-            Tag references (e.g. `@v5`) are mutable: anyone with write
-            access to the action's repo can re-point a tag to a new
-            commit. SHA pins are immutable. See
-            `docs/process/security-tooling.md` "SHA pinning" for the
-            full rationale.
-
-            ## How to verify
-            - Every `uses:` line should now have a 40-char SHA followed
-              by `# v...` comment.
-            - `make zizmor` should report zero unpinned-action findings
-              after merge.
-
-            ## Maintenance
-            Dependabot's `gh-actions-all` group will weekly bump these
-            SHAs as upstream tags advance. No manual intervention needed.
+            Verify with `pinact run --check` after merging.
+          labels: |
+            automated
+            chore
+            security
+          assignees: binGhzal

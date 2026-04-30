@@ -3,24 +3,11 @@ name: CodeQL
 # CodeQL split into two jobs by cost:
 #
 #   analyze-light  (python, actions)
-#     ubuntu, build-mode=none, ~2 min each. Cheap enough to run on
-#     every commit and PR — gives fast feedback on workflow file
-#     changes and Python helper script changes.
+#     ubuntu, build-mode=none, ~2 min each. Runs on every commit/PR.
 #
 #   analyze-swift  (swift)
 #     macos-15, build-mode=manual (`swift build`), ~10 min.
-#     Heavy. Runs only on:
-#       - tag push v*           (correlate to a shipped version)
-#       - weekly cron Mon 06:00 (catch new advisories)
-#       - workflow_dispatch     (maintainer audit on demand)
-#     This matches the original triggering before the multi-language
-#     expansion. Sojourn doesn't have so much Swift churn that a daily
-#     full-app scan is necessary; weekly + per-release is the right
-#     cadence.
-#
-# JavaScript was removed entirely — Sojourn has no .js/.ts source files.
-# Inline JS in actions/github-script blocks is analysed by the `actions`
-# language pack.
+#     Runs only on tag push v*, weekly cron, manual dispatch.
 
 on:
   push:
@@ -38,10 +25,15 @@ permissions:
   contents: read
   security-events: write
 
+# Cancel in-progress runs ONLY for PR context. Pushes to main, tag
+# pushes, and scheduled runs all complete fully — they're either
+# release-correlated or low-frequency, and shouldn't be killed by
+# stacked triggers.
+concurrency:
+  group: codeql-${{ github.ref }}-${{ github.event_name }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
-  # ----------------------------------------------------------------------- #
-  # Light path — runs on every push + PR + cron + dispatch
-  # ----------------------------------------------------------------------- #
   analyze-light:
     name: Analyze (${{ matrix.language }})
     runs-on: ubuntu-latest
@@ -72,18 +64,11 @@ jobs:
           category: /language:${{ matrix.language }}
           upload: always
 
-  # ----------------------------------------------------------------------- #
-  # Heavy path — Swift only, gated to tag/cron/dispatch
-  # ----------------------------------------------------------------------- #
   analyze-swift:
     name: Analyze swift
     runs-on: macos-15
     timeout-minutes: 60
 
-    # Skip on push-to-branch and pull_request. Run only when:
-    #   - a tag matching v* is pushed
-    #   - the weekly cron fires
-    #   - a maintainer manually triggers
     if: |
       (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')) ||
       github.event_name == 'schedule' ||
@@ -99,6 +84,21 @@ jobs:
         uses: maxim-lobanov/setup-xcode@v1 # PIN-SHA-AFTER
         with:
           xcode-version: '^16.0'
+
+      # Same SPM cache key as build.yml + notarize.yml. All three jobs
+      # share the cache: build.yml swift-test populates it on tag push,
+      # this analyze-swift job restores from it on the same tag push,
+      # cron runs use whatever's freshest.
+      - name: Cache SPM
+        uses: actions/cache@v4 # PIN-SHA-AFTER
+        with:
+          path: |
+            .build
+            ~/Library/Caches/org.swift.swiftpm
+            ~/Library/org.swift.swiftpm
+          key: ${{ runner.os }}-spm-${{ hashFiles('Package.resolved') }}
+          restore-keys: |
+            ${{ runner.os }}-spm-
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v4 # PIN-SHA-AFTER

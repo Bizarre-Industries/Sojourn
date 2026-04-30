@@ -10,8 +10,7 @@ on:
       - 'v*'
   workflow_dispatch:
 
-    # Default to read-only for the whole workflow. No job needs writes;
-    # this is a build-and-test pipeline, not a release job.
+
 permissions:
   contents: read
 
@@ -26,13 +25,30 @@ jobs:
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
-          # Don't persist GITHUB_TOKEN in .git/config; nothing here pushes.
           persist-credentials: false
 
       - name: Select Xcode
-        uses: maxim-lobanov/setup-xcode@v1 # PIN-SHA-AFTER (next pinact run)
+        uses: maxim-lobanov/setup-xcode@v1 # PIN-SHA-AFTER
         with:
           xcode-version: '^16.0'
+
+      # Cache resolved SPM packages + build outputs. Keyed on
+      # Package.resolved so the cache invalidates when deps change but
+      # is shared across runs that have the same dep graph. Shared with
+      # codeql.yml swift job (same key prefix → both populate/restore).
+      #
+      # Requires Package.resolved committed (see
+      # docs/process/security-tooling.md Bootstrap step 1).
+      - name: Cache SPM
+        uses: actions/cache@v4 # PIN-SHA-AFTER
+        with:
+          path: |
+            .build
+            ~/Library/Caches/org.swift.swiftpm
+            ~/Library/org.swift.swiftpm
+          key: ${{ runner.os }}-spm-${{ hashFiles('Package.resolved') }}
+          restore-keys: |
+            ${{ runner.os }}-spm-
 
       - name: Swift version
         run: swift --version
@@ -63,6 +79,7 @@ jobs:
         run: xcodebuild -resolvePackageDependencies -project Sojourn.xcodeproj -scheme Sojourn
 
       - name: Test
+        id: xcodebuild-test
         run: |
           # SojournUITests skipped on CI — XCUITest test-runner refuses
           # to load an ad-hoc-signed test bundle (Team ID mismatch). UI
@@ -73,7 +90,42 @@ jobs:
             -scheme Sojourn \
             -destination 'platform=macOS' \
             -enableCodeCoverage YES \
+            -resultBundlePath build/Test.xcresult \
             -skip-testing:SojournUITests \
             CODE_SIGN_IDENTITY="-" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO
+
+      # Upload xcresult on failure for debugging without re-running.
+      # 14-day retention — long enough to investigate, short enough not
+      # to bloat storage. xcresult bundles contain test logs, attached
+      # screenshots, and build settings — invaluable for "why did this
+      # fail in CI but pass locally" debugging.
+      - name: Upload xcresult on failure
+        if: failure() && steps.xcodebuild-test.outcome == 'failure'
+        uses: actions/upload-artifact@v4 # PIN-SHA-AFTER
+        with:
+          name: xcresult-${{ github.run_id }}
+          path: build/Test.xcresult
+          retention-days: 14
+          if-no-files-found: warn
+
+      # Coverage report — uploaded on success. Useful for tracking
+      # coverage over time via external tools (codecov, coveralls) when
+      # those land. 30-day retention.
+      - name: Extract coverage
+        if: success()
+        run: |
+          xcrun xccov view --report --json build/Test.xcresult > coverage.json
+          xcrun xccov view --report build/Test.xcresult > coverage.txt
+
+      - name: Upload coverage
+        if: success()
+        uses: actions/upload-artifact@v4 # PIN-SHA-AFTER
+        with:
+          name: coverage-${{ github.run_id }}
+          path: |
+            coverage.json
+            coverage.txt
+          retention-days: 30
+          if-no-files-found: warn

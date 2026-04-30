@@ -85,6 +85,11 @@ jobs:
       - name: Run gitleaks
         run: gitleaks dir --config=.gitleaks.toml --verbose
 
+        env:
+          GITLEAKS_CONFIG: .gitleaks.toml
+          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   lint:
     name: SwiftLint (advisory)
     runs-on: macos-15

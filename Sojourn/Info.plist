@@ -28,6 +28,8 @@
   <string>GPL-3.0-or-later. See LICENSE.</string>
   <key>NSPrincipalClass</key>
   <string>NSApplication</string>
+  <key>ATSApplicationFontsPath</key>
+  <string>Fonts</string>
   <key>NSSupportsAutomaticTermination</key>
   <false/>
   <key>NSSupportsSuddenTermination</key>

@@ -47,6 +47,7 @@ let package = Package(
         "Sojourn.entitlements",
         "Resources/bin",
         "Resources/Assets.xcassets",
+        "Resources/Fonts",
         "Config",
         // SwiftUI app entry + view layer: built only by Xcode (.app bundle).
         // SPM library cannot link @main cleanly, and AppKit/SwiftUI requires

@@ -42,12 +42,14 @@ targets:
           - Info.plist
           - Sojourn.entitlements
           - Resources/bin
-          - Resources/Assets.xcassets
+          - Resources/data
+          - Resources/Fonts
           - Config
     resources:
       - path: Sojourn/Resources/data
         type: folder
-      - path: Sojourn/Resources/Assets.xcassets
+      - path: Sojourn/Resources/Fonts
+        type: folder
     dependencies:
       - package: swift-subprocess
         product: Subprocess

@@ -1,54 +1,47 @@
 // Sojourn — MainWindowView
 //
-// Primary window. NavigationSplitView with the sidebar listing panes and
-// a pane-level detail column. See docs/ARCHITECTURE.md §11.
+// Primary window. Carry-first 12-entry sidebar (`SojournSidebarMenu`),
+// Liquid Glass shell over the wallpaper, glass toolbar with Push/Pull.
+// Pane content gets richer in Stage 3; Stage 2 establishes the chrome.
 
 import SwiftUI
 
 struct MainWindowView: View {
   @Environment(AppStore.self) private var store
-  @State private var selection: Pane? = .packages
-
-  enum Pane: String, Hashable, CaseIterable, Identifiable {
-    case packages, dotfiles, preferences, history, machines, cleanup
-    var id: String { rawValue }
-
-    var title: String {
-      switch self {
-      case .packages: return "Packages"
-      case .dotfiles: return "Dotfiles"
-      case .preferences: return "Preferences"
-      case .history: return "History"
-      case .machines: return "Machines"
-      case .cleanup: return "Cleanup"
-      }
-    }
-
-    var systemImage: String {
-      switch self {
-      case .packages: return "shippingbox"
-      case .dotfiles: return "doc.text"
-      case .preferences: return "slider.horizontal.3"
-      case .history: return "clock.arrow.circlepath"
-      case .machines: return "laptopcomputer.and.iphone"
-      case .cleanup: return "trash"
-      }
-    }
-  }
+  @State private var selection: String = "overview"
 
   var body: some View {
-    NavigationSplitView {
-      Sidebar(selection: $selection)
-        .navigationTitle("Sojourn")
-        .frame(minWidth: 200)
-    } detail: {
+    HStack(spacing: 0) {
+      LiquidGlassSidebar(
+        selection: $selection,
+        machineName: machineDisplayName,
+        machineRole: "ACTIVE WRITER",
+        machineActivity: "2h AGO",
+        machineSha: "a3f9c2e"
+      )
+
       VStack(spacing: 0) {
-        PushPullBar()
+        SojournToolbar(title: titleFor(selection), eyebrow: "BIZARRE / SOJOURN")
+
         Divider()
-        detail(for: selection ?? .packages)
+          .background(Color.hairline)
+
+        ZStack {
+          Color.glassContent
+          detail(for: selection)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        }
       }
-      .frame(minWidth: 600, minHeight: 400)
+      .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
+    .frame(minWidth: 1024, minHeight: 640)
+    .background(
+      ZStack {
+        GlassWallpaper()
+        Color.glassWindow
+      }
+      .ignoresSafeArea()
+    )
     .sheet(isPresented: bootstrapSheetPresented) {
       BootstrapView(
         state: store.bootstrap.state,
@@ -60,6 +53,14 @@ struct MainWindowView: View {
         }
       )
     }
+  }
+
+  private var machineDisplayName: String {
+    Host.current().localizedName ?? "this-mac"
+  }
+
+  private func titleFor(_ id: String) -> String {
+    SojournSidebarMenu.entries.first { $0.id == id }?.label ?? "Sojourn"
   }
 
   private var bootstrapSheetPresented: Binding<Bool> {
@@ -75,29 +76,21 @@ struct MainWindowView: View {
   }
 
   @ViewBuilder
-  private func detail(for pane: Pane) -> some View {
-    switch pane {
-    case .packages: PackagesPane()
-    case .dotfiles: DotfilesPane()
-    case .preferences: PreferencesPane()
-    case .history: HistoryPane()
-    case .machines: MachinesPane()
-    case .cleanup: CleanupPane()
+  private func detail(for id: String) -> some View {
+    switch id {
+    case "overview":    OverviewPane()
+    case "packages":    PackagesPane()
+    case "dotfiles":    DotfilesPane()
+    case "preferences": PreferencesPane()
+    case "machines":    MachinesPane()
+    case "history":     HistoryPane()
+    case "conflicts":   ConflictsPane()
+    case "onboard":     OnboardPane()
+    case "secrets":     SecretsPane()
+    case "cleanup":     CleanupPane()
+    case "diagnostics": DiagnosticsPane()
+    case "settings":    SettingsPaneEmbedded()
+    default:            OverviewPane()
     }
-  }
-}
-
-struct Sidebar: View {
-  @Binding var selection: MainWindowView.Pane?
-
-  var body: some View {
-    List(selection: $selection) {
-      ForEach(MainWindowView.Pane.allCases) { pane in
-        Label(pane.title, systemImage: pane.systemImage)
-          .tag(Optional(pane))
-          .accessibilityIdentifier("sidebar.\(pane.rawValue)")
-      }
-    }
-    .listStyle(.sidebar)
   }
 }

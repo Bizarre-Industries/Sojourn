@@ -23,7 +23,7 @@ struct GitServiceTests {
 
 struct MPMServiceMockTests {
   @Test func mockDecodesInstalled() async throws {
-    let url = Bundle.module.url(
+    let url = Bundle.sojournFixtures.url(
       forResource: "mpm-installed",
       withExtension: "json",
       subdirectory: "Fixtures"
@@ -51,7 +51,7 @@ struct MPMServiceMockTests {
 
 struct ChezmoiServiceTests {
   @Test func decodesManagedFixture() async throws {
-    let url = Bundle.module.url(
+    let url = Bundle.sojournFixtures.url(
       forResource: "chezmoi-managed",
       withExtension: "json",
       subdirectory: "Fixtures"
@@ -77,7 +77,7 @@ struct PrefServiceTests {
 
 struct SecretScanServiceTests {
   @Test func decodesFixtureReport() async throws {
-    let url = Bundle.module.url(
+    let url = Bundle.sojournFixtures.url(
       forResource: "gitleaks-report",
       withExtension: "json",
       subdirectory: "Fixtures"

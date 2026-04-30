@@ -35,12 +35,14 @@ struct SojournApp: App {
       }
     }
 
-    MenuBarExtra("Sojourn", systemImage: "arrow.triangle.2.circlepath") {
+    MenuBarExtra {
       if let store = storeBox.store {
         MenuBarRootView().environment(store)
       } else {
         Text("Sojourn not ready").padding(12)
       }
+    } label: {
+      SojournMenuBarIconView(size: 18, color: .primary)
     }
     .menuBarExtraStyle(.window)
 

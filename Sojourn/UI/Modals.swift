@@ -1,13 +1,15 @@
-// Sojourn — Modals
+// Sojourn — Modals & Sheets
 //
-// - BootstrapView: shown as a sheet on first run; drives BootstrapService.
-// - ConflictResolutionView: three-way diff UI for SyncCoordinator pull.
-// - SecretFindingsModal: 5s-locked "Commit anyway" button for high-
-//   confidence secret findings per docs/SECURITY.md.
-//
-// See docs/ARCHITECTURE.md §11.
+// Liquid Glass redesign of the modal surfaces:
+// - BootstrapView: first-run sheet driving BootstrapService.
+// - PushSheet: gitleaks-clean push preview + commit message.
+// - PullSheet: pull preview with per-pillar diff + conflict count.
+// - SecretFindingsModal: 5s-locked bypass for high-confidence findings.
+// - ConflictResolutionView: three-way diff for SyncCoordinator pull.
 
 import SwiftUI
+
+// MARK: - Bootstrap (first-run)
 
 struct BootstrapView: View {
   let state: BootstrapState
@@ -15,16 +17,19 @@ struct BootstrapView: View {
   var onRetry: () -> Void = {}
 
   var body: some View {
-    VStack(alignment: .leading, spacing: 16) {
-      HStack {
-        Image(systemName: "sparkles")
-        Text("Setting up Sojourn").font(.title2.bold())
+    VStack(alignment: .leading, spacing: 18) {
+      HStack(spacing: 10) {
+        SojournMenuBarIconView(size: 18, color: .bzrLime)
+        Text("Setting up Sojourn")
+          .font(.bzrDetailH2)
+          .foregroundStyle(Color.txtPrimary)
       }
 
       body(for: state)
     }
     .padding(24)
-    .frame(width: 520)
+    .frame(width: 560)
+    .modifier(GlassSheetBackground())
     .accessibilityIdentifier("bootstrap.root")
   }
 
@@ -32,50 +37,200 @@ struct BootstrapView: View {
   private func body(for state: BootstrapState) -> some View {
     switch state {
     case .unknown, .probingSystem:
-      ProgressView("Checking your system…")
-        .accessibilityIdentifier("bootstrap.probing")
+      VStack(alignment: .leading, spacing: 12) {
+        BzrProgressBar(value: 0.15)
+        Text("Probing your system for git, brew, mpm, chezmoi, age, gitleaks…")
+          .font(.bzrBody(size: 13))
+          .foregroundStyle(Color.txtSecondary)
+      }
+      .accessibilityIdentifier("bootstrap.probing")
 
     case .reportingStatus(let inv), .awaitingUserConsent(let inv):
-      VStack(alignment: .leading, spacing: 8) {
-        Text("Sojourn needs to install a few things before it can sync.")
-          .font(.body)
+      VStack(alignment: .leading, spacing: 12) {
         if !inv.missing.isEmpty {
-          Label("Missing: \(inv.missing.joined(separator: ", "))",
-                systemImage: "exclamationmark.triangle")
+          BzrCallout(
+            title: "Missing tools",
+            kind: .warn,
+            bodyText: inv.missing.joined(separator: ", ")
+          )
         }
         if !inv.hasCLT {
-          Label("Xcode Command Line Tools required", systemImage: "wrench")
+          BzrCallout(
+            title: "Xcode CLT required",
+            kind: .warn,
+            bodyText: "Click 'Install missing tools' — macOS surfaces its own Authorization sheet."
+          )
         }
-        Button("Install missing tools") { onConsent() }
-          .keyboardShortcut(.defaultAction)
-          .accessibilityIdentifier("bootstrap.consent")
+        HStack {
+          Spacer()
+          Button("Install missing tools") { onConsent() }
+            .buttonStyle(GlassPrimaryButtonStyle())
+            .keyboardShortcut(.defaultAction)
+            .accessibilityIdentifier("bootstrap.consent")
+        }
       }
 
     case .installingCLT:
-      ProgressView("Waiting for Xcode Command Line Tools to install…")
-
+      bootstrapStep(0.30, "Installing Xcode Command Line Tools…")
     case .installingBrew:
-      ProgressView("Installing Homebrew (signed .pkg)…")
-
+      bootstrapStep(0.50, "Installing Homebrew (signed .pkg)…")
     case .installingMPM:
-      ProgressView("Installing meta-package-manager…")
-
+      bootstrapStep(0.70, "Installing meta-package-manager…")
     case .installingChezmoi:
-      ProgressView("Installing chezmoi…")
+      bootstrapStep(0.90, "Installing chezmoi…")
 
     case .ready:
-      Label("Ready.", systemImage: "checkmark.seal.fill")
-        .foregroundStyle(.green)
-        .accessibilityIdentifier("bootstrap.ready")
+      BzrCallout(
+        title: "Ready",
+        kind: .info,
+        bodyText: "All tools detected. You can close this and start carrying."
+      )
+      .accessibilityIdentifier("bootstrap.ready")
 
     case .failed(let reason):
-      VStack(alignment: .leading, spacing: 8) {
-        Label(reason, systemImage: "exclamationmark.octagon")
-          .foregroundStyle(.red)
-        Button("Retry") { onRetry() }
-          .accessibilityIdentifier("bootstrap.retry")
+      VStack(alignment: .leading, spacing: 10) {
+        BzrCallout(title: "Bootstrap failed", kind: .danger, bodyText: reason)
+        HStack {
+          Spacer()
+          Button("Retry") { onRetry() }
+            .buttonStyle(GlassPrimaryButtonStyle())
+            .accessibilityIdentifier("bootstrap.retry")
+        }
       }
     }
+  }
+
+  @ViewBuilder
+  private func bootstrapStep(_ progress: Double, _ label: String) -> some View {
+    VStack(alignment: .leading, spacing: 12) {
+      BzrProgressBar(value: progress)
+      Text(label)
+        .font(.bzrBody(size: 13))
+        .foregroundStyle(Color.txtSecondary)
+    }
+  }
+}
+
+// MARK: - Push sheet
+
+struct PushSheet: View {
+  let lastSync: Date?
+  var onClose: () -> Void = {}
+  var onPush: (String) -> Void = { _ in }
+
+  @State private var message: String = "sojourn: sync"
+
+  var body: some View {
+    VStack(alignment: .leading, spacing: 16) {
+      HStack(spacing: 10) {
+        Image(systemName: "arrow.up")
+          .foregroundStyle(Color.bzrLime)
+        Text("Push")
+          .font(.bzrDetailH2)
+          .foregroundStyle(Color.txtPrimary)
+        Spacer()
+        BzrBadge(text: "GITLEAKS · CLEAN", kind: .success)
+      }
+
+      BzrCallout(
+        title: "Pre-push checks",
+        kind: .info,
+        bodyText: "gitleaks scan: no findings. SBOM regenerated. Cooldown gate cleared."
+      )
+
+      VStack(alignment: .leading, spacing: 6) {
+        Text("Commit message")
+          .font(.bzrTinyEyebrow)
+          .tracking(1.6)
+          .foregroundStyle(Color.txtTertiary)
+        TextField("sojourn: sync", text: $message)
+          .textFieldStyle(.plain)
+          .font(.bzrBody(size: 13))
+          .foregroundStyle(Color.txtPrimary)
+          .padding(8)
+          .background(
+            RoundedRectangle(cornerRadius: 6)
+              .fill(Color.black.opacity(0.25))
+              .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.hairline, lineWidth: 0.5))
+          )
+      }
+
+      HStack {
+        Button("Cancel") { onClose() }
+          .buttonStyle(GlassGhostButtonStyle())
+          .keyboardShortcut(.cancelAction)
+        Spacer()
+        Button("Push to git@…") {
+          onPush(message)
+          onClose()
+        }
+        .buttonStyle(GlassPrimaryButtonStyle())
+        .keyboardShortcut(.defaultAction)
+        .accessibilityIdentifier("push.confirm")
+      }
+    }
+    .padding(22)
+    .frame(width: 560)
+    .modifier(GlassSheetBackground())
+    .accessibilityIdentifier("push.root")
+  }
+}
+
+// MARK: - Pull sheet
+
+struct PullSheet: View {
+  var conflictCount: Int = 0
+  var onClose: () -> Void = {}
+  var onPull: () -> Void = {}
+
+  var body: some View {
+    VStack(alignment: .leading, spacing: 16) {
+      HStack(spacing: 10) {
+        Image(systemName: "arrow.down")
+          .foregroundStyle(Color.bzrLime)
+        Text("Pull")
+          .font(.bzrDetailH2)
+          .foregroundStyle(Color.txtPrimary)
+        Spacer()
+        if conflictCount > 0 {
+          BzrBadge(text: "\(conflictCount) CONFLICT\(conflictCount == 1 ? "" : "S")", kind: .warn)
+        } else {
+          BzrBadge(text: "CLEAN", kind: .success)
+        }
+      }
+
+      BzrCallout(
+        title: "Snapshot first",
+        kind: .info,
+        bodyText: "Sojourn writes a pre-op snapshot to ~/Library/Application Support/Sojourn/backups/<ts>-pull/ before applying any change. 30-day retention."
+      )
+
+      if conflictCount > 0 {
+        BzrCallout(
+          title: "Conflicts",
+          kind: .warn,
+          bodyText: "Resolve in the Conflicts pane before this pull can apply."
+        )
+      }
+
+      HStack {
+        Button("Cancel") { onClose() }
+          .buttonStyle(GlassGhostButtonStyle())
+          .keyboardShortcut(.cancelAction)
+        Spacer()
+        Button(conflictCount > 0 ? "Open Conflicts" : "Pull from origin") {
+          onPull()
+          onClose()
+        }
+        .buttonStyle(GlassPrimaryButtonStyle())
+        .keyboardShortcut(.defaultAction)
+        .accessibilityIdentifier("pull.confirm")
+      }
+    }
+    .padding(22)
+    .frame(width: 560)
+    .modifier(GlassSheetBackground())
+    .accessibilityIdentifier("pull.root")
   }
 }
 

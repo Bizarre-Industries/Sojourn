@@ -48,8 +48,7 @@ maintainer's other project) uses `AGENTS.md` as its canonical entry
 point. Sojourn adopts the convention so any agent (Claude, Cursor,
 Codex, Aider, future) lands here rather than guessing at filenames.
 
-The full invariants live in [CLAUDE.md](CLAUDE.md) for now. Whether to
-flip the canonical from CLAUDE.md to AGENTS.md is tracked as an open
-question — see
+AGENTS.md is the canonical entry. CLAUDE.md retains the full invariants
+and "do not do" list — read it next. Decided in
 [docs/process/open-questions.md](docs/process/open-questions.md)
-"Docs-rework proposal §11 — naming decisions" Q1.
+"Docs-rework proposal §11" Q11.1 (closed 2026-04-30, Phase 7.5).

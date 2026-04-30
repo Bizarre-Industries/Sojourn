@@ -71,7 +71,7 @@ phase = 3
 
 [[redirect]]
 from = "docs/SUPPORTED_MANAGERS.md"
-to = "docs/reference/managers/README.md"
+to = "docs/reference/package-managers/index.md"
 sunset_version = "v0.3"
 phase = 5
 note = "Coverage matrix + 18 per-manager detail pages. Adding-a-manager section moved to how-to/development/."
@@ -93,3 +93,53 @@ to = "docs/explain/threat-model.md"
 sunset_version = "v0.3"
 phase = 7
 note = "Split: disclosure policy moved to root SECURITY.md (GH-recognized); substantive threat model moved to docs/explain/threat-model.md."
+
+# Phase 7.5 — naming reconciliation rename pass (proposal §3 strict)
+
+[[redirect]]
+from = "docs/reference/managers/README.md"
+to = "docs/reference/package-managers/index.md"
+sunset_version = "v0.3"
+phase = 7
+note = "Directory + landing-file rename: managers/ → package-managers/, README.md → index.md."
+
+[[redirect]]
+from = "docs/reference/preference-domains.md"
+to = "docs/reference/pref-domains.md"
+sunset_version = "v0.3"
+phase = 7
+
+[[redirect]]
+from = "docs/reference/bootstrap-flow.md"
+to = "docs/explain/bootstrap-state-machine.md"
+sunset_version = "v0.3"
+phase = 7
+note = "Reclassified reference → explain per docs proposal §3."
+
+[[redirect]]
+from = "docs/reference/observability.md"
+to = "docs/explain/observability.md"
+sunset_version = "v0.3"
+phase = 7
+note = "Reclassified reference → explain per docs proposal §3."
+
+[[redirect]]
+from = "docs/explain/competitive-landscape.md"
+to = "docs/explain/why-sojourn.md"
+sunset_version = "v0.3"
+phase = 7
+note = "Scope-expanded from competitive matrix to wider \"why Sojourn\" framing."
+
+[[redirect]]
+from = "docs/explain/future-work.md"
+to = "docs/process/future.md"
+sunset_version = "v0.3"
+phase = 7
+note = "Reclassified explain → process per docs proposal §3."
+
+[[redirect]]
+from = "THIRDPARTY.md"
+to = "docs/reference/third-party.md"
+sunset_version = "n/a"
+phase = 7
+note = "Root file kept as 1-line pointer for GH ecosystem; full content at docs/reference/third-party.md. No sunset — root pointer stays indefinitely."

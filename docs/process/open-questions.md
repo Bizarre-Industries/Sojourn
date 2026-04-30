@@ -67,41 +67,9 @@ list is complete. Audit §1.6 closed; this is a no-op confirmation.
 
 ## Docs-rework proposal §11 — naming decisions
 
-These are docs-restructure decisions; the plan adopted defaults but
-maintainer can override.
-
-### 1. AGENTS.md vs CLAUDE.md
-
-Default: AGENTS.md is canonical; CLAUDE.md becomes thin pointer.
-Lands in Phase 7.
-
-### 2. start/ vs tutorials/
-
-Default: `start/` (URL brevity).
-
-### 3. explain/ vs explanation/
-
-Default: `explain/` (URL brevity).
-
-### 4. ADR retention
-
-Default: keep superseded ADRs inline with status=superseded. Codified in
-[DOCS_POLICY.md](DOCS_POLICY.md).
-
-### 5. Per-manager page depth
-
-Default: full Sojourn-specific (mpm flags passed, JSON shape, tier,
-known broken). Already shipped in Phase 5.
-
-### 6. Spec docs vs reference docs
-
-Default: no separate `docs/spec/`. File formats, plugin protocol live in
-`reference/`.
-
-### 7. Stub sunset version
-
-Default: v0.3 for most stubs; v0.4 for ARCHITECTURE.md (high inbound link
-density). Codified in [DOCS_POLICY.md](DOCS_POLICY.md).
+All seven naming questions resolved in the Phase 7.5 docs-rework planning
+session (2026-04-30). Maintainer chose strict proposal §3 naming. See
+[Decided](#decided) for the full closeout.
 
 ## How to close a question
 
@@ -113,4 +81,36 @@ density). Codified in [DOCS_POLICY.md](DOCS_POLICY.md).
 
 ## Decided
 
-(Empty until a question is closed.)
+### Docs-rework proposal §11 — strict §3 naming (closed 2026-04-30, Phase 7.5)
+
+Maintainer ratified strict proposal §3 naming for the docs tree. All
+seven sub-questions resolved together; rename pass landed in Phase 7.5.
+
+| § | Question | Decision | Rationale / record |
+|---|---|---|---|
+| 11.1 | `AGENTS.md` vs `CLAUDE.md` canonical | `AGENTS.md` is the canonical entry; `CLAUDE.md` retains the invariants list with cross-link from AGENTS.md | Helling-aligned; agent-agnostic; future-proof for Cursor / Codex / Aider |
+| 11.2 | `start/` vs `tutorials/` | `start/` | URL brevity; "tutorials" reads like homework |
+| 11.3 | `explain/` vs `explanation/` | `explain/` | URL brevity |
+| 11.4 | ADR retention policy | Keep superseded ADRs inline with `Status: Superseded by NNNN` | Preserves historical reasoning; codified in `process/DOCS_POLICY.md` |
+| 11.5 | Per-manager page depth | Full Sojourn-specific (mpm flags, JSON shape, tier, known-broken) | Single source of truth for AI agents + contributors |
+| 11.6 | Spec docs vs reference docs | No separate `docs/spec/`; file formats + plugin protocol live in `reference/` | Tree shallow; readers don't care about spec-vs-reference distinction |
+| 11.7 | Stub sunset version | `v0.3` for most stubs; `v0.4` for `ARCHITECTURE.md` (high inbound-link density); `n/a` for the root `THIRDPARTY.md` pointer | Codified in `process/DOCS_POLICY.md` |
+
+#### Phase 7.5-driven additional decisions (same session)
+
+Renames applied atomically in Phase 7.5; redirect stubs at every old path
+sunset `v0.3`. Recorded in `docs/redirects.toml`.
+
+| Old path | New path | Reason |
+|---|---|---|
+| `docs/reference/managers/` | `docs/reference/package-managers/` | Match proposal §3 vocabulary |
+| `docs/reference/managers/README.md` | `docs/reference/package-managers/index.md` | Proposal §3 landing-file convention |
+| `docs/reference/preference-domains.md` | `docs/reference/pref-domains.md` | Proposal §3 short-form |
+| `docs/reference/bootstrap-flow.md` | `docs/explain/bootstrap-state-machine.md` | Reclassified reference → explain (rationale-heavy) |
+| `docs/reference/observability.md` | `docs/explain/observability.md` | Reclassified reference → explain |
+| `docs/explain/competitive-landscape.md` | `docs/explain/why-sojourn.md` | Scope-expanded from competitive matrix to wider framing |
+| `docs/explain/future-work.md` | `docs/process/future.md` | Reclassified explain → process (deferred-work tracking is project process, not user-facing rationale) |
+| `THIRDPARTY.md` (full content at root) | `docs/reference/third-party.md` (full); root keeps 1-line pointer | GH ecosystem keeps surfacing root file; canonical content lives in reference |
+
+New file added: `docs/reference/chezmoi-features.md` — the
+feature-surface index promised by audit §2.2.

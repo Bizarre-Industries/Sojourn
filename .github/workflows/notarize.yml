@@ -29,6 +29,7 @@ jobs:
           security set-keychain-settings -lut 43200 build.keychain
           security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
           security import /tmp/dev-id.p12 -P "$DEVELOPER_ID_P12_PASSWORD" -A -t cert -f pkcs12 -k build.keychain
+          # shellcheck disable=SC2046  # intentional word split: list-keychains needs each keychain path as separate arg
           security list-keychains -d user -s build.keychain $(security list-keychains -d user | sed 's/\"//g')
           security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PASSWORD" build.keychain
           rm /tmp/dev-id.p12

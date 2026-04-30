@@ -43,7 +43,7 @@ jobs:
       contents: read # PAT supplies write
       pull-requests: read # PAT supplies write
     steps:
-      - uses: actions/checkout@v6 # PIN-SHA-AFTER
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           # PAT instead of GITHUB_TOKEN — needed because the post-job
           # cleanup step and any subsequent git push must be allowed
@@ -76,7 +76,7 @@ jobs:
 
       - name: Create Pull Request
         if: steps.changes.outputs.has_changes == 'true'
-        uses: peter-evans/create-pull-request@v8 # PIN-SHA-AFTER
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
         with:
           # Same WORKFLOWS_PAT — peter-evans/create-pull-request needs
           # workflow scope to push the branch with workflow file diffs.

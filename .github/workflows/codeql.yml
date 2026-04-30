@@ -1,18 +1,26 @@
 name: CodeQL
 
-# CodeQL across Sojourn's source: Swift app code, Python helper
-# scripts, the GitHub Actions workflow files themselves.
+# CodeQL split into two jobs by cost:
 #
-# JavaScript was removed from the matrix — Sojourn has no .js/.ts
-# source files. Inline JS in actions/github-script blocks is analysed
-# by the `actions` language pack, not `javascript-typescript`.
+#   analyze-light  (python, actions)
+#     ubuntu, build-mode=none, ~2 min each. Cheap enough to run on
+#     every commit and PR — gives fast feedback on workflow file
+#     changes and Python helper script changes.
 #
-# Triggers:
-#   - push to main           — fast feedback on every merge
-#   - pull_request to main   — gate merges on no new high-severity findings
-#   - tag push v*            — correlate findings to a shipped version
-#   - weekly cron Mon 06:00  — catch new advisories independently of code
-#   - workflow_dispatch      — maintainer audit on demand
+#   analyze-swift  (swift)
+#     macos-15, build-mode=manual (`swift build`), ~10 min.
+#     Heavy. Runs only on:
+#       - tag push v*           (correlate to a shipped version)
+#       - weekly cron Mon 06:00 (catch new advisories)
+#       - workflow_dispatch     (maintainer audit on demand)
+#     This matches the original triggering before the multi-language
+#     expansion. Sojourn doesn't have so much Swift churn that a daily
+#     full-app scan is necessary; weekly + per-release is the right
+#     cadence.
+#
+# JavaScript was removed entirely — Sojourn has no .js/.ts source files.
+# Inline JS in actions/github-script blocks is analysed by the `actions`
+# language pack.
 
 on:
   push:
@@ -31,36 +39,63 @@ permissions:
   security-events: write
 
 jobs:
-  analyze:
+  # ----------------------------------------------------------------------- #
+  # Light path — runs on every push + PR + cron + dispatch
+  # ----------------------------------------------------------------------- #
+  analyze-light:
     name: Analyze (${{ matrix.language }})
-    runs-on: ${{ matrix.runner }}
-    timeout-minutes: ${{ matrix.timeout }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - language: swift
-            runner: macos-15
-            build-mode: manual
-            timeout: 60
-          - language: python
-            runner: ubuntu-latest
-            build-mode: none
-            timeout: 30
-          - language: actions
-            runner: ubuntu-latest
-            build-mode: none
-            timeout: 30
+        language: [ python, actions ]
 
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v5 # PIN-SHA-AFTER
         with:
           persist-credentials: false
 
-      - name: Select Xcode (Swift only)
-        if: matrix.language == 'swift'
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4 # PIN-SHA-AFTER
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: none
+          config-file: ./.github/codeql/codeql-config.yml
+          queries: security-extended
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v4 # PIN-SHA-AFTER
+        with:
+          category: /language:${{ matrix.language }}
+          upload: always
+
+  # ----------------------------------------------------------------------- #
+  # Heavy path — Swift only, gated to tag/cron/dispatch
+  # ----------------------------------------------------------------------- #
+  analyze-swift:
+    name: Analyze swift
+    runs-on: macos-15
+    timeout-minutes: 60
+
+    # Skip on push-to-branch and pull_request. Run only when:
+    #   - a tag matching v* is pushed
+    #   - the weekly cron fires
+    #   - a maintainer manually triggers
+    if: |
+      (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')) ||
+      github.event_name == 'schedule' ||
+      github.event_name == 'workflow_dispatch'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5 # PIN-SHA-AFTER
+        with:
+          persist-credentials: false
+
+      - name: Select Xcode
         uses: maxim-lobanov/setup-xcode@v1 # PIN-SHA-AFTER
         with:
           xcode-version: '^16.0'
@@ -68,17 +103,16 @@ jobs:
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v4 # PIN-SHA-AFTER
         with:
-          languages: ${{ matrix.language }}
-          build-mode: ${{ matrix.build-mode }}
+          languages: swift
+          build-mode: manual
           config-file: ./.github/codeql/codeql-config.yml
           queries: security-extended
 
-      - name: Build Swift target (manual)
-        if: matrix.language == 'swift'
+      - name: Build Swift target
         run: swift build -c debug
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v4 # PIN-SHA-AFTER
         with:
-          category: /language:${{ matrix.language }}
+          category: /language:swift
           upload: always

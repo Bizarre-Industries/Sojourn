@@ -1,19 +1,17 @@
 name: Zizmor
 
 # Static analysis of GitHub Actions workflows. Catches:
-#   - Unpinned action references (use of @vN tags instead of @<sha>).
-#   - Untrusted input flowing into shell (script injection).
+#   - Unpinned action references.
+#   - Untrusted input → shell injection.
 #   - Persisted credentials misuse.
 #   - Excessive permissions / token misuse.
 #   - Cache-poisoning patterns.
 #
-# Complementary to CodeQL's `actions` language pack — zizmor catches
-# things CodeQL doesn't, and vice versa. Run both.
-#
-# Triggers:
-#   - PR to main     — block merges that introduce unpinned actions
-#   - push to main
-#   - weekly cron
+# Install path: zizmor is published to PyPI as `zizmor`. Install via
+# `uv tool` (Astral's fast Python package manager) — pre-compiled wheels,
+# no Rust toolchain required at runtime, no fragile binary-release URL
+# to maintain. This is the canonical path per the zizmor docs:
+# https://docs.zizmor.sh/integrations/
 
 on:
   pull_request:
@@ -45,23 +43,28 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Install zizmor
-        run: |
-          set -euo pipefail
-          ZIZMOR_VERSION="1.5.0"
-          curl -sSL -o /tmp/zizmor.tar.gz \
-            "https://github.com/woodruffw/zizmor/releases/download/v${ZIZMOR_VERSION}/zizmor-${ZIZMOR_VERSION}-x86_64-unknown-linux-gnu.tar.gz"
-          tar -xzf /tmp/zizmor.tar.gz -C /tmp
-          sudo mv /tmp/zizmor /usr/local/bin/zizmor
-          chmod +x /usr/local/bin/zizmor
-          zizmor --version
+      - name: Install uv
+        uses: astral-sh/setup-uv@v8 # PIN-SHA-AFTER
+        with:
+          # Pin the uv version so a runner-side uv update doesn't
+          # silently change behaviour. Bumped by Dependabot.
+          version: "0.5.x"
 
-      - name: Run zizmor
+      - name: Run zizmor (SARIF + console)
+        env:
+          # Some zizmor audits (e.g. impostor-commit detection) call
+          # the GitHub API. Without GH_TOKEN these audits are skipped
+          # silently. Provide the workflow token.
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Output SARIF for the Security tab; also print human-readable
-          # summary for the Actions log.
-          zizmor --format=sarif --output=zizmor.sarif .github/
-          zizmor --format=plain .github/ || true
+          # SARIF for Security tab. Pin zizmor version explicitly so
+          # the workflow's findings stay reproducible.
+          uvx zizmor@1.24.1 --format=sarif --output=zizmor.sarif .github/
+
+          # Plain output for the Actions log so you can read findings
+          # without round-tripping through the Security tab. Don't fail
+          # the job on findings — SARIF upload handles that pathway.
+          uvx zizmor@1.24.1 --format=plain .github/ || true
 
       - name: Upload SARIF
         uses: github/codeql-action/upload-sarif@v4 # PIN-SHA-AFTER

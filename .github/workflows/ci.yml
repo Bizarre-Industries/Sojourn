@@ -19,7 +19,7 @@ jobs:
     name: gitleaks scan
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -45,7 +45,7 @@ jobs:
     name: SwiftLint (advisory)
     runs-on: macos-15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Install swiftlint
         run: brew install swiftlint
       - name: Lint
@@ -55,7 +55,7 @@ jobs:
     name: swift-format (advisory)
     runs-on: macos-15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Install swift-format
         run: brew install swift-format
       - name: Check

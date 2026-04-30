@@ -36,7 +36,7 @@ normal commit runs only quality + security checks.
 | Workflow             | Trigger                            | Runs                                                                                                              |
 | -------------------- | ---------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
 | `ci.yml`             | push/PR to `main`                  | gitleaks scan, SwiftLint (advisory), swift-format (advisory)                                                      |
-| `codeql.yml`         | push/PR to `main` + weekly cron    | CodeQL static analysis                                                                                            |
+| `codeql.yml`         | push tag `v*` + weekly cron + `workflow_dispatch` | CodeQL static analysis (requires `swift build`, kept off the per-commit path)                          |
 | `build.yml`          | push tag `v*` + `workflow_dispatch`| `swift test`, `xcodebuild test` (UITests skipped — Team-ID gated)                                                 |
 | `notarize.yml`       | push tag `v*`                      | sign + notarize + DMG + Homebrew cask publish                                                                     |
 

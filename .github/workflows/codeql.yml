@@ -1,8 +1,11 @@
 name: CodeQL
 
-# CodeQL across all of Sojourn's source: Swift app code, Python helper
-# scripts, the GitHub Actions workflow files themselves, and any
-# inline JavaScript (actions/github-script blocks).
+# CodeQL across Sojourn's source: Swift app code, Python helper
+# scripts, the GitHub Actions workflow files themselves.
+#
+# JavaScript was removed from the matrix — Sojourn has no .js/.ts
+# source files. Inline JS in actions/github-script blocks is analysed
+# by the `actions` language pack, not `javascript-typescript`.
 #
 # Triggers:
 #   - push to main           — fast feedback on every merge
@@ -10,10 +13,6 @@ name: CodeQL
 #   - tag push v*            — correlate findings to a shipped version
 #   - weekly cron Mon 06:00  — catch new advisories independently of code
 #   - workflow_dispatch      — maintainer audit on demand
-#
-# Swift requires `swift build` (heavy; macos-15 runner; ~10 min). Other
-# languages run on ubuntu with build-mode=none (~2 min each). Matrix
-# fans them out in parallel.
 
 on:
   push:
@@ -53,17 +52,10 @@ jobs:
             runner: ubuntu-latest
             build-mode: none
             timeout: 30
-          - language: javascript-typescript
-            runner: ubuntu-latest
-            build-mode: none
-            timeout: 30
 
     steps:
       - name: Checkout repository
-        # Pinned to actions/checkout v5 — Dependabot will refresh the SHA
-        # and the # comment together. Run `make pin-actions` to regenerate
-        # this trailing comment if the version drifts.
-        uses: actions/checkout@v5 # PIN-SHA-AFTER: pinact will resolve
+        uses: actions/checkout@v5 # PIN-SHA-AFTER
         with:
           persist-credentials: false
 

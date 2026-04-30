@@ -1,18 +1,24 @@
 # Pinned dependencies for .github/scripts/check-expiry.py
 #
-# Versions are pinned to exact releases. Dependabot tracks updates via
-# the `pip` ecosystem entry in `.github/dependabot.yml` and opens a
-# weekly grouped PR with bumps + a security PR per CVE.
+# Versions verified against PyPI as of 2026-04-30 and OSV.dev advisory
+# database. Each version covers the relevant CVEs flagged by
+# OSV-Scanner against the prior pin.
 #
-# When updating manually:
-#   pip install --upgrade pip-tools
-#   pip-compile --upgrade --resolver=backtracking \
-#       --output-file=.github/scripts/requirements.txt \
-#       .github/scripts/requirements.in
-# (We don't currently ship `requirements.in` because the dep set is
-# minimal; if it grows, switch to that two-file pattern.)
+# Dependabot (per .github/dependabot.yml `pip` ecosystem) will keep
+# these current via weekly grouped PRs + per-CVE security PRs.
 
-pyjwt==2.10.1          # JWT for App Store Connect ES256 auth
-cryptography==46.0.7   # ES256 signing backend for pyjwt
-pyyaml==6.0.2          # config parsing
-requests==2.33.0       # HTTP client
+# 46.0.7 (Apr 8 2026) — covers GHSA-79v4-65xg-pq4g (≥44.0.1),
+# GHSA-m959-cc7f-wv43 (≥46.0.6), GHSA-r6ph-v2qm-q3c2 (≥46.0.5).
+# 46.0.7 is the latest stable. Compatible with PyJWT 2.12.x.
+cryptography==46.0.7
+
+# 2.12.1 (Mar 13 2026) — covers GHSA-752w-5fwx-jx9f (≥2.12.0).
+# Latest stable. Requires Python ≥3.9 (workflow uses 3.12).
+pyjwt==2.12.1
+
+# 2.33.0 — covers GHSA-9hjg-9r4m-mvj7 (≥2.32.4) and
+# GHSA-gc5v-m9x4-r6x2 (≥2.33.0). Both fixed in 2.33.0.
+requests==2.33.0
+
+# 6.0.2 — no CVEs flagged. Last release.
+pyyaml==6.0.2

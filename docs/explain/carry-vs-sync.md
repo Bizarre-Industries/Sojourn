@@ -1,5 +1,7 @@
 # Carry vs sync — vocabulary
 
+> **Audit driver**: vocabulary support for [process/audit-2026-04.md §2.2.1](../process/audit-2026-04.md#22-chezmoi-features-not-surfaced) ("carry whole shell setup" workflow as B-priority) + general audit usage of both terms.
+
 The Sojourn UI uses both "carry" and "sync" to describe what's
 happening to the user's setup. They are not synonyms. This page pins
 the terms down so contributors can use them consistently in copy,

@@ -1,5 +1,7 @@
 # Repo layout — user's data repo
 
+> **Audit driver**: closes [process/audit-2026-04.md §3.3.3](../process/audit-2026-04.md#33-models) (data-repo layout reference).
+
 The repo Sojourn manages on the user's behalf. Sojourn proposes this
 structure on first push. User's remote, user's name. The Sojourn app source
 repo is documented separately at

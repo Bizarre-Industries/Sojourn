@@ -2,6 +2,8 @@
 
 Sojourn is **GPL-3.0-or-later**. See [/LICENSE](../LICENSE) for the full text.
 
+> **Audit driver**: closes [process/audit-2026-04.md §1.2](../process/audit-2026-04.md#1-doc-level-inconsistencies) (Cork license verified GPL-3, no Commons Clause).
+
 ## The IPC-not-linking invariant
 
 Sojourn invokes `mpm`, `chezmoi`, `git`, `brew`, `gitleaks`, `age`, and `defaults` as **separate processes**. It communicates with them via:

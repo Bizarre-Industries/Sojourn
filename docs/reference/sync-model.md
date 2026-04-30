@@ -1,5 +1,7 @@
 # Sync model
 
+> **Audit driver**: drives [process/audit-2026-04.md §2.2.3](../process/audit-2026-04.md#22-chezmoi-features-not-surfaced) (`chezmoi merge` for text dotfiles, Phase 12) + §2.5 (SSH known_hosts boilerplate, Phase 4 slot-in).
+
 **Explicit push/pull, one active writer at a time.** Not continuous
 bidirectional sync. Conflict handling on concurrent writes is deferred to v2
 and loudly flagged in UI. See

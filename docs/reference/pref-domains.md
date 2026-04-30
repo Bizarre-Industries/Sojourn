@@ -1,5 +1,7 @@
 # Preference domains
 
+> **Audit driver**: tracks [process/audit-2026-04.md §1.5](../process/audit-2026-04.md#1-doc-level-inconsistencies) (Discover pane open question) + drives audit §4.1.* preference-pane gaps.
+
 Sojourn syncs macOS application preferences via
 `defaults export <domain> <file>` / `defaults import <domain> <file>`,
 round-tripped through `plutil -convert xml1` for readable diffs. This

@@ -1,5 +1,7 @@
 # Auto-update safety / cooldown policy
 
+> **Audit driver**: closes [process/audit-2026-04.md §1.3](../process/audit-2026-04.md#1-doc-level-inconsistencies) (casks reconciled to "C, 7d") + tracks §2.1.3 (`mpm sync` daily refresh) + §2.1.4 (`mpm cleanup`).
+
 **Default cooldown: 7 days.** The 72-hour figure from 2020-era writeups is
 now too aggressive given weekend publish windows. 7 days is the 2026
 consensus (Datadog, Renovate's `config:best-practices` for npm defaults to

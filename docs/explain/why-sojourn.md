@@ -1,5 +1,7 @@
 # Why Sojourn
 
+> **Audit driver**: closes [process/audit-2026-04.md §1.2](../process/audit-2026-04.md#1-doc-level-inconsistencies) (Cork license verified GPL-3, no Commons Clause) + framing for [§4.1.13](../process/audit-2026-04.md#4-gui-gaps) and competitive positioning across docs.
+
 Sojourn unifies package management, dotfile sync, and macOS app
 preference sync for the mainstream developer who wants their Mac setup
 to follow them across machines. This page explains why no existing tool

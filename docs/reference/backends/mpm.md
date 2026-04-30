@@ -5,6 +5,8 @@ mpm v6.3.0+, Python-based, PyInstaller-frozen standalone binary available.
 GPL-2.0-only — invoked as a subprocess only, never linked. See
 [decisions/0001-ipc-not-linking.md](../../decisions/0001-ipc-not-linking.md).
 
+> **Audit driver**: closes [process/audit-2026-04.md §1.4](../../process/audit-2026-04.md#1-doc-level-inconsistencies) (`--table-format json` is the mpm 6.x flag) + drives [§2.1](../../process/audit-2026-04.md#21-mpm-features-not-used) (sbom / PURL / sync / cleanup / locate / TOML snapshot wiring in implementation-plan Phase 12).
+
 ## Invocation contract
 
 mpm 6.x renamed its output flag from `--output-format` back to

@@ -1,5 +1,7 @@
 # Preference sync (plist round-trip)
 
+> **Audit driver**: tracks [process/audit-2026-04.md §1.5](../process/audit-2026-04.md#1-doc-level-inconsistencies) (Discover-pane cfprefsd watcher; open question) + drives audit §4.1.* prefs-pane wiring.
+
 Sojourn's pref-sync strategy in four layers. See
 [decisions/0002-no-symlink-preferences.md](../decisions/0002-no-symlink-preferences.md)
 for the rationale. For the layer model in detail, see

@@ -1,8 +1,10 @@
 # Conflicts
 
+> **Audit driver**: closes [process/audit-2026-04.md §1.6](../process/audit-2026-04.md#1-doc-level-inconsistencies) (six shapes enumerated) + drives [§2.2.3](../process/audit-2026-04.md#22-chezmoi-features-not-surfaced) (`chezmoi merge` swap for `apply --force` lands in implementation-plan Phase 12).
+
 Sojourn's sync is explicit push/pull over a git remote. Pull must fully
 complete — including conflict resolution — before push is allowed (see
-[ARCHITECTURE.md](ARCHITECTURE.md) §6). This doc enumerates conflict shapes
+[reference/sync-model.md](sync-model.md)). This doc enumerates conflict shapes
 and how `SyncCoordinator` + the UI resolve them.
 
 ## Shape 1: text file edited on two Macs
@@ -68,7 +70,7 @@ Every pull creates a pre-op snapshot under
 `~/Library/Application Support/Sojourn/backups/<ISO8601>-sync.pull/`
 before writing anything to the working tree. If resolution goes wrong,
 the user can restore from there. 30-day retention; see
-[ARCHITECTURE.md](ARCHITECTURE.md) §6.
+[reference/sync-model.md](sync-model.md).
 
 ## Out of scope (v1)
 

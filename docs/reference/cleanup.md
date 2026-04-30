@@ -1,5 +1,7 @@
 # Cleanup / orphan detection
 
+> **Audit driver**: closes [process/audit-2026-04.md §3.1.5](../process/audit-2026-04.md#31-modules) (Diagnostics module consolidation) + tracks §4.1.9 (LaunchAgents promoted from orphan to managed; Phase 13).
+
 No existing tool does this for dotfiles specifically. `~/Library/**` orphan
 detection is solved by Pearcleaner (active SwiftUI, open source, 5.4.3),
 AppCleaner (12+ years old, still works), PureMac, MyMacCleaner. All of them

@@ -1,5 +1,7 @@
 # Repo layout — Sojourn app source
 
+> **Audit driver**: closes [process/audit-2026-04.md §3.3.3](../process/audit-2026-04.md#33-models) (consolidate `~/Library/Application Support/Sojourn/` layout in one doc).
+
 The repo holding Sojourn's source code. The user's data repo (their personal
 dotfiles/packages) is documented separately at
 [reference/repo-layout-user.md](repo-layout-user.md).

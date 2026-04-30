@@ -1,5 +1,7 @@
 # Architecture
 
+> **Audit driver**: closes [process/audit-2026-04.md §1.7](../process/audit-2026-04.md#1-doc-level-inconsistencies) (v1.x target diagram + module list now match audit recommendations; v0.1 design PDF treated as v0.1 only) + drives [§3.1](../process/audit-2026-04.md#3-architectural-gaps) module breakdown.
+
 Sojourn's high-level component diagram and the layering rules every PR must
 respect. For per-subsystem detail see [reference/modules.md](modules.md);
 for backend integration see [reference/backends/](backends/).

@@ -6,5 +6,11 @@
 	<array>
 		<string>com.apple.systemevents</string>
 	</array>
+	<!-- Notarization rejects executables that request the debug-only
+	     get-task-allow entitlement. Force false so signed Release
+	     builds pass Apple's notary service. Debug builds with ad-hoc
+	     signing still attach to a debugger via the runtime override. -->
+	<key>com.apple.security.get-task-allow</key>
+	<false/>
 </dict>
 </plist>

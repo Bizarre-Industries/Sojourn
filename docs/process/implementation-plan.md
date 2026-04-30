@@ -63,7 +63,7 @@ lockout.
 **3f BrewService** — signed .pkg install via `/usr/sbin/installer` with
 Authorization.
 **3g BootstrapService** — state machine per
-[reference/bootstrap-flow.md](../reference/bootstrap-flow.md). **Audit
+[explain/bootstrap-state-machine.md](../explain/bootstrap-state-machine.md). **Audit
 slot-in §6.5**: configure `merge.command` in
 `~/.config/chezmoi/chezmoi.toml` during bootstrap.
 **3h GitHubDeviceAuth** — OAuth Device Flow, client_id only,
@@ -105,7 +105,7 @@ Real `download-bundled-bins.sh` (gitleaks + age via `gh release download`,
 codesign `--options=runtime`). Real sign/notarize/dmg/cask scripts. CI
 workflows: ci.yml (swift test + xcodebuild test + gitleaks), notarize.yml
 (tag-triggered full release), codeql.yml weekly. MAINTAINERS.md,
-THIRDPARTY.md.
+docs/reference/third-party.md.
 
 ## Phase 8 — Docs expansion
 
@@ -233,10 +233,10 @@ to Accepted.
 
 | Item | Tracked in |
 |---|---|
-| Sandboxed-app prefs (FDA-gated) | [explain/future-work.md](../explain/future-work.md) |
+| Sandboxed-app prefs (FDA-gated) | [process/future.md](../process/future.md) |
 | Concurrent-write merge (three-way) | [decisions/0012-cooperative-writer-lock.md](../decisions/0012-cooperative-writer-lock.md) — v1 ships cooperative lock |
-| SwiftTerm-embedded console pane | [explain/future-work.md](../explain/future-work.md) |
-| `SMAppService.agent` (background-only LaunchAgent) | [explain/future-work.md](../explain/future-work.md) |
+| SwiftTerm-embedded console pane | [process/future.md](../process/future.md) |
+| `SMAppService.agent` (background-only LaunchAgent) | [process/future.md](../process/future.md) |
 | Mac App Store distribution | sandbox conflicts with subprocess invocation |
 | Non-macOS platforms | [decisions/0014-no-linux-no-helling-plugin.md](../decisions/0014-no-linux-no-helling-plugin.md) |
 | Hosted backend | local-only by design |

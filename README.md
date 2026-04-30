@@ -71,17 +71,17 @@ Sojourn's docs follow [Diátaxis](https://diataxis.fr) — start here:
 
 - [Architecture](docs/reference/architecture.md) — top-down system spec.
 - [Modules](docs/reference/modules.md) — Sojourn/ directory layout.
-- [Bootstrap flow](docs/reference/bootstrap-flow.md) — first-run state machine.
+- [Bootstrap flow](docs/explain/bootstrap-state-machine.md) — first-run state machine.
 - [Sync model](docs/reference/sync-model.md) — push/pull semantics.
 - [Cooldown policy](docs/reference/cooldown-policy.md) — supply-chain tiers.
 - [Conflict shapes](docs/reference/conflict-shapes.md) — sync-merge shapes.
 - [Preference sync](docs/reference/preference-sync.md) +
-  [Preference domains](docs/reference/preference-domains.md) — plist round-trip.
+  [Preference domains](docs/reference/pref-domains.md) — plist round-trip.
 - [Cleanup](docs/reference/cleanup.md) — orphan detection.
 - [Licensing](docs/reference/licensing.md) — GPL-3.0-or-later, IPC-not-linking.
-- [Testing](docs/reference/testing.md), [Observability](docs/reference/observability.md).
+- [Testing](docs/reference/testing.md), [Observability](docs/explain/observability.md).
 - [Backends](docs/reference/backends/) — mpm, chezmoi, gitleaks, git.
-- [Managers](docs/reference/managers/) — per-manager pages + matrix.
+- [Managers](docs/reference/package-managers/) — per-manager pages + matrix.
 - [Externals](docs/reference/externals.md), [SSH config](docs/reference/ssh-config.md),
   [Secret brokers](docs/reference/secret-brokers.md),
   [Extra config](docs/reference/extra-config.md),
@@ -89,11 +89,11 @@ Sojourn's docs follow [Diátaxis](https://diataxis.fr) — start here:
 
 **Explain** (understand the why):
 
-- [Why Sojourn](docs/explain/competitive-landscape.md),
+- [Why Sojourn](docs/explain/why-sojourn.md),
   [Risks](docs/explain/risks.md),
   [Why no symlink prefs](docs/explain/why-no-symlink-prefs.md),
   [State management](docs/explain/state-management.md),
-  [Future work](docs/explain/future-work.md).
+  [Future work](docs/process/future.md).
 
 **Decisions** (immutable ADR log):
 

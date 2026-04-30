@@ -37,7 +37,7 @@ Porcelain flags: `git status --porcelain=v2 --branch -z`,
 - libgit2 lacks Git LFS, has partial SSH agent forwarding, partial SSH
   signing — shelling out gets all of these for free.
 - Bootstrap already triggers Xcode CLT install when missing (see
-  [reference/bootstrap-flow.md](../reference/bootstrap-flow.md)).
+  [explain/bootstrap-state-machine.md](../explain/bootstrap-state-machine.md)).
 
 ### Negative
 

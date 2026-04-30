@@ -1,6 +1,6 @@
 # Moved
 
-This page moved to [docs/reference/bootstrap-flow.md](reference/bootstrap-flow.md).
+This page moved to [docs/explain/bootstrap-state-machine.md](explain/bootstrap-state-machine.md).
 The legacy `ARCHITECTURE.md §9` content was merged into the same destination.
 
 The redirect will be removed in **v0.3**. See

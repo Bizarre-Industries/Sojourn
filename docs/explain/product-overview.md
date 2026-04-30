@@ -13,7 +13,7 @@ Time Machine for the parts of your Mac that Time Machine doesn't actually
 restore well.
 
 For the gap analysis Sojourn fills and the products it does *not* try to
-replace, see [explain/competitive-landscape.md](competitive-landscape.md).
+replace, see [explain/why-sojourn.md](why-sojourn.md).
 
 For the v1 scope cut and what's deferred, see
 [process/implementation-plan.md](../process/implementation-plan.md).

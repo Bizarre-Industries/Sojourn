@@ -16,7 +16,7 @@ For audit-driven post-v1 work that **is** scheduled (phases 10–14), see
   `com.apple.security.files.all` entitlement and a per-app
   quit-relaunch dance. See
   [reference/preference-sync.md](../reference/preference-sync.md) and
-  [reference/preference-domains.md](../reference/preference-domains.md).
+  [reference/pref-domains.md](../reference/pref-domains.md).
 - **Concurrent-write merge** for multi-user Macs. Current v1 assumes
   one active writer at a time via `.sojourn/active.toml`. See
   [decisions/0012-cooperative-writer-lock.md](../decisions/0012-cooperative-writer-lock.md).
@@ -56,11 +56,11 @@ The following items were "future" in v0.1 and are now scheduled:
 
 - **Plugin system for custom service actors** — phase 14, ADR-0013.
 - **OSLog + `os_signpost` instrumentation** — phase 11, partial in
-  [reference/observability.md](../reference/observability.md).
+  [explain/observability.md](../explain/observability.md).
 - **OBSERVABILITY doc** — shipped at
-  [reference/observability.md](../reference/observability.md).
+  [explain/observability.md](../explain/observability.md).
 - **THREAT_MODEL doc** — phase 8 of docs rework (lands at
   `docs/explain/threat-model.md`).
 - **ADR log** — shipped at [decisions/](../decisions/).
 - **`pnpm` support** — plugin protocol target, see
-  [reference/managers/pnpm.md](../reference/managers/pnpm.md).
+  [reference/package-managers/pnpm.md](../reference/package-managers/pnpm.md).

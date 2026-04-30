@@ -19,8 +19,8 @@ already supports the manager, you just need to wire it in:
    captured output, not generated.
 6. Wire into `AppStore` aggregation so the UI sees uniform results.
 7. Add a per-manager doc page under
-   [reference/managers/](../../reference/managers/).
-8. Update [reference/managers/README.md](../../reference/managers/README.md)
+   [reference/package-managers/](../../reference/package-managers/).
+8. Update [reference/package-managers/index.md](../../reference/package-managers/index.md)
    matrix.
 
 ## Path B — mpm does not cover the manager

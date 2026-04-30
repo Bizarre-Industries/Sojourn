@@ -47,7 +47,7 @@ so git diffs are legible.
   plist / Application Support blob) is documented in
   [reference/preference-sync.md](../reference/preference-sync.md).
 - The Mackup `applications/` registry is reused as **seed material**, not
-  verbatim truth — see [reference/preference-domains.md](../reference/preference-domains.md).
+  verbatim truth — see [reference/pref-domains.md](../reference/pref-domains.md).
 
 ## Alternatives considered
 

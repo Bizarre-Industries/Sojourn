@@ -3,7 +3,7 @@
 Sojourn's pref-sync strategy in four layers. See
 [decisions/0002-no-symlink-preferences.md](../decisions/0002-no-symlink-preferences.md)
 for the rationale. For the layer model in detail, see
-[reference/preference-domains.md](preference-domains.md).
+[reference/pref-domains.md](pref-domains.md).
 
 ## Layer 1: transport is `defaults export` / `defaults import`
 

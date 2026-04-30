@@ -42,7 +42,7 @@ Hard rule: **never auto-run an install that would execute `preinstall` /
 cooldown.
 
 Per-manager tier assignment lives in
-[reference/managers/README.md](managers/README.md).
+[reference/package-managers/index.md](managers/README.md).
 
 ## Advisory-aware cooldown
 

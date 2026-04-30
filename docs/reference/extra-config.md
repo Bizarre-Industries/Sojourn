@@ -111,4 +111,4 @@ bundle_id = "com.microsoft.VSCode"
 | `gh auth` tokens, 1Password CLI session | macOS Keychain — not Sojourn's lane. Audit §2.4.6. |
 | LaunchServices DB (default-application bindings beyond `duti`) | `lsregister`-style capture; deferred to v2. Audit §2.4.7. |
 | `crontab` | macOS deprecates in favour of launchd. Audit §2.4.9. |
-| Tool version managers (mise, asdf, rustup, sdkman, volta, fnm, nvm) | Synced as **dotfile-classified** config files, not as service actors. See [reference/managers/](managers/). Audit §2.4.8. |
+| Tool version managers (mise, asdf, rustup, sdkman, volta, fnm, nvm) | Synced as **dotfile-classified** config files, not as service actors. See [reference/package-managers/](managers/). Audit §2.4.8. |

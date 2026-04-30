@@ -54,7 +54,7 @@ Release authority: the Sojourn maintainer only. See
 
 - Bump `MARKETING_VERSION` past the release to mark
   development-toward-next.
-- Update `THIRDPARTY.md` if dep versions changed.
+- Update `docs/reference/third-party.md` if dep versions changed.
 - Update `docs/SUPPORTED_MANAGERS.md` if manager coverage changed.
 
 ## Troubleshooting

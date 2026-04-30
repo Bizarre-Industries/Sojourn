@@ -48,7 +48,7 @@ Per ADR-0010, `BrewService` becomes a native actor in v1.x. Reasons:
 
 Sojourn installs Homebrew via signed `.pkg` per
 [decisions/0008-no-curl-bash-for-brew.md](../../decisions/0008-no-curl-bash-for-brew.md).
-See [reference/bootstrap-flow.md](../bootstrap-flow.md) "Homebrew install".
+See [explain/bootstrap-state-machine.md](../../explain/bootstrap-state-machine.md) "Homebrew install".
 
 ## Known issues
 

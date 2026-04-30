@@ -58,7 +58,7 @@ to the **pre-built Nuitka-compiled standalone binaries**
 `Contents/Resources/` — it updates more often than Sojourn, and shipping a
 frozen Python interpreter inside the app complicates notarization.
 
-See [reference/bootstrap-flow.md](../bootstrap-flow.md) for the install state
+See [explain/bootstrap-state-machine.md](../../explain/bootstrap-state-machine.md) for the install state
 machine.
 
 ## Risk

@@ -1,8 +1,8 @@
 # Moved
 
-This page moved to [docs/reference/managers/README.md](reference/managers/README.md)
+This page moved to [docs/reference/package-managers/index.md](reference/package-managers/index.md)
 (coverage matrix) plus per-manager pages under
-[docs/reference/managers/](reference/managers/). The "Adding a manager"
+[docs/reference/package-managers/](reference/package-managers/). The "Adding a manager"
 section moved to
 [docs/how-to/development/add-package-manager.md](how-to/development/add-package-manager.md).
 

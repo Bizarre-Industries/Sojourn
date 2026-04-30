@@ -20,7 +20,7 @@ repo.
 ## Invoked (not bundled)
 
 Discovered or installed on the user's system via the bootstrap flow described
-in [docs/reference/bootstrap-flow.md](docs/reference/bootstrap-flow.md). Sojourn invokes these as separate
+in [docs/explain/bootstrap-state-machine.md](docs/explain/bootstrap-state-machine.md). Sojourn invokes these as separate
 processes only (see
 [docs/LICENSING.md](docs/LICENSING.md#the-ipc-not-linking-invariant)).
 

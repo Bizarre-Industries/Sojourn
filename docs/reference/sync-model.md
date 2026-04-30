@@ -82,4 +82,4 @@ BYO remote is the default (`git@github.com:user/sojourn-data.git` style;
 works for any host). Optional GitHub Device Flow for users who don't have a
 remote yet. Sojourn owns and maintains the OAuth App; the app stores only
 `client_id`, never `client_secret`. See
-[reference/bootstrap-flow.md](bootstrap-flow.md).
+[explain/bootstrap-state-machine.md](../explain/bootstrap-state-machine.md).

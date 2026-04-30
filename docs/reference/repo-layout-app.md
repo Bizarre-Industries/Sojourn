@@ -14,7 +14,7 @@ sojourn/
 ├── SECURITY.md                     # vuln disclosure policy (root convention)
 ├── CODE_OF_CONDUCT.md              # Contributor Covenant 2.1
 ├── MAINTAINERS.md
-├── THIRDPARTY.md                   # bundled binaries; release script writes
+├── THIRDPARTY.md                   # 1-line pointer; source at docs/reference/third-party.md
 ├── CHANGELOG.md                    # keep-a-changelog 1.1
 ├── .gitleaks.toml                  # for sojourn's own CI
 ├── .github/

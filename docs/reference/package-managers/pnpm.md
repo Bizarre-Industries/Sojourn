@@ -21,4 +21,4 @@ Until a pnpm plugin ships, users with pnpm installed should sync
 `~/.pnpmfile.cjs` and `~/.npmrc` as plain dotfiles via chezmoi. The
 list of globally-installed pnpm packages is not auto-captured.
 
-Tracked in [explain/future-work.md](../../explain/future-work.md).
+Tracked in [process/future.md](../../process/future.md).

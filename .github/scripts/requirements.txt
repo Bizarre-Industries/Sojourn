@@ -13,6 +13,6 @@
 # minimal; if it grows, switch to that two-file pattern.)
 
 pyjwt==2.10.1          # JWT for App Store Connect ES256 auth
-cryptography==44.0.0   # ES256 signing backend for pyjwt
+cryptography==46.0.7   # ES256 signing backend for pyjwt
 pyyaml==6.0.2          # config parsing
-requests==2.32.3       # HTTP client
+requests==2.33.0       # HTTP client

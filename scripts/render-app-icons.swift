@@ -305,8 +305,11 @@ func renderVariant(_ variant: Variant, prefix: String) {
 
 print("Rendering Light variant…")
 renderVariant(.light, prefix: "")
-print("Rendering Dark variant…")
-renderVariant(.dark, prefix: "dark")
-print("Rendering Tinted variant…")
-renderVariant(.tinted, prefix: "tinted")
+// Dark + tinted variants intentionally not rendered. Xcode 16 doesn't
+// pair multi-resolution `.appiconset` entries with `appearance:
+// luminosity` overrides cleanly — including them produces unassigned-
+// children warnings. macOS renders the same icon in light/dark mode
+// at the .app level, which is acceptable for v0.1.x. Future versions
+// can switch to the Xcode 16 single-source `.icon` composer format.
+// The `Variant.{dark,tinted}` enum cases stay for that migration.
 print("Done.")

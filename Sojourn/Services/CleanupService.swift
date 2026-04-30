@@ -34,7 +34,7 @@ internal actor CleanupService {
       ) ?? Bundle.main.url(forResource: "dotfile_owners", withExtension: "toml")
       #endif
     }()
-    guard let url, let text = try? String(contentsOf: url) else {
+    guard let url, let text = try? String(contentsOf: url, encoding: .utf8) else {
       return
     }
     if let table = try? SojournFileCodec().decode(text),

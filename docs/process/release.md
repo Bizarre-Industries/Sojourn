@@ -28,13 +28,42 @@ Release authority: the Sojourn maintainer only. See
 7. Set `DEVELOPMENT_TEAM` in a local `Sojourn/Config/Local.xcconfig`
    (gitignored) for Xcode signing.
 
+## Workflow split
+
+Heavy build + Xcode test + notarize **only run on `v*` tag push**. Every
+normal commit runs only quality + security checks.
+
+| Workflow             | Trigger                            | Runs                                                                                                              |
+| -------------------- | ---------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `ci.yml`             | push/PR to `main`                  | gitleaks scan, SwiftLint (advisory), swift-format (advisory)                                                      |
+| `codeql.yml`         | push/PR to `main` + weekly cron    | CodeQL static analysis                                                                                            |
+| `build.yml`          | push tag `v*` + `workflow_dispatch`| `swift test`, `xcodebuild test` (UITests skipped — Team-ID gated)                                                 |
+| `notarize.yml`       | push tag `v*`                      | sign + notarize + DMG + Homebrew cask publish                                                                     |
+
+A normal commit never spends macOS runner minutes on the heavy test path.
+Tag push triggers `build.yml` first; `notarize.yml` runs in parallel
+because it doesn't `needs:` build (failures are caught in the concurrent
+`xcodebuild` step inside notarize itself).
+
+## Local verification (run BEFORE every commit)
+
+```sh
+make ci-local       # mirrors ci.yml: actionlint + gitleaks + swiftlint + swift-format
+make test           # swift test
+make xcodebuild     # full Xcode test (mirrors build.yml's xcodebuild job)
+make act-ci         # run ci.yml's ubuntu jobs in Docker via nektos/act
+```
+
+`act` cannot virtualize macOS runners — `make test` and `make xcodebuild`
+are the local equivalents of the macOS jobs in `build.yml`.
+
 ## Per-release
 
 1. Bump `CFBundleShortVersionString` in `Sojourn/Info.plist` and
    `MARKETING_VERSION` in `project.yml`.
 2. Regenerate Xcode project: `make generate` (runs
    `scripts/regenerate-project.sh`).
-3. Run `make test` + `make leaks` locally.
+3. Local pre-flight: `make ci-local && make test && make xcodebuild`.
 4. Tag: `git tag -s vX.Y.Z -m "release vX.Y.Z"`.
 5. Push tag: `git push origin vX.Y.Z`.
 6. Watch GitHub Actions → `notarize.yml` workflow:

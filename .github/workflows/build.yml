@@ -1,0 +1,69 @@
+name: Build
+
+# Heavy Swift/Xcode build + test pipeline. Only runs on release tag push
+# and manual dispatch — `ci.yml` covers lint/format/secret-scan on every
+# normal commit. Notarize/sign/publish lives in `notarize.yml`.
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  swift-test:
+    name: swift test
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '^16.0'
+
+      - name: Swift version
+        run: swift --version
+
+      - name: Resolve dependencies
+        run: swift package resolve
+
+      - name: Build
+        run: swift build -c debug
+
+      - name: Test
+        run: swift test --parallel
+
+  xcodebuild:
+    name: xcodebuild test
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '^16.0'
+
+      - name: Resolve packages
+        run: xcodebuild -resolvePackageDependencies -project Sojourn.xcodeproj -scheme Sojourn
+
+      - name: Test
+        run: |
+          # SojournUITests skipped on CI — XCUITest test-runner refuses
+          # to load an ad-hoc-signed test bundle (Team ID mismatch). UI
+          # coverage runs under the notarize.yml job which holds a real
+          # Developer ID identity.
+          xcodebuild test \
+            -project Sojourn.xcodeproj \
+            -scheme Sojourn \
+            -destination 'platform=macOS' \
+            -enableCodeCoverage YES \
+            -skip-testing:SojournUITests \
+            CODE_SIGN_IDENTITY="-" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO

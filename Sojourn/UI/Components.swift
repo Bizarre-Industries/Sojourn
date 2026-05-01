@@ -179,55 +179,108 @@ struct MenuBarRootView: View {
   @Environment(AppStore.self) private var store
 
   var body: some View {
-    VStack(alignment: .leading, spacing: 10) {
+    VStack(alignment: .leading, spacing: 0) {
+      // Brand strip
       HStack(spacing: 8) {
         SojournMenuBarIconView(size: 14, color: .bzrLime)
-        Text("Sojourn")
-          .font(.bzrBody(size: 14, weight: .bold))
+        Text("SOJOURN")
+          .font(.bzrStencil(size: 14, weight: .heavy))
+          .tracking(1.6)
           .foregroundStyle(Color.txtPrimary)
         Spacer()
         StatusDot(kind: store.sync == nil ? .warn : .lime)
       }
+      .padding(.horizontal, 14)
+      .padding(.vertical, 12)
+      .overlay(
+        Rectangle().fill(Color.hairline).frame(height: 0.5),
+        alignment: .bottom
+      )
 
-      if let last = store.settings.lastSyncTime {
-        Text("Synced \(last.formatted(.relative(presentation: .named)))")
-          .font(.bzrMono(size: 10))
-          .foregroundStyle(Color.txtTertiary)
-      } else {
-        Text("Never synced")
-          .font(.bzrMono(size: 10))
-          .foregroundStyle(Color.txtTertiary)
+      // Status row
+      VStack(alignment: .leading, spacing: 4) {
+        HStack(spacing: 6) {
+          Text(machineName.uppercased())
+            .font(.bzrMono(size: 10, weight: .semibold))
+            .tracking(1.4)
+            .foregroundStyle(Color.bzrLime)
+          Text("·")
+            .font(.bzrMono(size: 10))
+            .foregroundStyle(Color.txtTertiary)
+          Text(syncRelative)
+            .font(.bzrMono(size: 10))
+            .foregroundStyle(Color.txtTertiary)
+        }
+        Text(store.sync == nil ? "Sync not configured" : "Writer · clean")
+          .font(.bzrBody(size: 11))
+          .foregroundStyle(Color.txtSecondary)
       }
+      .padding(.horizontal, 14)
+      .padding(.vertical, 10)
+      .frame(maxWidth: .infinity, alignment: .leading)
 
-      Divider()
+      // Quick actions
+      VStack(spacing: 6) {
+        Button {
+          Task { await store.sync?.pull() }
+        } label: {
+          HStack(spacing: 6) {
+            Image(systemName: "arrow.down")
+              .font(.system(size: 10, weight: .semibold))
+            Text("Pull")
+            Spacer()
+          }
+        }
+        .buttonStyle(GlassCapsuleButtonStyle())
+        .disabled(store.sync == nil)
+        .accessibilityIdentifier("menubar.pull")
 
-      Button("Open Sojourn…") {
-        NSApp.activate(ignoringOtherApps: true)
+        Button {
+          Task { await store.sync?.push(message: "sojourn: menu-bar push") }
+        } label: {
+          HStack(spacing: 6) {
+            Image(systemName: "arrow.up")
+              .font(.system(size: 10, weight: .semibold))
+            Text("Push")
+            Spacer()
+          }
+        }
+        .buttonStyle(GlassPrimaryButtonStyle())
+        .disabled(store.sync == nil)
+        .accessibilityIdentifier("menubar.push")
       }
-      .buttonStyle(GlassCapsuleButtonStyle())
-      .accessibilityIdentifier("menubar.open")
+      .padding(.horizontal, 14)
+      .padding(.vertical, 6)
 
-      Button("Pull") {
-        Task { await store.sync?.pull() }
+      // Footer
+      VStack(spacing: 0) {
+        Rectangle().fill(Color.hairline).frame(height: 0.5)
+        HStack(spacing: 6) {
+          Button("Open Sojourn…") {
+            NSApp.activate(ignoringOtherApps: true)
+          }
+          .buttonStyle(GlassGhostButtonStyle())
+          .accessibilityIdentifier("menubar.open")
+          Spacer()
+          Button("Quit") { NSApp.terminate(nil) }
+            .buttonStyle(GlassGhostButtonStyle())
+            .accessibilityIdentifier("menubar.quit")
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 8)
       }
-      .buttonStyle(GlassCapsuleButtonStyle())
-      .disabled(store.sync == nil)
-      .accessibilityIdentifier("menubar.pull")
-
-      Button("Push") {
-        Task { await store.sync?.push(message: "sojourn: menu-bar push") }
-      }
-      .buttonStyle(GlassPrimaryButtonStyle())
-      .disabled(store.sync == nil)
-      .accessibilityIdentifier("menubar.push")
-
-      Divider()
-
-      Button("Quit") { NSApp.terminate(nil) }
-        .buttonStyle(GlassGhostButtonStyle())
-        .accessibilityIdentifier("menubar.quit")
     }
-    .padding(14)
-    .frame(width: 280, alignment: .leading)
+    .frame(width: 300, alignment: .leading)
+  }
+
+  private var machineName: String {
+    Host.current().localizedName ?? "this-mac"
+  }
+
+  private var syncRelative: String {
+    if let last = store.settings.lastSyncTime {
+      return last.formatted(.relative(presentation: .named))
+    }
+    return "never synced"
   }
 }

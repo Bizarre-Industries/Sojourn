@@ -53,6 +53,27 @@ struct SojournApp: App {
         Text("Sojourn not ready").padding(20)
       }
     }
+
+    Window("Architecture", id: "architecture") {
+      ArchitectureView()
+    }
+    .windowResizability(.contentSize)
+    .commands {
+      CommandGroup(after: .help) {
+        ArchitectureMenuItem()
+      }
+    }
+  }
+}
+
+private struct ArchitectureMenuItem: View {
+  @Environment(\.openWindow) private var openWindow
+
+  var body: some View {
+    Button("Architecture") {
+      openWindow(id: "architecture")
+    }
+    .keyboardShortcut("a", modifiers: [.command, .option])
   }
 }
 

@@ -4,11 +4,21 @@ All notable changes to Sojourn. Follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 [SemVer](https://semver.org/).
 
-## [Unreleased] — v0.2 pivot in progress
+## [Unreleased]
 
-Tracking `docs/process/plans/v0.2-plan.md` (canonical, 510 lines). v1.0
-cosmetic preview withdrawn (see section below); v0.2 reboots architecture
-on top of that work.
+### Planned (post-v0.2)
+
+- v0.3: Containers panel (Apple `container` CLI / OrbStack detection),
+  mas Touch-ID privileged helper at `/Library/PrivilegedHelperTools/`,
+  Sparkle delta updates, multi-machine sync conflict UX polish.
+- v1.x: Discover pane (record-session model), Bitwarden secret broker,
+  native Cargo re-evaluation per `docs/process/open-questions.md` §1.
+
+## [0.2.0] — 2026-05-01
+
+Tracking `docs/process/plans/v0.2-plan.md` (canonical). v1.0 cosmetic
+preview withdrawn (see section below); v0.2 reboots architecture on
+top of that work.
 
 ### Planned
 

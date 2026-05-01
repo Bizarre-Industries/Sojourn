@@ -146,6 +146,8 @@ internal struct BzrBadge: View {
               .stroke(kind.fg.opacity(0.30), lineWidth: 0.5)
           )
       )
+      .accessibilityElement()
+      .accessibilityLabel("\(text) badge")
   }
 }
 
@@ -324,6 +326,18 @@ internal struct StatusDot: View {
       .fill(kind.color)
       .frame(width: 6, height: 6)
       .shadow(color: kind.color.opacity(0.7), radius: 3)
+      .accessibilityElement()
+      .accessibilityLabel(accessibleLabel)
+      .accessibilityHidden(false)
+  }
+
+  private var accessibleLabel: String {
+    switch kind {
+    case .ok:     return "Status: ok"
+    case .warn:   return "Status: warn"
+    case .danger: return "Status: danger"
+    case .lime:   return "Status: active"
+    }
   }
 }
 
@@ -345,6 +359,9 @@ internal struct BzrProgressBar: View {
       }
     }
     .frame(height: 4)
+    .accessibilityElement()
+    .accessibilityLabel("Progress")
+    .accessibilityValue("\(Int(max(0, min(1, value)) * 100)) percent")
   }
 }
 

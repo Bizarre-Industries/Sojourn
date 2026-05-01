@@ -6,136 +6,55 @@ All notable changes to Sojourn. Follows
 
 ## [Unreleased]
 
-### Planned (post-v0.2.7)
+### Planned (post-v0.2.0)
 
 (See `docs/process/plans/v0.3-plan.md`.)
 
-## [0.2.7] — 2026-05-01
+## [0.2.0] — 2026-05-01
+
+This is the canonical v0.2 release. Earlier failed v0.2.0 → v0.2.7
+attempts (cask-publish chain failures, all on the same day) were
+deleted; the v0.2.0 tag was force-moved to the working state. Single
+tag, repeatedly iterated on until the release pipeline went green.
+
+### Added
+
+- Homebrew tap repository at `Bizarre-Industries/homebrew-sojourn`,
+  seeded with `Casks/sojourn.rb` at v0.2.0 with the real DMG sha256.
+- `scripts/publish-homebrew-cask.sh` — direct-push publisher invoked
+  by `notarize.yml`. Shellcheck-clean. `--dry-run` flag for local
+  validation. Structured exit codes (1 precondition, 2 verification,
+  3 audit, 4 push). Replayable for backfills.
 
 ### Fixed
 
-- v0.2.6 notarize run 25224852919 failed at the new direct-push publish
-  step with `timeout: command not found` (exit 127). macOS doesn't ship
-  GNU `timeout`. Added `brew install --quiet coreutils` (now its own
-  workflow step) and switched to `gtimeout`.
+- `Sojourn/Info.plist` had `CFBundleShortVersionString` /
+  `CFBundleVersion` hardcoded at `0.1.0` / `1` since initial scaffold.
+  Replaced with `$(MARKETING_VERSION)` / `$(CURRENT_PROJECT_VERSION)`
+  Xcode build-setting substitution; values now flow from `project.yml`.
+- `notarize.yml` "Publish Homebrew cask update" step previously
+  invoked the deleted `scripts/publish-homebrew-cask.sh`. Recreated it
+  per the design below.
+- `brew audit [path]` was disabled in Homebrew 5.x — replaced with
+  `brew style ./Casks/sojourn.rb` for the in-repo template's CI check.
+- In-repo `Casks/sojourn.rb` template's `verified:` parameter dropped
+  (URL domain matched homepage — `brew audit` rejected it).
 
 ### Changed
 
-- Factored the inline publish-cask shell out of `notarize.yml` into
-  `scripts/publish-homebrew-cask.sh`. The workflow step is now a thin
-  `bash scripts/publish-homebrew-cask.sh Sojourn.dmg` invocation.
-  Benefits: shellcheck-clean reusable script; `--dry-run` flag for
-  local validation; replayable for backfills (e.g. cask publishes that
-  failed in v0.2.0–v0.2.6); cleaner YAML.
-
-## [0.2.6] — 2026-05-01
-
-### Changed
-
-- `notarize.yml` "Publish Homebrew cask update" step rewritten as
-  direct-push to tap main. The hybrid (`brew bump-cask-pr --no-fork`
-  + `gh pr merge --squash --delete-branch`) approved by council in
-  v0.2.4 was blocked at the PR-creation step in v0.2.5 CI: the
-  `HOMEBREW_TAP_TOKEN` PAT is fine-grained with `Contents: Read and
-  write` but lacks `Pull requests: Read and write`. Both bump-cask-pr's
-  PR API call and `gh pr create` returned `Resource not accessible by
-  personal access token`. Council re-voted 5/5 APPROVE-WITH-CONDITIONS
-  on direct-push (security flipped from REJECT, devil-advocate flipped
-  from REJECT) given the new evidence. Implementation includes all
-  consolidated safeguards: tag-format guard, token scrub via
-  `git remote set-url`, ephemeral push-only token via
-  `-c http.extraheader=…`, `::add-mask::` on the PAT, post-edit
-  positive + negative grep verification of `version` and `sha256`
-  lines, online audit via `brew audit --cask --online` on the bumped
-  cask, `timeout 180`/`timeout 30` wrappers, `git ls-remote` push-landed
-  check. Council deliberation log:
-  `.claude/council-logs/2026-05-01-notarize-publish-direct-push.md`.
-  Follow-up issue: #5 (revisit at v0.3 PAT rotation; adding
-  `Pull requests: write` to the PAT would unblock the hybrid).
-
-## [0.2.5] — 2026-05-01
-
-### Fixed
-
-- v0.2.4 notarize runs all failed at workflow-parse stage. The new
-  publish step embedded a multi-line `--message='line1\n\nline2'`
-  argument with literal newlines inside the YAML run-block. Newlines
-  escaped the `|` block scalar's indentation, so actionlint and the
-  GitHub Actions parser rejected the file (`mapping values are not
-  allowed here`). Build the message in a `printf`'d shell variable
-  instead — same content, valid YAML.
-
-## [0.2.4] — 2026-05-01
-
-### Fixed
-
-- v0.2.0 → v0.2.3 notarize runs all failed at the publish step because
-  the Homebrew tap repo `Bizarre-Industries/homebrew-sojourn` did not
-  exist on GitHub. `brew bump-cask-pr` was downloading a stale
-  `v1.0.0/Sojourn.dmg` URL (404) from a phantom tap state. Created the
-  tap, seeded `Casks/sojourn.rb` at v0.2.3 with the real DMG sha256, and
-  removed the redundant `verified:` parameter (URL domain matched
-  homepage domain — `brew audit` was rejecting it).
-- `Sojourn/Info.plist` had `CFBundleShortVersionString` and
-  `CFBundleVersion` hardcoded at `0.1.0` / `1` since the initial scaffold.
-  Releases v0.2.0 → v0.2.3 all shipped binaries that reported themselves
-  as v0.1.0 — Sparkle would never have detected an update. Replaced with
-  `$(MARKETING_VERSION)` / `$(CURRENT_PROJECT_VERSION)` Xcode build-setting
-  substitution; values now flow from `project.yml`.
-
-### Changed
-
-- `notarize.yml` "Publish Homebrew cask update" step is now a hybrid:
-  `brew bump-cask-pr --no-fork` opens the PR (kept for AST-aware Ruby
-  edits + online sha verification of the published release asset),
-  immediately followed by `gh pr merge --squash --delete-branch` to
-  collapse it into one commit on tap main. End state: no lingering PR,
-  one commit per release. Council deliberation:
-  `.claude/council-logs/2026-05-01-notarize-publish-direct-push.md`.
-- Tag-format guard added before any string interpolation: refuses
-  anything that doesn't match `^v[0-9]+\.[0-9]+\.[0-9]+$`. Defense in
-  depth.
-
-### Internal
-
-- In-repo `Casks/sojourn.rb` template synced to v0.2.3 + real sha256.
-  This file is style-checked by `brew style ./Casks/sojourn.rb` in CI
-  but is not the runtime cask — the runtime lives in
-  `Bizarre-Industries/homebrew-sojourn`.
-
-## [0.2.3] — 2026-05-01
-
-### Fixed
-
-- v0.2.2 notarize run 25221069026 reached `brew style ./Casks/sojourn.rb`
-  (replacing the deprecated `brew audit [path]` from v0.2.1) and
-  surfaced 7 cookbook offenses. 6 autocorrected via `brew style --fix`
-  (stanza order: caveats / uninstall / zap; uninstall method order:
-  launchctl before quit; zap trash array alphabetised). 1 manual fix:
-  cask `desc` mustn't reference platform — "Brew-native Mac config
-  manager" → "Brew-native config manager: Brewfile, chezmoi, defaults".
-
-## [0.2.2] — 2026-05-01
-
-### Fixed
-
-- v0.2.1 notarize run 25220836742 cleared all signing/notarize stages
-  (Build → Sign → DMG → Notarize → Upload all succeeded) but failed at
-  the local-cask audit step: `brew audit [path ...]` was disabled in
-  Homebrew 5.x. Replaced with `brew style ./Casks/sojourn.rb`. Full
-  audit still runs downstream — `brew bump-cask-pr` audits the
-  bumped tap-side cask before opening the PR.
-
-## [0.2.1] — 2026-05-01
-
-### Fixed
-
-- `notarize.yml` referenced `scripts/publish-homebrew-cask.sh` which
-  was deleted in v0.2 step 8. v0.2.0 release run failed at the publish
-  step (exit 127). Replaced with the three-step
-  `Homebrew/actions/setup-homebrew` + `brew audit --cask --new --online` +
-  `brew bump-cask-pr` flow specified in v0.2-plan.md §"Cask + CI rewrite"
-  + ADR-0019/0020.
+- `notarize.yml` Publish step is now direct-push to tap main (no PR).
+  Council 2026-05-01-notarize-publish-direct-push deliberated and
+  re-voted 5/5 APPROVE-WITH-CONDITIONS after the bump-cask-pr hybrid
+  was blocked by the fine-grained PAT lacking `Pull requests: write`.
+  Implementation safeguards: tag-format guard, token scrub via
+  `git remote set-url` post-clone, ephemeral push-only URL-userinfo
+  token (`https://x-access-token:${TAP_TOKEN}@…` for one push command,
+  not `.git/config`), `::add-mask::` on the PAT, post-edit positive
+  + negative grep verification of `version` + `sha256` lines, online
+  audit via `brew audit --cask --online`, `gtimeout 180/30` wrappers,
+  `git ls-remote` push-landed verification.
+- Workflow installs `coreutils` for `gtimeout` (macOS doesn't ship
+  GNU `timeout`).
 
 ### Locked decisions (carried into v0.3)
 
@@ -161,10 +80,13 @@ All notable changes to Sojourn. Follows
   `op://Bizarre-Industries/sojourn-sparkle-eddsa` (ADR-0020 amended).
 - ADR-0022 flip-condition #2 tracking surface re-anchored to user's
   data/dotfiles repo (drift is observed there).
-- v1.0.0 GitHub Release artifact deleted via `gh release delete v1.0.0`
-  (orphaned cosmetic preview).
+- v1.0.0 + v0.2.1–v0.2.7 GitHub Release artifacts deleted (failed
+  iteration attempts; consolidated under single v0.2.0 tag).
+- Follow-up issue #5: revisit PAT scope at v0.3 PAT rotation; adding
+  `Pull requests: write` to the PAT would unblock the upstream-tooling
+  bump-cask-pr hybrid.
 
-## [0.2.0] — 2026-05-01
+## [0.2.0-pre] — superseded
 
 ### Planned (post-v0.2)
 

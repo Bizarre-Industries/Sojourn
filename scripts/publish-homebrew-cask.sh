@@ -254,18 +254,22 @@ main() {
     return 0
   fi
 
+  # GitHub git smart-http requires HTTP Basic auth, not Bearer (Bearer is
+  # only honored by the REST API). Pass the token as the URL userinfo for
+  # this single command — token lives in argv of one process, never on
+  # disk. (Origin remote URL was scrubbed earlier; we don't reuse it.)
+  local push_url
+  push_url="https://x-access-token:${TAP_TOKEN}@${TAP_REMOTE}"
+
   log "pushing to tap main (local HEAD ${local_sha})"
   if ! gtimeout "${PUSH_TIMEOUT_SEC}" git -C "${tap_dir}" \
-       -c "http.https://github.com/.extraheader=AUTHORIZATION: bearer ${TAP_TOKEN}" \
-       push origin main; then
+       push "${push_url}" main; then
     err "git push failed (or timed out at ${PUSH_TIMEOUT_SEC}s)" 4
   fi
 
-  # Push-landed verification.
+  # Push-landed verification — same auth pattern as the push.
   local remote_sha
-  remote_sha="$(git -C "${tap_dir}" \
-    -c "http.https://github.com/.extraheader=AUTHORIZATION: bearer ${TAP_TOKEN}" \
-    ls-remote origin refs/heads/main | cut -f1)"
+  remote_sha="$(git -C "${tap_dir}" ls-remote "${push_url}" refs/heads/main | cut -f1)"
   if [ "${local_sha}" != "${remote_sha}" ]; then
     err "push exit 0 but remote main is ${remote_sha}, expected ${local_sha}" 4
   fi

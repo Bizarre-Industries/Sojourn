@@ -6,9 +6,21 @@ All notable changes to Sojourn. Follows
 
 ## [Unreleased]
 
-### Planned (post-v0.2.2)
+### Planned (post-v0.2.3)
 
 (See `docs/process/plans/v0.3-plan.md`.)
+
+## [0.2.3] — 2026-05-01
+
+### Fixed
+
+- v0.2.2 notarize run 25221069026 reached `brew style ./Casks/sojourn.rb`
+  (replacing the deprecated `brew audit [path]` from v0.2.1) and
+  surfaced 7 cookbook offenses. 6 autocorrected via `brew style --fix`
+  (stanza order: caveats / uninstall / zap; uninstall method order:
+  launchctl before quit; zap trash array alphabetised). 1 manual fix:
+  cask `desc` mustn't reference platform — "Brew-native Mac config
+  manager" → "Brew-native config manager: Brewfile, chezmoi, defaults".
 
 ## [0.2.2] — 2026-05-01
 

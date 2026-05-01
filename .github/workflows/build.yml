@@ -21,7 +21,7 @@ concurrency:
 jobs:
   swift-test:
     name: swift test
-    runs-on: macos-15
+    runs-on: macos-26
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
@@ -30,7 +30,7 @@ jobs:
       - name: Select Xcode
         uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1.7.0
         with:
-          xcode-version: '^16.0'
+          xcode-version: '26.x'
 
       # Cache resolved SPM packages + build outputs. Keyed on
       # Package.resolved so the cache invalidates when deps change but
@@ -68,7 +68,7 @@ jobs:
 
   xcodebuild:
     name: xcodebuild test
-    runs-on: macos-15
+    runs-on: macos-26
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
@@ -77,7 +77,7 @@ jobs:
       - name: Select Xcode
         uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1.7.0
         with:
-          xcode-version: '^16.0'
+          xcode-version: '26.x'
 
       - name: Resolve packages
         run: xcodebuild -resolvePackageDependencies -project Sojourn.xcodeproj -scheme Sojourn

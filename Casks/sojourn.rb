@@ -5,7 +5,7 @@ cask "sojourn" do
   url "https://github.com/Bizarre-Industries/Sojourn/releases/download/v#{version}/Sojourn.dmg",
       verified: "github.com/Bizarre-Industries/Sojourn/"
   name "Sojourn"
-  desc "Brew-native Mac config manager"
+  desc "Brew-native config manager"
   homepage "https://github.com/Bizarre-Industries/Sojourn"
 
   livecheck do
@@ -19,6 +19,22 @@ cask "sojourn" do
 
   app "Sojourn.app"
 
+  uninstall launchctl: "industries.bizarre.Sojourn.helper",
+            quit:      "industries.bizarre.Sojourn",
+            delete:    [
+              "/Library/LaunchDaemons/industries.bizarre.Sojourn.helper.plist",
+              "/Library/PrivilegedHelperTools/industries.bizarre.Sojourn.helper",
+            ]
+
+  zap trash: [
+    "~/Library/Application Support/Sojourn",
+    "~/Library/Caches/industries.bizarre.Sojourn",
+    "~/Library/Caches/Sojourn",
+    "~/Library/Logs/Sojourn",
+    "~/Library/Preferences/industries.bizarre.Sojourn.plist",
+    "~/Library/Saved Application State/industries.bizarre.Sojourn.savedState",
+  ]
+
   caveats <<~EOS
     Sojourn shells out to chezmoi and mas. Both were installed as
     formula dependencies of this cask. To remove them when uninstalling
@@ -29,20 +45,4 @@ cask "sojourn" do
     age and gitleaks ship bundled inside the .app — no formula install,
     no formula uninstall step.
   EOS
-
-  uninstall quit:      "industries.bizarre.Sojourn",
-            launchctl: "industries.bizarre.Sojourn.helper",
-            delete:    [
-              "/Library/LaunchDaemons/industries.bizarre.Sojourn.helper.plist",
-              "/Library/PrivilegedHelperTools/industries.bizarre.Sojourn.helper",
-            ]
-
-  zap trash: [
-    "~/Library/Application Support/Sojourn",
-    "~/Library/Caches/Sojourn",
-    "~/Library/Caches/industries.bizarre.Sojourn",
-    "~/Library/Logs/Sojourn",
-    "~/Library/Preferences/industries.bizarre.Sojourn.plist",
-    "~/Library/Saved Application State/industries.bizarre.Sojourn.savedState",
-  ]
 end

@@ -6,7 +6,7 @@ name: CodeQL
 #     ubuntu, build-mode=none, ~2 min each. Runs on every commit/PR.
 #
 #   analyze-swift  (swift)
-#     macos-15, build-mode=manual (`swift build`), ~10 min.
+#     macos-26, build-mode=manual (`swift build`), ~10 min.
 #     Runs only on tag push v*, weekly cron, manual dispatch.
 
 on:
@@ -70,7 +70,7 @@ jobs:
 
   analyze-swift:
     name: Analyze swift
-    runs-on: macos-15
+    runs-on: macos-26
     timeout-minutes: 60
     permissions:
       contents: read
@@ -90,7 +90,7 @@ jobs:
       - name: Select Xcode
         uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1.7.0
         with:
-          xcode-version: '^16.0'
+          xcode-version: '26.x'
 
       # Same SPM cache key as build.yml + notarize.yml. All three jobs
       # share the cache: build.yml swift-test populates it on tag push,

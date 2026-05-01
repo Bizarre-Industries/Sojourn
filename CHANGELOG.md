@@ -6,9 +6,21 @@ All notable changes to Sojourn. Follows
 
 ## [Unreleased]
 
-### Planned (post-v0.2.4)
+### Planned (post-v0.2.5)
 
 (See `docs/process/plans/v0.3-plan.md`.)
+
+## [0.2.5] — 2026-05-01
+
+### Fixed
+
+- v0.2.4 notarize runs all failed at workflow-parse stage. The new
+  publish step embedded a multi-line `--message='line1\n\nline2'`
+  argument with literal newlines inside the YAML run-block. Newlines
+  escaped the `|` block scalar's indentation, so actionlint and the
+  GitHub Actions parser rejected the file (`mapping values are not
+  allowed here`). Build the message in a `printf`'d shell variable
+  instead — same content, valid YAML.
 
 ## [0.2.4] — 2026-05-01
 

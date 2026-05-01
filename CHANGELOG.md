@@ -6,6 +6,50 @@ All notable changes to Sojourn. Follows
 
 ## [Unreleased]
 
+### Planned (post-v0.2.1)
+
+(See `docs/process/plans/v0.3-plan.md`.)
+
+## [0.2.1] — 2026-05-01
+
+### Fixed
+
+- `notarize.yml` referenced `scripts/publish-homebrew-cask.sh` which
+  was deleted in v0.2 step 8. v0.2.0 release run failed at the publish
+  step (exit 127). Replaced with the three-step
+  `Homebrew/actions/setup-homebrew` + `brew audit --cask --new --online` +
+  `brew bump-cask-pr` flow specified in v0.2-plan.md §"Cask + CI rewrite"
+  + ADR-0019/0020.
+
+### Locked decisions (carried into v0.3)
+
+(Details in v0.3-plan.md §"Hard decisions".)
+
+- Containers detection priority: Docker > OrbStack > Apple `container`
+  > Lima > Colima.
+- mas Touch-ID: privileged helper at
+  `/Library/PrivilegedHelperTools/` via `SMAppService`.
+- Sparkle delta updates: ship in v0.3.0.
+- Multi-machine conflict UX: refuse-and-show-diff.
+- `repro-drift` issue template: lives in user's data/dotfiles repo;
+  Sojourn ships reference template only at
+  `.github/ISSUE_TEMPLATE/repro-drift.md`.
+- Cask `caveats` block: instructs `brew uninstall chezmoi mas` on
+  cask uninstall (formula deps don't cascade).
+- JobRunner timeout: install/upgrade exempt; advisory 30s; snapshot 600s.
+- v0.1 packages.toml migration: skipped (alpha had zero users).
+
+### Notes
+
+- Sparkle EdDSA key vault path corrected to
+  `op://Bizarre-Industries/sojourn-sparkle-eddsa` (ADR-0020 amended).
+- ADR-0022 flip-condition #2 tracking surface re-anchored to user's
+  data/dotfiles repo (drift is observed there).
+- v1.0.0 GitHub Release artifact deleted via `gh release delete v1.0.0`
+  (orphaned cosmetic preview).
+
+## [0.2.0] — 2026-05-01
+
 ### Planned (post-v0.2)
 
 - v0.3: Containers panel (Apple `container` CLI / OrbStack detection),

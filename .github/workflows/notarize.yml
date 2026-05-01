@@ -21,7 +21,7 @@ jobs:
           persist-credentials: false
       # ADD this step after the checkout (~line 20):
       - name: Load 1Password secrets
-        uses: 1password/load-secrets-action@v2
+        uses: 1password/load-secrets-action@92467eb28f72e8255933372f1e0707c567ce2259 # v4.0.0
         with:
           export-env: true
         env:

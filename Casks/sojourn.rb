@@ -1,9 +1,8 @@
 cask "sojourn" do
-  version "0.2.0"
-  sha256 "0000000000000000000000000000000000000000000000000000000000000000"
+  version "0.2.3"
+  sha256 "327d4890e568d3151c30c29068d117959f0a15581f70bc18a14dd6974244bdf8"
 
-  url "https://github.com/Bizarre-Industries/Sojourn/releases/download/v#{version}/Sojourn.dmg",
-      verified: "github.com/Bizarre-Industries/Sojourn/"
+  url "https://github.com/Bizarre-Industries/Sojourn/releases/download/v#{version}/Sojourn.dmg"
   name "Sojourn"
   desc "Brew-native config manager"
   homepage "https://github.com/Bizarre-Industries/Sojourn"

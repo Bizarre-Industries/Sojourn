@@ -20,28 +20,6 @@
 
 import SwiftUI
 
-internal struct GenerationsPane: View {
-  var body: some View {
-    StubView(
-      paneID: "pane.generations",
-      title: "Generations",
-      subtitle: "Tarball-snapshot rollback (v0.2 step 6)",
-      icon: "clock.arrow.circlepath",
-      detail: """
-      Each generation = git tag in the chezmoi source repo named
-      `sojourn-gen-N` plus a tarball under
-      ~/Library/Application Support/Sojourn/generations/N.tar.zst
-      containing Brewfile.common, Brewfile.<host>, prefs.toml,
-      machines.toml, and the chezmoi state hash.
-
-      Rollback: `brew bundle install --cleanup --file=<snapshot>` →
-      `chezmoi apply` → `defaults import`. ~85% of nix-darwin's atomic
-      rollback UX without `/nix`.
-      """
-    )
-  }
-}
-
 internal struct MacOSFeaturesPane: View {
   var body: some View {
     StubView(

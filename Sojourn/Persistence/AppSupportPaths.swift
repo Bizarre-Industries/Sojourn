@@ -11,6 +11,7 @@ internal struct AppSupportPaths: Sendable {
 
   internal let root: URL
   internal let backups: URL
+  internal let generations: URL
   internal let logs: URL
   internal let cache: URL
   internal let config: URL
@@ -26,12 +27,13 @@ internal struct AppSupportPaths: Sendable {
 
     self.root = base
     self.backups = base.appendingPathComponent("backups", isDirectory: true)
+    self.generations = base.appendingPathComponent("generations", isDirectory: true)
     self.logs = base.appendingPathComponent("logs", isDirectory: true)
     self.cache = base.appendingPathComponent("cache", isDirectory: true)
     self.config = base.appendingPathComponent("config", isDirectory: true)
     self.bin = base.appendingPathComponent("bin", isDirectory: true)
 
-    for url in [root, backups, logs, cache, config, bin] {
+    for url in [root, backups, generations, logs, cache, config, bin] {
       try fileManager.createDirectory(
         at: url, withIntermediateDirectories: true
       )
@@ -43,11 +45,12 @@ internal struct AppSupportPaths: Sendable {
   internal init(overrideRoot: URL, fileManager: FileManager = .default) throws {
     self.root = overrideRoot
     self.backups = overrideRoot.appendingPathComponent("backups", isDirectory: true)
+    self.generations = overrideRoot.appendingPathComponent("generations", isDirectory: true)
     self.logs = overrideRoot.appendingPathComponent("logs", isDirectory: true)
     self.cache = overrideRoot.appendingPathComponent("cache", isDirectory: true)
     self.config = overrideRoot.appendingPathComponent("config", isDirectory: true)
     self.bin = overrideRoot.appendingPathComponent("bin", isDirectory: true)
-    for url in [root, backups, logs, cache, config, bin] {
+    for url in [root, backups, generations, logs, cache, config, bin] {
       try fileManager.createDirectory(at: url, withIntermediateDirectories: true)
     }
   }

@@ -88,7 +88,7 @@ extension BrewfileAST {
   /// Top-level summary counts by entry type. Used by Dashboard pane and
   /// snapshot tests as a stable comparison surface (raw text flaps between
   /// brew minor versions; counts don't).
-  internal struct Counts: Equatable, Sendable {
+  internal struct Counts: Equatable, Hashable, Sendable, Codable {
     internal var taps: Int = 0
     internal var brews: Int = 0
     internal var casks: Int = 0

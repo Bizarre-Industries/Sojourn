@@ -16,6 +16,7 @@
 		0ED1AAAEAADA7250AF998BA2 /* JobRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4207776C9EC0D4B31D82E91 /* JobRunner.swift */; };
 		13CED2766FF188E9F0C1D8A9 /* GitHubDeviceAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DED6874FE4B27207A890E6E /* GitHubDeviceAuth.swift */; };
 		14AC4C6C18F2127EE503F9B6 /* Fonts in Resources */ = {isa = PBXBuildFile; fileRef = 6E6EE61BCBB43941CBEF30F4 /* Fonts */; };
+		19015140F1CC02CD00D3BFF8 /* AdvisoriesPane.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B75E2CD72BA992F32BCEB9C /* AdvisoriesPane.swift */; };
 		191866534A9570E447AEA969 /* MacOSFeaturesService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF0F7E5B022F32A9CF6BF028 /* MacOSFeaturesService.swift */; };
 		19ED9BB99FD79A3F00DE09A4 /* SyncCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 197100C16F14E6EF4B75D6E3 /* SyncCoordinator.swift */; };
 		1B511F22B7852AF15BAE3CE2 /* Bundle+Fixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = A64D32536414511C9E9911C6 /* Bundle+Fixtures.swift */; };
@@ -196,6 +197,7 @@
 		75102F527B8749FB644C0444 /* LogBuffer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogBuffer.swift; sourceTree = "<group>"; };
 		789996000891BE42FD7BD49C /* BrewBundleServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrewBundleServiceTests.swift; sourceTree = "<group>"; };
 		78D3E34CEC39749CE7D6E198 /* PersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceTests.swift; sourceTree = "<group>"; };
+		7B75E2CD72BA992F32BCEB9C /* AdvisoriesPane.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvisoriesPane.swift; sourceTree = "<group>"; };
 		7FD1B4AC2223DF98A4D4AF30 /* SyncTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncTests.swift; sourceTree = "<group>"; };
 		81F879A8DCA19A0D5AA7B0AB /* SojournIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SojournIcon.swift; sourceTree = "<group>"; };
 		82A52B4280B84BAE4A95BCBF /* MainWindowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainWindowView.swift; sourceTree = "<group>"; };
@@ -597,6 +599,7 @@
 			isa = PBXGroup;
 			children = (
 				B155502B536A71BBC60866A8 /* .gitkeep */,
+				7B75E2CD72BA992F32BCEB9C /* AdvisoriesPane.swift */,
 				917C3CA7A3B22318CCEC81F1 /* CleanupPane.swift */,
 				A7BBFBFD2E7DDE3A05F343A7 /* ConflictsPane.swift */,
 				5F73FECB65986451C136A8A2 /* DiagnosticsPane.swift */,
@@ -787,6 +790,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2B3E1342F39ED82478E6D339 /* ANSIParser.swift in Sources */,
+				19015140F1CC02CD00D3BFF8 /* AdvisoriesPane.swift in Sources */,
 				7F4A4A10C94FD64082D138E3 /* AdvisoryReference.swift in Sources */,
 				33A0D8F52C71675A0C748F02 /* AdvisoryService.swift in Sources */,
 				4AB1BACFB2400962D5F880A7 /* AgeBroker.swift in Sources */,

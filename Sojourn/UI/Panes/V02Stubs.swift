@@ -40,30 +40,6 @@ internal struct SyncPane: View {
   }
 }
 
-internal struct AdvisoriesPane: View {
-  var body: some View {
-    StubView(
-      paneID: "pane.advisories",
-      title: "Advisories",
-      subtitle: "brew vulns shell-out (v0.2 step 10)",
-      icon: "exclamationmark.shield",
-      detail: """
-      ADR-0021 replaces the 92-line AdvisoryService no-op with a
-      `brew vulns --brewfile <path> --cyclonedx` shell-out. Three
-      freshness states:
-
-      • fresh — cache <24h
-      • stale — cache 24h–7d, last refresh failed
-      • unavailable — no cache or >7d
-
-      OSV-format JSON parser caps at 16 MB / depth 32. Cache key =
-      SHA-256 of sorted Brewfile entries. Auto-tap of
-      homebrew/brew-vulns requires user consent — never silent.
-      """
-    )
-  }
-}
-
 private struct StubView: View {
   let paneID: String
   let title: String

@@ -82,9 +82,12 @@ This decision is reversed only if BOTH of the following are true:
    reproducibility justifies the cost.** Concrete personal-tool
    signal: two machines diverge at the same git SHA twice within
    a 30-day window. Tracked via GitHub label `repro-drift` on the
-   Sojourn repo (label created at v0.2 ship time alongside this ADR;
-   contributors apply it to issues that match the criterion). At ≥ 2
-   such issues, this flip-condition fires.
+   user's own data/dotfiles repo (the chezmoi-managed repo Sojourn
+   syncs against — drift is observed there, not in Sojourn's source
+   tree). The label + matching issue template ship as part of the
+   `setup new dotfiles repo` flow. At ≥ 2 such issues filed against
+   the user's data repo within a 30-day window, this flip-condition
+   fires and a new ADR proposes Nix as an alternative backend.
 
 If both conditions land, a new ADR proposes Nix as an alternative
 backend (NOT a replacement) and cites this one as the prior rejection.

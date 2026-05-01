@@ -19,6 +19,17 @@ cask "sojourn" do
 
   app "Sojourn.app"
 
+  caveats <<~EOS
+    Sojourn shells out to chezmoi and mas. Both were installed as
+    formula dependencies of this cask. To remove them when uninstalling
+    Sojourn (cask uninstall doesn't cascade formula deps):
+
+      brew uninstall chezmoi mas
+
+    age and gitleaks ship bundled inside the .app — no formula install,
+    no formula uninstall step.
+  EOS
+
   uninstall quit:      "industries.bizarre.Sojourn",
             launchctl: "industries.bizarre.Sojourn.helper",
             delete:    [

@@ -44,8 +44,8 @@ Ship both, with clear ownership:
   check-for-updates is silent — `brew upgrade` is the user's
   expected path.
 
-EdDSA private key lives in 1Password (vault: `Sojourn`, item:
-`sparkle-eddsa`, fields: `private` / `public`). CI reads it via the
+EdDSA private key lives in 1Password (vault: `Bizarre-Industries`, item:
+`sojourn-sparkle-eddsa`, fields: `private` / `public`). CI reads it via the
 `op` CLI using a service-account token in
 `OP_SERVICE_ACCOUNT_TOKEN` (GitHub Actions secret). The public key is
 baked into `Info.plist` at build time as `SUPublicEDKey`.
@@ -53,10 +53,10 @@ baked into `Info.plist` at build time as `SUPublicEDKey`.
 **Key handling protocol** (security council condition):
 
 - The service-account token is scoped read-only to the single
-  `op://Sojourn/sparkle-eddsa` item. Token cannot enumerate other
+  `op://Bizarre-Industries/sojourn-sparkle-eddsa` item. Token cannot enumerate other
   vaults or items.
 - The private key is **never written to disk**. The notarize workflow
-  pipes `op read --no-newline op://Sojourn/sparkle-eddsa/private`
+  pipes `op read --no-newline op://Bizarre-Industries/sojourn-sparkle-eddsa/private`
   directly into `sign_update -f -` (stdin pipe). No tempfile, no
   `--key-file` flag.
 - After signing, `unset OP_SERVICE_ACCOUNT_TOKEN` runs in the same

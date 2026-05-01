@@ -185,16 +185,21 @@ jobs:
           # extract the PR URL for the auto-merge step.
           # `--message` overrides the default commit-message template so
           # the squashed commit on tap main carries useful provenance.
+          # Build the commit message in a variable so we don't have to
+          # embed literal newlines in the YAML run-block (which would
+          # break indentation of the `|` block scalar).
+          msg=$(printf 'release: bump sojourn to v%s\n\nsource: %s/%s/releases/tag/%s\nworkflow-run: %s/%s/actions/runs/%s' \
+            "${version}" \
+            "${GITHUB_SERVER_URL}" "${GITHUB_REPOSITORY}" "${GITHUB_REF_NAME}" \
+            "${GITHUB_SERVER_URL}" "${GITHUB_REPOSITORY}" "${GITHUB_RUN_ID}")
+
           bump_log=$(mktemp)
           brew bump-cask-pr \
             --version="${version}" \
             --sha256="${sha}" \
             --no-browse \
             --no-fork \
-            --message="release: bump sojourn to v${version}
-
-source: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/releases/tag/${GITHUB_REF_NAME}
-workflow-run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" \
+            --message="${msg}" \
             Bizarre-Industries/sojourn/sojourn 2>&1 | tee "${bump_log}"
 
           pr_url=$(grep -oE 'https://github.com/Bizarre-Industries/homebrew-sojourn/pull/[0-9]+' "${bump_log}" | tail -1)

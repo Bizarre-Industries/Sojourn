@@ -6,9 +6,20 @@ All notable changes to Sojourn. Follows
 
 ## [Unreleased]
 
-### Planned (post-v0.2.1)
+### Planned (post-v0.2.2)
 
 (See `docs/process/plans/v0.3-plan.md`.)
+
+## [0.2.2] — 2026-05-01
+
+### Fixed
+
+- v0.2.1 notarize run 25220836742 cleared all signing/notarize stages
+  (Build → Sign → DMG → Notarize → Upload all succeeded) but failed at
+  the local-cask audit step: `brew audit [path ...]` was disabled in
+  Homebrew 5.x. Replaced with `brew style ./Casks/sojourn.rb`. Full
+  audit still runs downstream — `brew bump-cask-pr` audits the
+  bumped tap-side cask before opening the PR.
 
 ## [0.2.1] — 2026-05-01
 

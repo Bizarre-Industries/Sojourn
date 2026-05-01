@@ -142,9 +142,14 @@ jobs:
         if: "!contains(github.ref, '-')"
         uses: Homebrew/actions/setup-homebrew@master
 
-      - name: Audit cask
+      - name: Style-check cask
+        # `brew audit [path ...]` was disabled in Homebrew 5.x — only
+        # name-based audit is supported, which requires the cask already
+        # be tapped at the upstream version. `brew style` covers the
+        # local-file linting layer; `brew bump-cask-pr` runs full audit
+        # against the bumped tap-side cask before opening the PR.
         if: "!contains(github.ref, '-')"
-        run: brew audit --cask --new --online ./Casks/sojourn.rb
+        run: brew style ./Casks/sojourn.rb
 
       - name: Publish Homebrew cask update
         if: "!contains(github.ref, '-')"

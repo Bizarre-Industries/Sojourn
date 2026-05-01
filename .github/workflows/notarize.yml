@@ -151,139 +151,22 @@ jobs:
         if: "!contains(github.ref, '-')"
         run: brew style ./Casks/sojourn.rb
 
+      - name: Install coreutils (gtimeout)
+        # macOS doesn't ship GNU `timeout`; the publish script wraps brew
+        # audit + git push in gtimeout to fail fast. Install once here so
+        # the publish step doesn't have to.
+        if: "!contains(github.ref, '-')"
+        run: brew install --quiet coreutils
+
       - name: Publish Homebrew cask update
-        # Direct-push to tap main (council 2026-05-01-notarize-publish-direct-push,
-        # re-voted after fine-grained PAT scope blocked the bump-cask-pr hybrid).
-        # The HOMEBREW_TAP_TOKEN PAT has Contents: write but not Pull requests:
-        # write — bump-cask-pr's PR step + `gh pr create` both 403 with
-        # "Resource not accessible by personal access token". Direct-push
-        # only needs Contents: write, which the PAT has.
-        #
-        # All five council members re-voted APPROVE-WITH-CONDITIONS. Conditions
-        # implemented inline below; see deliberation log for the mapping.
-        #
-        # TODO(self-hosted runner migration): the push embeds the token in
-        # `git -c http.extraheader='AUTHORIZATION: bearer …' push` argv. On
-        # ephemeral hosted runners the blast radius is one VM. If we ever move
-        # to self-hosted runners, switch to a credential helper or GitHub App
-        # token exchange so the token never appears in /proc/<pid>/cmdline.
+        # Thin wrapper around scripts/publish-homebrew-cask.sh. All the
+        # logic — tag-format guard, token scrub, sed + verification, brew
+        # audit, ephemeral-token push, push-landed check — lives in the
+        # script so we can replay it locally (e.g. `act` for CI testing,
+        # or for backfilling missed cask publishes). See script header
+        # for the full safeguard list and the council deliberation at
+        # .claude/council-logs/2026-05-01-notarize-publish-direct-push.md.
         if: "!contains(github.ref, '-')"
         env:
           TAP_TOKEN: ${{ env.HOMEBREW_TAP_TOKEN }}
-        run: |
-          set -euo pipefail
-          # Mask the token so it can't leak via accidental `set -x` or echoes
-          # inside this step.
-          echo "::add-mask::${TAP_TOKEN}"
-
-          version="${GITHUB_REF_NAME#v}"
-
-          # Tag-format guard (security council, condition #1). Hard-fail
-          # before any string interpolation; refuse anything that isn't
-          # strict semver. Catches typos and closes shell-injection vectors.
-          if ! [[ "${version}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "::error::Tag '${GITHUB_REF_NAME}' is not in vN.N.N form; refusing to publish"
-            exit 1
-          fi
-
-          # Compute sha256 from the locally notarized + stapled DMG. This is
-          # the same DMG Gatekeeper just verified two steps up. We do NOT
-          # re-download from the GitHub release asset (devil-advocate raised
-          # the upload-corruption case; we mitigate by running brew audit
-          # below, which DOES re-download and compares).
-          sha=$(shasum -a 256 Sojourn.dmg | cut -d' ' -f1)
-
-          # Clone the tap with the token in the URL — it lives there only
-          # until the next command, which scrubs it.
-          tap_dir="$(mktemp -d)/homebrew-sojourn"
-          git clone --depth 1 \
-            "https://x-access-token:${TAP_TOKEN}@github.com/Bizarre-Industries/homebrew-sojourn.git" \
-            "${tap_dir}"
-
-          # Token scrub (security council, condition #2). After this point
-          # `.git/config` has no credentials. The push at the end of this
-          # step re-injects the token via `-c http.extraheader=…` for one
-          # invocation — token in argv of one process, never on disk.
-          git -C "${tap_dir}" remote set-url origin \
-            "https://github.com/Bizarre-Industries/homebrew-sojourn.git"
-
-          # Capture the pre-edit version + sha to drive a negative grep
-          # afterwards (perf-skeptic, condition #6).
-          old_version=$(grep -oE '^  version "[^"]+"' "${tap_dir}/Casks/sojourn.rb" | head -1 | sed -E 's/.*"([^"]+)".*/\1/')
-          old_sha=$(grep -oE '^  sha256 "[a-f0-9]{64}"' "${tap_dir}/Casks/sojourn.rb" | head -1 | sed -E 's/.*"([a-f0-9]+)".*/\1/')
-
-          # Anchored sed: only the `version "…"` and `sha256 "…"` lines at
-          # column 3 are touched. Won't match URL strings or comments.
-          sed -i.bak -E \
-            -e "s|^([[:space:]]*version )\".*\"|\1\"${version}\"|" \
-            -e "s|^([[:space:]]*sha256 )\".*\"|\1\"${sha}\"|" \
-            "${tap_dir}/Casks/sojourn.rb"
-          rm "${tap_dir}/Casks/sojourn.rb.bak"
-
-          # Post-edit verification — positive (architect + ux-critic).
-          if ! grep -q "^  version \"${version}\"$" "${tap_dir}/Casks/sojourn.rb"; then
-            echo "::error::version substitution did not produce expected line"
-            cat "${tap_dir}/Casks/sojourn.rb"
-            exit 1
-          fi
-          if ! grep -qE "^  sha256 \"${sha}\"$" "${tap_dir}/Casks/sojourn.rb"; then
-            echo "::error::sha256 substitution did not produce expected line"
-            cat "${tap_dir}/Casks/sojourn.rb"
-            exit 1
-          fi
-
-          # Post-edit verification — negative (perf-skeptic, condition #6).
-          # Catches the case where sed produced both old + new strings.
-          if [ -n "${old_version}" ] && [ "${old_version}" != "${version}" ] && \
-             grep -q "^  version \"${old_version}\"$" "${tap_dir}/Casks/sojourn.rb"; then
-            echo "::error::old version ${old_version} still present after sed"
-            exit 1
-          fi
-          if [ -n "${old_sha}" ] && [ "${old_sha}" != "${sha}" ] && \
-             grep -q "^  sha256 \"${old_sha}\"$" "${tap_dir}/Casks/sojourn.rb"; then
-            echo "::error::old sha ${old_sha} still present after sed"
-            exit 1
-          fi
-
-          # Style + online audit on the bumped cask via the tap's own brew
-          # tree (devil-advocate condition: replace bump-cask-pr's online
-          # audit). Wrapped in `timeout 180` to fail fast if the GitHub
-          # release CDN is cold (perf-skeptic, condition #1).
-          brew tap Bizarre-Industries/sojourn
-          tap_repo="$(brew --repo Bizarre-Industries/sojourn)"
-          mkdir -p "${tap_repo}/Casks"
-          cp "${tap_dir}/Casks/sojourn.rb" "${tap_repo}/Casks/sojourn.rb"
-          brew style "${tap_repo}/Casks/sojourn.rb"
-          timeout 180 brew audit --cask --online sojourn
-
-          # Build the commit message in a variable to avoid embedding literal
-          # newlines in the YAML run-block (would break the `|` scalar).
-          msg=$(printf 'release: bump sojourn to v%s\n\nsha256 %s\nsource: %s/%s/releases/tag/%s\nworkflow-run: %s/%s/actions/runs/%s' \
-            "${version}" "${sha}" \
-            "${GITHUB_SERVER_URL}" "${GITHUB_REPOSITORY}" "${GITHUB_REF_NAME}" \
-            "${GITHUB_SERVER_URL}" "${GITHUB_REPOSITORY}" "${GITHUB_RUN_ID}")
-
-          # Commit + push as the actions bot. DCO sign-off required by
-          # org policy (web_commit_signoff_required = true).
-          git -C "${tap_dir}" config user.name  "github-actions[bot]"
-          git -C "${tap_dir}" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git -C "${tap_dir}" add Casks/sojourn.rb
-          git -C "${tap_dir}" commit -s -m "${msg}"
-
-          # Ephemeral-token push: token never lands in `.git/config`.
-          # Wrap in `timeout 30` to fail fast on auth hangs (perf-skeptic).
-          local_sha=$(git -C "${tap_dir}" rev-parse HEAD)
-          timeout 30 git -C "${tap_dir}" \
-            -c "http.https://github.com/.extraheader=AUTHORIZATION: bearer ${TAP_TOKEN}" \
-            push origin main
-
-          # Verify the push actually landed (architect dissent #3). Bare
-          # push exit code is not proof of remote state under network flakes.
-          remote_sha=$(git -C "${tap_dir}" \
-            -c "http.https://github.com/.extraheader=AUTHORIZATION: bearer ${TAP_TOKEN}" \
-            ls-remote origin refs/heads/main | cut -f1)
-          if [ "${local_sha}" != "${remote_sha}" ]; then
-            echo "::error::push exit 0 but remote main is ${remote_sha}, expected ${local_sha}"
-            exit 1
-          fi
-          echo "Tap main is now at ${local_sha}"
+        run: bash scripts/publish-homebrew-cask.sh Sojourn.dmg

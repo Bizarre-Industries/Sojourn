@@ -6,9 +6,27 @@ All notable changes to Sojourn. Follows
 
 ## [Unreleased]
 
-### Planned (post-v0.2.6)
+### Planned (post-v0.2.7)
 
 (See `docs/process/plans/v0.3-plan.md`.)
+
+## [0.2.7] — 2026-05-01
+
+### Fixed
+
+- v0.2.6 notarize run 25224852919 failed at the new direct-push publish
+  step with `timeout: command not found` (exit 127). macOS doesn't ship
+  GNU `timeout`. Added `brew install --quiet coreutils` (now its own
+  workflow step) and switched to `gtimeout`.
+
+### Changed
+
+- Factored the inline publish-cask shell out of `notarize.yml` into
+  `scripts/publish-homebrew-cask.sh`. The workflow step is now a thin
+  `bash scripts/publish-homebrew-cask.sh Sojourn.dmg` invocation.
+  Benefits: shellcheck-clean reusable script; `--dry-run` flag for
+  local validation; replayable for backfills (e.g. cask publishes that
+  failed in v0.2.0–v0.2.6); cleaner YAML.
 
 ## [0.2.6] — 2026-05-01
 

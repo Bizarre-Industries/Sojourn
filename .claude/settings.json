@@ -1,4 +1,33 @@
 {
+  "$comment": "Sojourn project Claude Code settings. Committed to repo, applies to every session in this repo. Pairs with ~/.claude/settings.json (user-global). Per docs/process/plans/v0.X-plan.md and CLAUDE.md.",
+
+  "permissions": {
+    "$comment": "defaultMode 'bypassPermissions' = zero pauses for unmatched tools. Deny list catches only laptop-bricking patterns, not project-breaking ones. Council is the runtime sanity check; deny list is the irrecoverable-only safety net.",
+    "defaultMode": "bypassPermissions",
+    "deny": [
+      "Bash(rm -rf /)",
+      "Bash(rm -rf /*)",
+      "Bash(rm -rf ~)",
+      "Bash(rm -rf ~/)",
+      "Bash(rm -rf ~/*)",
+      "Bash(rm -rf $HOME)",
+      "Bash(rm -rf $HOME/)",
+      "Bash(rm -rf $HOME/*)",
+      "Bash(dd if=* of=/dev/disk*)",
+      "Bash(dd if=* of=/dev/rdisk*)",
+      "Bash(dd if=/dev/zero of=/dev/*)",
+      "Bash(dd if=/dev/random of=/dev/*)",
+      "Bash(:(){ :|:& };:)",
+      "Bash(diskutil eraseDisk*)",
+      "Bash(diskutil eraseVolume*)",
+      "Bash(mkfs.*)",
+      "Bash(sudo rm -rf /)",
+      "Bash(sudo rm -rf /*)"
+    ],
+    "allow": [],
+    "ask": []
+  },
+
   "hooks": {
     "SessionStart": [
       {
@@ -6,7 +35,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${CLAUDE_PROJECT_DIR}/.claude/hooks/replan-on-ship.sh",
+            "command": "bash ${CLAUDE_PROJECT_DIR}/.claude/hooks/replan-on-tag.sh",
             "statusMessage": "Checking for unprocessed shipped tags"
           }
         ]
@@ -16,22 +45,47 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${CLAUDE_PROJECT_DIR}/.claude/hooks/replan-on-ship.sh",
+            "command": "bash ${CLAUDE_PROJECT_DIR}/.claude/hooks/replan-on-tag.sh",
             "statusMessage": "Checking for unprocessed shipped tags"
           }
         ]
       }
     ],
+
     "Stop": [
       {
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${CLAUDE_PROJECT_DIR}/.claude/hooks/replan-on-ship.sh",
+            "command": "bash ${CLAUDE_PROJECT_DIR}/.claude/hooks/replan-on-tag.sh",
             "statusMessage": "Checking for newly shipped tags"
           }
         ]
       }
+    ],
+
+    "PreToolUse": [
+      {
+        "matcher": "Bash|WebFetch",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PROJECT_DIR}/.claude/hooks/never-guess.sh",
+            "statusMessage": "Verifying claim is grounded"
+          }
+        ]
+      }
     ]
+  },
+
+  "env": {
+    "$comment": "CLAUDE_CODE_SUBAGENT_MODEL controls model used for subagents that have model: inherit. Set to Haiku for cheap mechanical ops; council members and main loop override to Opus 4.7 in their own frontmatter or via this default. Override per-agent via YAML frontmatter 'model: opus' or 'model: claude-opus-4-7'.",
+    "CLAUDE_CODE_SUBAGENT_MODEL": "claude-haiku-4-5-20251001"
+  },
+
+  "attribution": {
+    "$comment": "Suhail's preference: no Claude co-author trailer in commits. Sojourn's git history stays human-attributed.",
+    "includeCoAuthoredBy": false,
+    "claudeAttribution": ""
   }
 }

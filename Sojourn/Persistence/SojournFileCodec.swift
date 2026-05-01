@@ -33,8 +33,6 @@ internal enum TOMLError: Error, Sendable, Equatable {
 }
 
 internal struct SojournFileCodec: Sendable {
-  internal init() {}
-
   // MARK: - Decode
 
   internal func decode(_ input: String) throws -> [String: TOMLValue] {

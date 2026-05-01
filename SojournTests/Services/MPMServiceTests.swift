@@ -1,6 +1,6 @@
 import Foundation
-import Testing
 @testable import Sojourn
+import Testing
 
 /// Fixture-backed tests for MPMService JSON decoding.
 /// See docs/ARCHITECTURE.md section 5.1.

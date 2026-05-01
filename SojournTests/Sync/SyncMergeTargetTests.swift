@@ -2,12 +2,11 @@
 // drives audit §2.2.3 three-way merge for text dotfiles.
 
 import Foundation
-import Testing
 @testable import Sojourn
+import Testing
 
 @Suite("SyncCoordinator.textMergeTargets")
 struct SyncMergeTargetTests {
-
   @Test("yields modified text paths and skips non-mergeable extensions")
   func filtersBinariesAndPlists() {
     let status = """

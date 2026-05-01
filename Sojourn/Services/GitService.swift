@@ -59,7 +59,7 @@ internal actor GitService {
     "PATH": "/usr/bin:/bin",
     "GIT_TERMINAL_PROMPT": "0",
     "GIT_PAGER": "cat",
-    "LC_ALL": "C",
+    "LC_ALL": "C"
   ]
 
   // MARK: - Queries

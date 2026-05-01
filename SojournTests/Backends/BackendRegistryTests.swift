@@ -3,12 +3,11 @@
 // implementations. Audit §3.2.5.
 
 import Foundation
-import Testing
 @testable import Sojourn
+import Testing
 
 @Suite("BackendRegistry")
 struct BackendRegistryTests {
-
   private struct StubPackageBackend: PackageBackend {
     let managerID: String
     func installed() async throws -> ManagerSnapshot {

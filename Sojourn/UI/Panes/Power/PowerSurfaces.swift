@@ -22,11 +22,11 @@ struct JobInspectorPane: View {
       )
       BzrCard(eyebrow: "RECENT · 5 MOST RECENT") {
         VStack(spacing: 6) {
-          jobRow("git push origin main",                       "exit 0",   "1.4s",  .ok)
-          jobRow("gitleaks dir --staged --no-git",             "exit 0",   "0.8s",  .ok)
-          jobRow("mpm --table-format json outdated",           "exit 0",   "12.3s", .ok)
-          jobRow("brew outdated --json",                       "exit 0",   "3.1s",  .ok)
-          jobRow("chezmoi diff --no-pager --color=false",      "running",  "0.4s",  .lime)
+          jobRow("git push origin main", "exit 0", "1.4s", .ok)
+          jobRow("gitleaks dir --staged --no-git", "exit 0", "0.8s", .ok)
+          jobRow("mpm --table-format json outdated", "exit 0", "12.3s", .ok)
+          jobRow("brew outdated --json", "exit 0", "3.1s", .ok)
+          jobRow("chezmoi diff --no-pager --color=false", "running", "0.4s", .lime)
         }
       }
     }
@@ -105,9 +105,9 @@ struct AgeKeysPane: View {
       }
       BzrCard(eyebrow: "RECIPIENTS · .sojourn/recipients.txt") {
         VStack(alignment: .leading, spacing: 8) {
-          recipientRow("work-mbp",       "age1qzr...l7kq",   true)
-          recipientRow("personal-mini",  "age1abc...x4yz",   false)
-          recipientRow("ci-runner",      "age1def...m9np",   false)
+          recipientRow("work-mbp", "age1qzr...l7kq", true)
+          recipientRow("personal-mini", "age1abc...x4yz", false)
+          recipientRow("ci-runner", "age1def...m9np", false)
         }
       }
       BzrCallout(
@@ -188,14 +188,14 @@ struct GitleaksRulesPane: View {
                   subtitle: "142 builtin patterns. Per-repo allowlist with optional expiry. High-confidence categories drive 5-second lockout.") {
       BzrCard(eyebrow: "BUILTIN · 142 PATTERNS") {
         VStack(alignment: .leading, spacing: 6) {
-          ruleRow("aws-access-token",       "HIGH", .tierE)
-          ruleRow("github-pat",             "HIGH", .tierE)
-          ruleRow("openai-api-key",         "HIGH", .tierE)
-          ruleRow("stripe-access-token",    "HIGH", .tierE)
-          ruleRow("anthropic-api-key",      "HIGH", .tierE)
-          ruleRow("slack-bot-token",        "HIGH", .tierE)
-          ruleRow("generic-api-key",        "MED",  .tierC)
-          ruleRow("private-key-rsa",        "HIGH", .tierE)
+          ruleRow("aws-access-token", "HIGH", .tierE)
+          ruleRow("github-pat", "HIGH", .tierE)
+          ruleRow("openai-api-key", "HIGH", .tierE)
+          ruleRow("stripe-access-token", "HIGH", .tierE)
+          ruleRow("anthropic-api-key", "HIGH", .tierE)
+          ruleRow("slack-bot-token", "HIGH", .tierE)
+          ruleRow("generic-api-key", "MED", .tierC)
+          ruleRow("private-key-rsa", "HIGH", .tierE)
         }
       }
       BzrCard(eyebrow: "ALLOWLIST · .gitleaks.toml (repo)") {
@@ -303,11 +303,11 @@ struct BackupsPane: View {
 
   private var backups: [Backup] {
     [
-      .init(id: "2026-04-30T19-34-pre-push",    when: "2h ago",  op: "push",     size: "12 MB"),
-      .init(id: "2026-04-30T08-12-pre-pull",    when: "13h ago", op: "pull",     size: "8 MB"),
-      .init(id: "2026-04-29T19-02-pre-apply",   when: "1d ago",  op: "apply",    size: "4 MB"),
-      .init(id: "2026-04-28T14-30-sync.pull",   when: "2d ago",  op: "pull",     size: "10 MB"),
-      .init(id: "2026-04-26T11-45-pre-cleanup", when: "4d ago",  op: "cleanup",  size: "2 MB")
+      .init(id: "2026-04-30T19-34-pre-push", when: "2h ago", op: "push", size: "12 MB"),
+      .init(id: "2026-04-30T08-12-pre-pull", when: "13h ago", op: "pull", size: "8 MB"),
+      .init(id: "2026-04-29T19-02-pre-apply", when: "1d ago", op: "apply", size: "4 MB"),
+      .init(id: "2026-04-28T14-30-sync.pull", when: "2d ago", op: "pull", size: "10 MB"),
+      .init(id: "2026-04-26T11-45-pre-cleanup", when: "4d ago", op: "cleanup", size: "2 MB")
     ]
   }
 
@@ -396,9 +396,9 @@ struct RepoSetupPane: View {
       }
       BzrCard(eyebrow: "SIGNING") {
         VStack(alignment: .leading, spacing: 6) {
-          signingRow("GPG (gpg-agent)",      true)
-          signingRow("SSH (ssh-agent)",      false)
-          signingRow("Apple Notary",         false)
+          signingRow("GPG (gpg-agent)", true)
+          signingRow("SSH (ssh-agent)", false)
+          signingRow("Apple Notary", false)
         }
       }
       BzrCard(eyebrow: "COMMIT MESSAGE TEMPLATE") {

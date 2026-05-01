@@ -62,7 +62,7 @@ internal enum ManagerTier {
     "composer": .d,
     "vscode": .c,
     "yarn": .d,
-    "npm": .e,
+    "npm": .e
   ]
 
   internal static func tier(for managerID: String) -> AutoUpdateTier {

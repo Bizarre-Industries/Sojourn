@@ -5,12 +5,11 @@
 // Audit §3.1.7 + ADR-0011.
 
 import Foundation
-import Testing
 @testable import Sojourn
+import Testing
 
 @Suite("KeychainBroker")
 struct KeychainBrokerTests {
-
   @Test("brokerID is `keychain` and isAvailable returns true on macOS")
   func availability() async {
     let broker = KeychainBroker()

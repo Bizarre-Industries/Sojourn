@@ -65,12 +65,12 @@ internal indirect enum PluginValue: Sendable, Codable, Hashable {
 
   internal init(from decoder: any Decoder) throws {
     let c = try decoder.singleValueContainer()
-    if c.decodeNil()                                     { self = .null;       return }
-    if let v = try? c.decode(Bool.self)                  { self = .bool(v);    return }
-    if let v = try? c.decode(Int.self)                   { self = .int(v);     return }
-    if let v = try? c.decode(Double.self)                { self = .double(v);  return }
-    if let v = try? c.decode(String.self)                { self = .string(v);  return }
-    if let v = try? c.decode([PluginValue].self)         { self = .array(v);   return }
+    if c.decodeNil() { self = .null;       return }
+    if let v = try? c.decode(Bool.self) { self = .bool(v);    return }
+    if let v = try? c.decode(Int.self) { self = .int(v);     return }
+    if let v = try? c.decode(Double.self) { self = .double(v);  return }
+    if let v = try? c.decode(String.self) { self = .string(v);  return }
+    if let v = try? c.decode([PluginValue].self) { self = .array(v);   return }
     if let v = try? c.decode([String: PluginValue].self) { self = .object(v);  return }
     throw DecodingError.dataCorruptedError(in: c, debugDescription: "PluginValue")
   }

@@ -111,7 +111,7 @@ internal actor CooldownGate {
   ) async -> Bool {
     let payload: [String: Any] = [
       "package": ["name": package, "ecosystem": ecosystem],
-      "version": version,
+      "version": version
     ]
     guard let body = try? JSONSerialization.data(withJSONObject: payload) else {
       return false

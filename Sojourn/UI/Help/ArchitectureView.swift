@@ -107,12 +107,12 @@ struct ArchitectureView: View {
 
   private var servicesLayer: some View {
     Layer(label: "SERVICES", sub: "actor per CLI · structured I/O", tone: .white) {
-      Svc(name: "MPMService",     cli: "mpm",          out: "--table-format json",                kind: .normal)
-      Svc(name: "ChezmoiService", cli: "chezmoi",      out: "--format=json · status · diff",      kind: .normal)
-      Svc(name: "GitService",     cli: "/usr/bin/git", out: "--porcelain=v2 -z",                  kind: .normal)
-      Svc(name: "PrefService",    cli: "defaults",     out: "export/import + plutil xml1",        kind: .normal)
-      Svc(name: "SecretScan",     cli: "gitleaks",     out: "dir --report-format json",           kind: .warn)
-      Svc(name: "BrewService",    cli: "brew",         out: ".pkg installer · Authorization",     kind: .normal)
+      Svc(name: "MPMService", cli: "mpm", out: "--table-format json", kind: .normal)
+      Svc(name: "ChezmoiService", cli: "chezmoi", out: "--format=json · status · diff", kind: .normal)
+      Svc(name: "GitService", cli: "/usr/bin/git", out: "--porcelain=v2 -z", kind: .normal)
+      Svc(name: "PrefService", cli: "defaults", out: "export/import + plutil xml1", kind: .normal)
+      Svc(name: "SecretScan", cli: "gitleaks", out: "dir --report-format json", kind: .warn)
+      Svc(name: "BrewService", cli: "brew", out: ".pkg installer · Authorization", kind: .normal)
       Text("ALL VIA swift-subprocess")
         .font(.bzrMono(size: 9, weight: .semibold))
         .tracking(1.4)
@@ -122,12 +122,12 @@ struct ArchitectureView: View {
 
   private var backendsLayer: some View {
     Layer(label: "BACKENDS", sub: "user's binaries · arm's length", tone: .amber) {
-      Backend(bin: "mpm",      path: "/opt/homebrew/bin/mpm",      license: "GPL-2.0",  pinned: "6.3.0+")
-      Backend(bin: "chezmoi",  path: "/opt/homebrew/bin/chezmoi",  license: "MIT",      pinned: "2.70.2+")
-      Backend(bin: "brew",     path: "/opt/homebrew/bin/brew",     license: "BSD-2",    pinned: "4.4.7+")
-      Backend(bin: "git",      path: "/usr/bin/git",                license: "GPL-2",    pinned: "system")
-      Backend(bin: "gitleaks", path: "…/Resources/bin/",            license: "MIT",      pinned: "bundled · re-signed")
-      Backend(bin: "age",      path: "…/Resources/bin/",            license: "MIT",      pinned: "bundled · re-signed")
+      Backend(bin: "mpm", path: "/opt/homebrew/bin/mpm", license: "GPL-2.0", pinned: "6.3.0+")
+      Backend(bin: "chezmoi", path: "/opt/homebrew/bin/chezmoi", license: "MIT", pinned: "2.70.2+")
+      Backend(bin: "brew", path: "/opt/homebrew/bin/brew", license: "BSD-2", pinned: "4.4.7+")
+      Backend(bin: "git", path: "/usr/bin/git", license: "GPL-2", pinned: "system")
+      Backend(bin: "gitleaks", path: "…/Resources/bin/", license: "MIT", pinned: "bundled · re-signed")
+      Backend(bin: "age", path: "…/Resources/bin/", license: "MIT", pinned: "bundled · re-signed")
       Text("LICENSING FIREWALL · NO LINKING")
         .font(.bzrMono(size: 9, weight: .semibold))
         .tracking(1.4)
@@ -176,22 +176,22 @@ struct ArchitectureView: View {
   private var bottomStrip: some View {
     HStack(alignment: .top, spacing: 14) {
       BottomCard(title: "PERSISTENCE", sub: "~/Library/Application Support/Sojourn", rows: [
-        ("settings.toml",       "tool paths · cooldown overrides · machine_id"),
-        ("backups/<ts>-<op>/",  "tarball before push/pull/apply · 30d GC"),
-        ("deletions.db",        "SQLite · path · sha256 · reason · undo log"),
-        ("logs/",               "OSLog export bundle · gitleaks-redacted")
+        ("settings.toml", "tool paths · cooldown overrides · machine_id"),
+        ("backups/<ts>-<op>/", "tarball before push/pull/apply · 30d GC"),
+        ("deletions.db", "SQLite · path · sha256 · reason · undo log"),
+        ("logs/", "OSLog export bundle · gitleaks-redacted")
       ])
       BottomCard(title: "SCHEDULING", sub: "NSBackgroundActivityScheduler", rows: [
-        ("activity-id",          "app.bizarre.sojourn.refresh-outdated"),
+        ("activity-id", "app.bizarre.sojourn.refresh-outdated"),
         ("interval / tolerance", "1h · 15m · QoS .utility"),
-        ("App Nap",              "respected · battery-aware"),
-        ("v1.1 opt-in",          "SMAppService.agent · LaunchAgent")
+        ("App Nap", "respected · battery-aware"),
+        ("v1.1 opt-in", "SMAppService.agent · LaunchAgent")
       ])
       BottomCard(title: "USER REPO · YOUR REMOTE", sub: "git@github.com:you/my-mac.git", rows: [
-        ("packages.toml",       "mpm backup · root · TOML"),
-        ("dotfiles/",           "chezmoi source dir · age-encrypted secrets"),
+        ("packages.toml", "mpm backup · root · TOML"),
+        ("dotfiles/", "chezmoi source dir · age-encrypted secrets"),
         ("preferences/*.plist", "XML · per-domain · git-diffable"),
-        (".sojourn/",           "machines/ · active.toml · backups/ · version.toml")
+        (".sojourn/", "machines/ · active.toml · backups/ · version.toml")
       ])
     }
   }

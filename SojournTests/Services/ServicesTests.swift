@@ -1,6 +1,6 @@
 import Foundation
-import Testing
 @testable import Sojourn
+import Testing
 
 struct GitServiceTests {
   @Test func parsesPorcelainV2Status() {

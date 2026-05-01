@@ -68,7 +68,7 @@ extension PURL {
     guard raw.hasPrefix("pkg:") else { throw PURLParseError.missingScheme }
     var rest = String(raw.dropFirst("pkg:".count))
 
-    var subpath: String? = nil
+    var subpath: String?
     if let hashIndex = rest.firstIndex(of: "#") {
       subpath = String(rest[rest.index(after: hashIndex)...])
       rest = String(rest[..<hashIndex])
@@ -86,7 +86,7 @@ extension PURL {
       }
     }
 
-    var version: String? = nil
+    var version: String?
     if let atIndex = rest.lastIndex(of: "@") {
       version = String(rest[rest.index(after: atIndex)...])
       rest = String(rest[..<atIndex])

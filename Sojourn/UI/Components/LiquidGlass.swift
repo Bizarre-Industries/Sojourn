@@ -53,8 +53,8 @@ internal struct GlassWallpaper: View {
         // Base diagonal gradient.
         LinearGradient(
           gradient: Gradient(colors: [
-            Color(red: 10/255, green: 10/255, blue: 20/255),
-            Color(red: 26/255, green: 14/255, blue: 31/255)
+            Color(red: 10 / 255, green: 10 / 255, blue: 20 / 255),
+            Color(red: 26 / 255, green: 14 / 255, blue: 31 / 255)
           ]),
           startPoint: .topLeading,
           endPoint: .bottomTrailing
@@ -62,11 +62,11 @@ internal struct GlassWallpaper: View {
 
         // Aurora blooms — sized to the viewport so the refraction holds
         // at every window dimension.
-        bloom(color: Color.bzrLime,                     x: 0.12 * w, y: 0.18 * h, r: 0.55 * max(w, h))
-        bloom(color: Color(red: 255/255, green:  91/255, blue: 138/255), x: 0.88 * w, y: 0.82 * h, r: 0.65 * max(w, h))
-        bloom(color: Color(red: 255/255, green: 209/255, blue: 102/255), x: 0.78 * w, y: 0.18 * h, r: 0.55 * max(w, h))
-        bloom(color: Color.bzrInfo,                     x: 0.22 * w, y: 0.78 * h, r: 0.60 * max(w, h))
-        bloom(color: Color(red: 138/255, green:  61/255, blue: 255/255), x: 0.50 * w, y: 0.50 * h, r: 0.50 * max(w, h))
+        bloom(color: Color.bzrLime, x: 0.12 * w, y: 0.18 * h, r: 0.55 * max(w, h))
+        bloom(color: Color(red: 255 / 255, green: 91 / 255, blue: 138 / 255), x: 0.88 * w, y: 0.82 * h, r: 0.65 * max(w, h))
+        bloom(color: Color(red: 255 / 255, green: 209 / 255, blue: 102 / 255), x: 0.78 * w, y: 0.18 * h, r: 0.55 * max(w, h))
+        bloom(color: Color.bzrInfo, x: 0.22 * w, y: 0.78 * h, r: 0.60 * max(w, h))
+        bloom(color: Color(red: 138 / 255, green: 61 / 255, blue: 255 / 255), x: 0.50 * w, y: 0.50 * h, r: 0.50 * max(w, h))
 
         // Star-dust speckle. Twelve fixed offsets — deterministic so the
         // wallpaper doesn't flicker between renders.
@@ -151,7 +151,7 @@ internal struct GlassDangerButtonStyle: ButtonStyle {
   func makeBody(configuration: Configuration) -> some View {
     configuration.label
       .font(.bzrButton)
-      .foregroundStyle(Color(red: 255/255, green: 138/255, blue: 144/255))
+      .foregroundStyle(Color(red: 255 / 255, green: 138 / 255, blue: 144 / 255))
       .padding(.horizontal, 12)
       .padding(.vertical, 5)
       .background(
@@ -230,7 +230,7 @@ internal struct GlassSheetBackground: ViewModifier {
           RoundedRectangle(cornerRadius: 14, style: .continuous)
             .fill(.regularMaterial)
           RoundedRectangle(cornerRadius: 14, style: .continuous)
-            .fill(Color(red: 36/255, green: 36/255, blue: 40/255).opacity(0.40))
+            .fill(Color(red: 36 / 255, green: 36 / 255, blue: 40 / 255).opacity(0.40))
           RoundedRectangle(cornerRadius: 14, style: .continuous)
             .stroke(Color.hairlineStrong, lineWidth: 0.5)
         }

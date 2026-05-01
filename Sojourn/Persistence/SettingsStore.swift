@@ -10,19 +10,19 @@ import Foundation
 
 internal struct Settings: Sendable, Codable, Equatable {
   internal var toolLocations: [ToolResolution] = []
-  internal var lastSyncTime: Date? = nil
+  internal var lastSyncTime: Date?
   internal var cooldownOverrides: [String: AutoUpdateTier] = [:]
   internal var userConsents: [String: Bool] = [:]
   internal var machines: [MachineMetadata] = []
   internal var history: [HistoryEntry] = []
-  internal var remoteRepoURL: String? = nil
+  internal var remoteRepoURL: String?
   internal var cooldownEnabled: Bool = true
   internal var dryRunByDefault: Bool = true
   /// User-supplied GitHub OAuth `client_id` for the Device Flow, set
   /// via Settings → Integrations. v0.1.0 ships without a Sojourn-owned
   /// OAuth app; users register their own GitHub OAuth App and paste
   /// the `client_id` here. v0.1.1 ships a Sojourn-owned default.
-  internal var githubClientID: String? = nil
+  internal var githubClientID: String?
 
   internal static let empty = Settings()
 

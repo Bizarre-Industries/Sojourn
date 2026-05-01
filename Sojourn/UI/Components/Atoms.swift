@@ -115,11 +115,11 @@ internal enum BzrBadgeKind {
   }
   var fg: Color {
     switch self {
-    case .tierA, .success: return Color(red: 108/255, green: 230/255, blue: 124/255)
-    case .tierB:           return Color(red: 138/255, green: 184/255, blue: 255/255)
-    case .tierC:           return Color(red: 255/255, green: 192/255, blue: 106/255)
-    case .tierD, .warn:    return Color(red: 255/255, green: 184/255, blue:  74/255)
-    case .tierE, .danger:  return Color(red: 255/255, green: 138/255, blue: 144/255)
+    case .tierA, .success: return Color(red: 108 / 255, green: 230 / 255, blue: 124 / 255)
+    case .tierB:           return Color(red: 138 / 255, green: 184 / 255, blue: 255 / 255)
+    case .tierC:           return Color(red: 255 / 255, green: 192 / 255, blue: 106 / 255)
+    case .tierD, .warn:    return Color(red: 255 / 255, green: 184 / 255, blue: 74 / 255)
+    case .tierE, .danger:  return Color(red: 255 / 255, green: 138 / 255, blue: 144 / 255)
     case .lime:            return Color.bzrLime
     case .mute:            return Color.txtSecondary
     }
@@ -183,8 +183,8 @@ internal enum BzrCalloutKind {
   var titleColor: Color {
     switch self {
     case .info:   return Color.bzrLime
-    case .warn:   return Color(red: 255/255, green: 184/255, blue:  74/255)
-    case .danger: return Color(red: 255/255, green: 138/255, blue: 144/255)
+    case .warn:   return Color(red: 255 / 255, green: 184 / 255, blue: 74 / 255)
+    case .danger: return Color(red: 255 / 255, green: 138 / 255, blue: 144 / 255)
     }
   }
 }

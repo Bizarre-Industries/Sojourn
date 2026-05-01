@@ -4,12 +4,11 @@
 // removal.
 
 import Foundation
-import Testing
 @testable import Sojourn
+import Testing
 
 @Suite("HistoryDB")
 struct HistoryDBTests {
-
   private func makeTempURL() -> URL {
     let dir = URL(fileURLWithPath: NSTemporaryDirectory())
       .appendingPathComponent("sojourn-historydb-\(UUID().uuidString)")

@@ -1,6 +1,6 @@
 import Foundation
-import Testing
 @testable import Sojourn
+import Testing
 
 struct SnapshotServiceTests {
   @Test func captureCreatesTarArchive() async throws {
@@ -119,7 +119,7 @@ struct SyncCoordinatorTests {
       ["-C", workA.path, "config", "user.name", "Test User"],
       ["-C", workA.path, "config", "commit.gpgsign", "false"],
       ["-C", workA.path, "config", "init.defaultBranch", "main"],
-      ["-C", workA.path, "checkout", "-b", "main"],
+      ["-C", workA.path, "checkout", "-b", "main"]
     ] {
       _ = try? await runner.run(
         tool: URL(fileURLWithPath: "/usr/bin/git"),

@@ -36,8 +36,8 @@ internal struct SojournAppIconLight: View {
         .fill(
           LinearGradient(
             stops: [
-              .init(color: Color(red: 224/255, green: 255/255, blue: 107/255), location: 0),
-              .init(color: Color(red: 168/255, green: 224/255, blue: 0/255), location: 1)
+              .init(color: Color(red: 224 / 255, green: 255 / 255, blue: 107 / 255), location: 0),
+              .init(color: Color(red: 168 / 255, green: 224 / 255, blue: 0 / 255), location: 1)
             ],
             startPoint: .top,
             endPoint: .bottom
@@ -59,9 +59,9 @@ internal struct SojournAppIconLight: View {
 
       ZStack {
         SojournIconFrameShape()
-          .stroke(Color(red: 14/255, green: 14/255, blue: 14/255), lineWidth: stroke)
+          .stroke(Color(red: 14 / 255, green: 14 / 255, blue: 14 / 255), lineWidth: stroke)
         SojournIconMarkShape()
-          .fill(Color(red: 14/255, green: 14/255, blue: 14/255), style: FillStyle(eoFill: true))
+          .fill(Color(red: 14 / 255, green: 14 / 255, blue: 14 / 255), style: FillStyle(eoFill: true))
       }
 
       SojournSquircleShape()
@@ -84,8 +84,8 @@ internal struct SojournAppIconDark: View {
         .fill(
           LinearGradient(
             stops: [
-              .init(color: Color(red: 42/255, green: 42/255, blue: 44/255), location: 0),
-              .init(color: Color(red: 14/255, green: 14/255, blue: 14/255), location: 1)
+              .init(color: Color(red: 42 / 255, green: 42 / 255, blue: 44 / 255), location: 0),
+              .init(color: Color(red: 14 / 255, green: 14 / 255, blue: 14 / 255), location: 1)
             ],
             startPoint: .top,
             endPoint: .bottom
@@ -127,7 +127,7 @@ internal struct SojournAppIconTinted: View {
       SojournSquircleShape()
         .fill(
           LinearGradient(
-            colors: [Color(red: 26/255, green: 26/255, blue: 28/255), Color.black],
+            colors: [Color(red: 26 / 255, green: 26 / 255, blue: 28 / 255), Color.black],
             startPoint: .top,
             endPoint: .bottom
           )
@@ -171,10 +171,10 @@ internal struct SojournAppIconLiquidGlass: View {
       ZStack {
         Group {
           SojournIconFrameShape()
-            .stroke(darkWallpaper ? Color.black : Color(red: 14/255, green: 14/255, blue: 14/255), lineWidth: stroke)
+            .stroke(darkWallpaper ? Color.black : Color(red: 14 / 255, green: 14 / 255, blue: 14 / 255), lineWidth: stroke)
           SojournIconMarkShape()
             .fill(
-              darkWallpaper ? Color.black : Color(red: 14/255, green: 14/255, blue: 14/255),
+              darkWallpaper ? Color.black : Color(red: 14 / 255, green: 14 / 255, blue: 14 / 255),
               style: FillStyle(eoFill: true)
             )
         }
@@ -211,7 +211,7 @@ internal struct SojournAppIconLiquidGlass: View {
               .init(color: Color.white.opacity(0.15), location: 0.4),
               .init(color: Color.white.opacity(0), location: 1)
             ],
-            center: UnitPoint(x: 320/1024, y: 220/1024),
+            center: UnitPoint(x: 320 / 1024, y: 220 / 1024),
             startRadius: 0,
             endRadius: 400 * size / 1024
           )
@@ -279,7 +279,7 @@ internal struct SojournAppIconClear: View {
         .fill(
           RadialGradient(
             colors: [Color.white.opacity(0.7), Color.white.opacity(0)],
-            center: UnitPoint(x: 320/1024, y: 220/1024),
+            center: UnitPoint(x: 320 / 1024, y: 220 / 1024),
             startRadius: 0,
             endRadius: 400 * size / 1024
           )

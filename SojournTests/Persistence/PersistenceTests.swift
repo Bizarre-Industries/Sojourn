@@ -1,6 +1,6 @@
 import Foundation
-import Testing
 @testable import Sojourn
+import Testing
 
 struct SojournFileCodecTests {
   @Test func decodesSimpleTable() throws {
@@ -70,8 +70,8 @@ struct SojournFileCodecTests {
       "tags": .array([.string("a"), .string("b")]),
       "package": .table([
         "id": .string("ripgrep"),
-        "version": .string("14.1.0"),
-      ]),
+        "version": .string("14.1.0")
+      ])
     ]
     let text = codec.encode(input)
     let reparsed = try codec.decode(text)

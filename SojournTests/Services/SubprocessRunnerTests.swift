@@ -1,6 +1,6 @@
 import Foundation
-import Testing
 @testable import Sojourn
+import Testing
 
 /// Unit tests for SubprocessRunner. See docs/ARCHITECTURE.md §11.
 ///
@@ -8,7 +8,6 @@ import Testing
 /// /usr/bin/false) that are guaranteed to exist on macOS. No network,
 /// no brew/mpm/chezmoi — those are fixture-only per CLAUDE.md.
 struct SubprocessRunnerTests {
-
   @Test func runEchoCollectsStdout() async throws {
     let runner = SubprocessRunner()
     let result = try await runner.run(

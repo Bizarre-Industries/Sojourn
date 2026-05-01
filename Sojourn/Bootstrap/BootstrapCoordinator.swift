@@ -32,11 +32,11 @@ internal actor BootstrapCoordinator {
     }
     let inv = BootstrapState.Inventory(
       tools: [
-        "git":      report.git,
-        "brew":     report.brew,
-        "mpm":      report.mpm,
-        "chezmoi":  report.chezmoi,
-        "age":      report.age,
+        "git": report.git,
+        "brew": report.brew,
+        "mpm": report.mpm,
+        "chezmoi": report.chezmoi,
+        "age": report.age,
         "gitleaks": report.gitleaks
       ],
       hasCLT: report.hasXcodeCLT

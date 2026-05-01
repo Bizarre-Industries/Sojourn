@@ -20,12 +20,6 @@ internal struct ToolResolution: Sendable, Hashable, Codable {
     /// Cached from a previous run.
     case cached
   }
-
-  internal init(tool: String, url: URL, source: Source) {
-    self.tool = tool
-    self.url = url
-    self.source = source
-  }
 }
 
 internal actor ToolLocator {
@@ -42,7 +36,7 @@ internal actor ToolLocator {
     "/usr/bin",
     "/bin",
     "/usr/sbin",
-    "/sbin",
+    "/sbin"
   ]
 
   private let fileManager: FileManager

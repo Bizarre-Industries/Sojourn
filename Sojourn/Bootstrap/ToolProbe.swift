@@ -48,12 +48,12 @@ internal struct ToolProbeReport: Sendable, Hashable {
 
   internal var missing: [String] {
     var m: [String] = []
-    if git == nil       { m.append("git") }
-    if brew == nil      { m.append("brew") }
-    if mpm == nil       { m.append("mpm") }
-    if chezmoi == nil   { m.append("chezmoi") }
-    if age == nil       { m.append("age") }
-    if gitleaks == nil  { m.append("gitleaks") }
+    if git == nil { m.append("git") }
+    if brew == nil { m.append("brew") }
+    if mpm == nil { m.append("mpm") }
+    if chezmoi == nil { m.append("chezmoi") }
+    if age == nil { m.append("age") }
+    if gitleaks == nil { m.append("gitleaks") }
     return m
   }
 

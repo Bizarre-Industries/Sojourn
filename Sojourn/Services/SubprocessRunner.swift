@@ -226,7 +226,7 @@ internal actor SubprocessRunner {
     exit: ExitBox,
     timeout: TimeInterval
   ) async throws -> Bool {
-    return try await withThrowingTaskGroup(of: TimeoutOutcome.self) { group in
+    try await withThrowingTaskGroup(of: TimeoutOutcome.self) { group in
       group.addTask {
         await exit.wait()
         return .exited

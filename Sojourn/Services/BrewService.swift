@@ -104,7 +104,7 @@ internal actor BrewService {
   internal func postVerify() async throws -> URL {
     for candidate in [
       URL(fileURLWithPath: "/opt/homebrew/bin/brew"),
-      URL(fileURLWithPath: "/usr/local/bin/brew"),
+      URL(fileURLWithPath: "/usr/local/bin/brew")
     ] {
       if FileManager.default.isExecutableFile(atPath: candidate.path) {
         do {

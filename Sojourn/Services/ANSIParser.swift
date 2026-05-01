@@ -16,8 +16,8 @@ internal struct ANSIAttributes: Sendable, Hashable {
   internal var underline: Bool = false
   internal var inverse: Bool = false
   internal var strikethrough: Bool = false
-  internal var foreground: ANSIColor? = nil
-  internal var background: ANSIColor? = nil
+  internal var foreground: ANSIColor?
+  internal var background: ANSIColor?
 
   internal init() {}
 
@@ -35,16 +35,9 @@ internal enum ANSIColor: Sendable, Hashable {
 internal struct ANSIRun: Sendable, Hashable {
   internal let attrs: ANSIAttributes
   internal let text: String
-
-  internal init(attrs: ANSIAttributes, text: String) {
-    self.attrs = attrs
-    self.text = text
-  }
 }
 
 internal struct ANSIParser: Sendable {
-  internal init() {}
-
   /// Parse `input` into attributed runs. Stateless across calls; use
   /// `StatefulANSIParser` to preserve attribute state across chunks.
   internal func parse(_ input: String) -> [ANSIRun] {

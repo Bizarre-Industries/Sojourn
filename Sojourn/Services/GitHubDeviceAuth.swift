@@ -126,7 +126,7 @@ internal actor GitHubDeviceAuth {
     req.httpBody = Self.formEncode([
       "client_id": clientID,
       "device_code": deviceCode.deviceCode,
-      "grant_type": "urn:ietf:params:oauth:grant-type:device_code",
+      "grant_type": "urn:ietf:params:oauth:grant-type:device_code"
     ])
     let (data, _) = try await fetch(req)
     let resp: GitHubTokenResponse
@@ -166,7 +166,7 @@ internal actor GitHubDeviceAuth {
     let query: [String: Any] = [
       kSecClass as String: kSecClassGenericPassword,
       kSecAttrService as String: keychainService,
-      kSecAttrAccount as String: keychainAccount,
+      kSecAttrAccount as String: keychainAccount
     ]
     SecItemDelete(query as CFDictionary)
     var attrs = query
@@ -184,7 +184,7 @@ internal actor GitHubDeviceAuth {
       kSecAttrService as String: keychainService,
       kSecAttrAccount as String: keychainAccount,
       kSecReturnData as String: true,
-      kSecMatchLimit as String: kSecMatchLimitOne,
+      kSecMatchLimit as String: kSecMatchLimitOne
     ]
     var out: CFTypeRef?
     let status = SecItemCopyMatching(query as CFDictionary, &out)
@@ -196,7 +196,7 @@ internal actor GitHubDeviceAuth {
     let query: [String: Any] = [
       kSecClass as String: kSecClassGenericPassword,
       kSecAttrService as String: keychainService,
-      kSecAttrAccount as String: keychainAccount,
+      kSecAttrAccount as String: keychainAccount
     ]
     let status = SecItemDelete(query as CFDictionary)
     if status != errSecSuccess && status != errSecItemNotFound {

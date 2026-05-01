@@ -50,7 +50,7 @@ internal struct SecretFinding: Sendable, Hashable, Codable, Identifiable {
       "sojourn-github-pat",
       "sojourn-openai-key",
       "sojourn-stripe-live",
-      "sojourn-anthropic-key",
+      "sojourn-anthropic-key"
     ]
     return blocking.contains(ruleID)
   }
@@ -80,7 +80,7 @@ internal actor SecretScanService {
     let candidates: [URL] = [
       Bundle.main.bundleURL.appendingPathComponent("Contents/Resources/bin/gitleaks"),
       URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
-        .appendingPathComponent("Sojourn/Resources/bin/gitleaks"),
+        .appendingPathComponent("Sojourn/Resources/bin/gitleaks")
     ]
     guard let found = candidates.first(where: {
       FileManager.default.isExecutableFile(atPath: $0.path)

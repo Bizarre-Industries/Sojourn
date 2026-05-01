@@ -4,12 +4,11 @@
 // asserted here.
 
 import Foundation
-import Testing
 @testable import Sojourn
+import Testing
 
 @Suite("ToolProbe")
 struct ToolProbeTests {
-
   @Test("probe returns a report with deterministic isComplete computation")
   func probeRuns() async {
     let locator = ToolLocator()

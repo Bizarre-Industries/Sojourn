@@ -10,8 +10,8 @@
 import SwiftUI
 
 internal enum BzrRadius {
-  static let window:   CGFloat = 12
-  static let card:     CGFloat = 10
-  static let control:  CGFloat = 8
+  static let window: CGFloat = 12
+  static let card: CGFloat = 10
+  static let control: CGFloat = 8
   static let bzrSharp: CGFloat = 2
 }

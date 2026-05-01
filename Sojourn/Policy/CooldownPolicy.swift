@@ -17,9 +17,9 @@ internal enum CooldownPolicy {
   internal static func cooldown(for tier: AutoUpdateTier) -> TimeInterval {
     switch tier {
     case .a: return 0
-    case .b: return 7  * 24 * 60 * 60
-    case .c: return 7  * 24 * 60 * 60
-    case .d: return 7  * 24 * 60 * 60
+    case .b: return 7 * 24 * 60 * 60
+    case .c: return 7 * 24 * 60 * 60
+    case .d: return 7 * 24 * 60 * 60
     case .e: return 14 * 24 * 60 * 60
     }
   }

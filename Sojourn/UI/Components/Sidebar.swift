@@ -44,32 +44,32 @@ internal struct SidebarEntry: Identifiable, Hashable {
 /// Stage 3 binds counts to `AppStore` projections.
 internal enum SojournSidebarMenu {
   static let entries: [SidebarEntry] = [
-    .init(id: "overview",    label: "Overview",    icon: "rocket",                    section: .carry),
-    .init(id: "packages",    label: "Packages",    icon: "shippingbox",                section: .carry),
-    .init(id: "dotfiles",    label: "Dotfiles",    icon: "doc.text",                   section: .carry),
-    .init(id: "preferences", label: "Preferences", icon: "slider.horizontal.3",        section: .carry),
+    .init(id: "overview", label: "Overview", icon: "rocket", section: .carry),
+    .init(id: "packages", label: "Packages", icon: "shippingbox", section: .carry),
+    .init(id: "dotfiles", label: "Dotfiles", icon: "doc.text", section: .carry),
+    .init(id: "preferences", label: "Preferences", icon: "slider.horizontal.3", section: .carry),
 
-    .init(id: "machines",    label: "Machines",    icon: "laptopcomputer.and.iphone",  section: .sync),
-    .init(id: "history",     label: "History",     icon: "clock.arrow.circlepath",     section: .sync),
-    .init(id: "conflicts",   label: "Conflicts",   icon: "arrow.triangle.branch",      section: .sync),
-    .init(id: "onboard",     label: "Onboard Mac", icon: "plus.rectangle.on.folder",   section: .sync),
+    .init(id: "machines", label: "Machines", icon: "laptopcomputer.and.iphone", section: .sync),
+    .init(id: "history", label: "History", icon: "clock.arrow.circlepath", section: .sync),
+    .init(id: "conflicts", label: "Conflicts", icon: "arrow.triangle.branch", section: .sync),
+    .init(id: "onboard", label: "Onboard Mac", icon: "plus.rectangle.on.folder", section: .sync),
 
-    .init(id: "secrets",     label: "Secrets",     icon: "lock.shield",                section: .hygiene),
-    .init(id: "cleanup",     label: "Cleanup",     icon: "trash",                      section: .hygiene),
+    .init(id: "secrets", label: "Secrets", icon: "lock.shield", section: .hygiene),
+    .init(id: "cleanup", label: "Cleanup", icon: "trash", section: .hygiene),
 
-    .init(id: "diagnostics", label: "Diagnostics", icon: "waveform.path.ecg",          section: .app),
-    .init(id: "settings",    label: "Settings",    icon: "gear",                       section: .app),
+    .init(id: "diagnostics", label: "Diagnostics", icon: "waveform.path.ecg", section: .app),
+    .init(id: "settings", label: "Settings", icon: "gear", section: .app),
 
-    .init(id: "jobs",                label: "Jobs",          icon: "terminal",                  section: .power),
-    .init(id: "schedule",            label: "Schedule",      icon: "clock",                     section: .power),
-    .init(id: "age",                 label: "age Keys",      icon: "key.fill",                  section: .power),
-    .init(id: "chezmoi-templates",   label: "Templates",     icon: "doc.text.below.ecg",        section: .power),
-    .init(id: "gitleaks-rules",      label: "Rules",         icon: "shield.lefthalf.filled",    section: .power),
-    .init(id: "authorization",       label: "Authorization", icon: "checkmark.seal",            section: .power),
-    .init(id: "manager-detail",      label: "Manager",       icon: "shippingbox.and.arrow.backward", section: .power),
-    .init(id: "backups",             label: "Backups",       icon: "archivebox",                section: .power),
-    .init(id: "defaults-discover",   label: "Discover",      icon: "magnifyingglass",           section: .power),
-    .init(id: "repo-setup",          label: "Repo",          icon: "arrow.triangle.branch",     section: .power),
+    .init(id: "jobs", label: "Jobs", icon: "terminal", section: .power),
+    .init(id: "schedule", label: "Schedule", icon: "clock", section: .power),
+    .init(id: "age", label: "age Keys", icon: "key.fill", section: .power),
+    .init(id: "chezmoi-templates", label: "Templates", icon: "doc.text.below.ecg", section: .power),
+    .init(id: "gitleaks-rules", label: "Rules", icon: "shield.lefthalf.filled", section: .power),
+    .init(id: "authorization", label: "Authorization", icon: "checkmark.seal", section: .power),
+    .init(id: "manager-detail", label: "Manager", icon: "shippingbox.and.arrow.backward", section: .power),
+    .init(id: "backups", label: "Backups", icon: "archivebox", section: .power),
+    .init(id: "defaults-discover", label: "Discover", icon: "magnifyingglass", section: .power),
+    .init(id: "repo-setup", label: "Repo", icon: "arrow.triangle.branch", section: .power)
   ]
 }
 

@@ -158,12 +158,12 @@ struct OverviewPane: View {
 
   private var packagesTierRows: [PackagesTierRow] {
     [
-      .init(tier: "A", tierKind: .tierA, label: "mas",        count: "14", note: "auto · 0d · Apple reviews"),
-      .init(tier: "B", tierKind: .tierB, label: "brew",       count: "87", note: "7d · curated formulae"),
-      .init(tier: "B", tierKind: .tierB, label: "cargo",      count: "22", note: "7d · crates.io"),
-      .init(tier: "C", tierKind: .tierC, label: "cask",       count: "31", note: "7d · prompt · install scripts"),
+      .init(tier: "A", tierKind: .tierA, label: "mas", count: "14", note: "auto · 0d · Apple reviews"),
+      .init(tier: "B", tierKind: .tierB, label: "brew", count: "87", note: "7d · curated formulae"),
+      .init(tier: "B", tierKind: .tierB, label: "cargo", count: "22", note: "7d · crates.io"),
+      .init(tier: "C", tierKind: .tierC, label: "cask", count: "31", note: "7d · prompt · install scripts"),
       .init(tier: "D", tierKind: .tierD, label: "pipx · pip", count: "11", note: "7d · prompt · global interpreter"),
-      .init(tier: "E", tierKind: .tierE, label: "npm global", count: "9",  note: "14d · never silent · pre/postinstall")
+      .init(tier: "E", tierKind: .tierE, label: "npm global", count: "9", note: "14d · never silent · pre/postinstall")
     ]
   }
 
@@ -197,10 +197,10 @@ struct OverviewPane: View {
       )
 
       VStack(alignment: .leading, spacing: 6) {
-        dotfileRow(.warn, ".zshrc",                        "+4 −1")
-        dotfileRow(.warn, ".gitconfig",                    "+1 −0")
-        dotfileRow(.ok,   ".config/nvim/init.lua",         "+47 new")
-        dotfileRow(.ok,   ".tmux.conf",                    "+2 −0")
+        dotfileRow(.warn, ".zshrc", "+4 −1")
+        dotfileRow(.warn, ".gitconfig", "+1 −0")
+        dotfileRow(.ok, ".config/nvim/init.lua", "+47 new")
+        dotfileRow(.ok, ".tmux.conf", "+2 −0")
         HStack(spacing: 8) {
           BzrBadge(text: "AGE", kind: .mute)
           Text("private_dot_ssh/encrypted_id_ed25519.age")
@@ -271,10 +271,10 @@ struct OverviewPane: View {
       )
 
       VStack(alignment: .leading, spacing: 8) {
-        prefRow(.success, "USER",     "iTerm2, Dock, Finder, Raycast", "14")
-        prefRow(.mute,    "APP-SUPP", "Karabiner keymaps",             "3")
-        prefRow(.tierC,   "FDA",      "Safari, 1Password",             "v2")
-        prefRow(.tierE,   "SYS",      "loginwindow · refused",         "—")
+        prefRow(.success, "USER", "iTerm2, Dock, Finder, Raycast", "14")
+        prefRow(.mute, "APP-SUPP", "Karabiner keymaps", "3")
+        prefRow(.tierC, "FDA", "Safari, 1Password", "v2")
+        prefRow(.tierE, "SYS", "loginwindow · refused", "—")
         Text("QUIT-AND-RELAUNCH ON IMPORT")
           .font(.bzrMono(size: 10))
           .foregroundStyle(Color.txtTertiary)
@@ -406,12 +406,12 @@ struct ConflictsPane: View {
 
   private var shapes: [Shape] {
     [
-      .init(id: "1", title: "TEXT EDIT",         context: ".zshrc edited on both Macs",            resolution: "Keep local · Keep remote · Manual merge"),
-      .init(id: "2", title: "PACKAGES.TOML",     context: "mpm install/remove diverged",           resolution: "Merge per-manager (grouped UI)"),
-      .init(id: "3", title: "CHEZMOI TEMPLATE",  context: "dot_gitconfig.tmpl conditional clash",  resolution: "Always surfaces · cannot auto-merge Go templates"),
-      .init(id: "4", title: "PLIST",             context: "iterm2 same key, different values",     resolution: "Keyed diff · per-key pick"),
-      .init(id: "5", title: "RENAME × EDIT",     context: ".tmux.conf renamed + edited",           resolution: "User picks final path · git rename hint"),
-      .init(id: "6", title: "DELETE × EDIT",     context: "chezmoi forget vs continued edit",      resolution: "Default: keep edit · explicit override")
+      .init(id: "1", title: "TEXT EDIT", context: ".zshrc edited on both Macs", resolution: "Keep local · Keep remote · Manual merge"),
+      .init(id: "2", title: "PACKAGES.TOML", context: "mpm install/remove diverged", resolution: "Merge per-manager (grouped UI)"),
+      .init(id: "3", title: "CHEZMOI TEMPLATE", context: "dot_gitconfig.tmpl conditional clash", resolution: "Always surfaces · cannot auto-merge Go templates"),
+      .init(id: "4", title: "PLIST", context: "iterm2 same key, different values", resolution: "Keyed diff · per-key pick"),
+      .init(id: "5", title: "RENAME × EDIT", context: ".tmux.conf renamed + edited", resolution: "User picks final path · git rename hint"),
+      .init(id: "6", title: "DELETE × EDIT", context: "chezmoi forget vs continued edit", resolution: "Default: keep edit · explicit override")
     ]
   }
 
@@ -502,13 +502,13 @@ struct OnboardPane: View {
 
   private var steps: [Step] {
     [
-      .init(id: "1", label: "PROBE",        detail: "Found brew, mpm, chezmoi, git, age",         state: .done),
-      .init(id: "2", label: "REMOTE",       detail: "git@github.com:you/my-mac.git · clone ok",   state: .done),
-      .init(id: "3", label: "MACHINE ID",   detail: "mini-home.local · 8d2a-... · stored",        state: .done),
+      .init(id: "1", label: "PROBE", detail: "Found brew, mpm, chezmoi, git, age", state: .done),
+      .init(id: "2", label: "REMOTE", detail: "git@github.com:you/my-mac.git · clone ok", state: .done),
+      .init(id: "3", label: "MACHINE ID", detail: "mini-home.local · 8d2a-... · stored", state: .done),
       .init(id: "4", label: "AGE IDENTITY", detail: "Generated · public recipient ready to share", state: .active),
-      .init(id: "5", label: "WRITER ADDS",  detail: "Old Mac re-encrypts on next push",           state: .pending),
-      .init(id: "6", label: "PULL",         detail: "mpm restore + chezmoi apply + defaults import", state: .pending),
-      .init(id: "7", label: "READY",        detail: "Reader joined fleet",                        state: .pending)
+      .init(id: "5", label: "WRITER ADDS", detail: "Old Mac re-encrypts on next push", state: .pending),
+      .init(id: "6", label: "PULL", detail: "mpm restore + chezmoi apply + defaults import", state: .pending),
+      .init(id: "7", label: "READY", detail: "Reader joined fleet", state: .pending)
     ]
   }
 
@@ -688,10 +688,10 @@ struct SecretsPane: View {
           .frame(maxWidth: 64 * 9, alignment: .leading)
 
         StatStrip(stats: [
-          Stat(label: "Last scan",   value: "2",   unit: "hours",    kind: .neutral, meta: "a3f9c2e · pre-commit"),
-          Stat(label: "Findings",    value: "0",   unit: nil,        kind: .lime,    meta: "since last push"),
-          Stat(label: "Allowlisted", value: "2",   unit: nil,        kind: .neutral, meta: "test fixtures · repo-scoped"),
-          Stat(label: "Rules",       value: "142", unit: nil,        kind: .neutral, meta: ".gitleaks.toml · bundled")
+          Stat(label: "Last scan", value: "2", unit: "hours", kind: .neutral, meta: "a3f9c2e · pre-commit"),
+          Stat(label: "Findings", value: "0", unit: nil, kind: .lime, meta: "since last push"),
+          Stat(label: "Allowlisted", value: "2", unit: nil, kind: .neutral, meta: "test fixtures · repo-scoped"),
+          Stat(label: "Rules", value: "142", unit: nil, kind: .neutral, meta: ".gitleaks.toml · bundled")
         ])
 
         Text("Last scan output")
@@ -700,14 +700,14 @@ struct SecretsPane: View {
           .padding(.top, 6)
 
         VStack(alignment: .leading, spacing: 0) {
-          scanLogLine("14:21:58", "$",  "gitleaks dir --staged --no-git --report-format json", .secondary)
-          scanLogLine("14:21:58", "→",  "scanning 47 staged files (4.2 MB)", .lime)
-          scanLogLine("14:21:59", "✓",  "rule set: 142 patterns loaded from .gitleaks.toml", .ok)
-          scanLogLine("14:22:00", "✓",  "dotfiles/dot_zshrc.tmpl    clean", .ok)
-          scanLogLine("14:22:00", "✓",  "dotfiles/dot_gitconfig.tmpl clean", .ok)
-          scanLogLine("14:22:01", "⚠",  "packages.toml:42  generic-api-key  → ALLOWLISTED (repo)", .warn)
-          scanLogLine("14:22:01", "✓",  "47 files scanned, 0 findings, 2 allowlisted", .ok)
-          scanLogLine("14:22:01", "━",  "commit allowed. proceeding to push.", .lime)
+          scanLogLine("14:21:58", "$", "gitleaks dir --staged --no-git --report-format json", .secondary)
+          scanLogLine("14:21:58", "→", "scanning 47 staged files (4.2 MB)", .lime)
+          scanLogLine("14:21:59", "✓", "rule set: 142 patterns loaded from .gitleaks.toml", .ok)
+          scanLogLine("14:22:00", "✓", "dotfiles/dot_zshrc.tmpl    clean", .ok)
+          scanLogLine("14:22:00", "✓", "dotfiles/dot_gitconfig.tmpl clean", .ok)
+          scanLogLine("14:22:01", "⚠", "packages.toml:42  generic-api-key  → ALLOWLISTED (repo)", .warn)
+          scanLogLine("14:22:01", "✓", "47 files scanned, 0 findings, 2 allowlisted", .ok)
+          scanLogLine("14:22:01", "━", "commit allowed. proceeding to push.", .lime)
         }
         .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -752,7 +752,7 @@ struct SecretsPane: View {
         .foregroundStyle(toneColor(tone))
       Text(msg)
         .font(.bzrMono(size: 11))
-        .foregroundStyle(Color(red: 220/255, green: 225/255, blue: 210/255).opacity(0.85))
+        .foregroundStyle(Color(red: 220 / 255, green: 225 / 255, blue: 210 / 255).opacity(0.85))
       Spacer(minLength: 0)
     }
     .padding(.vertical, 2)
@@ -782,12 +782,12 @@ struct DiagnosticsPane: View {
 
   private var categories: [Category] {
     [
-      .init(id: "sync",       count: "142",   meta: "last 24h"),
+      .init(id: "sync", count: "142", meta: "last 24h"),
       .init(id: "subprocess", count: "3,481", meta: "line-buffered"),
-      .init(id: "bootstrap",  count: "12",    meta: "probe + install"),
-      .init(id: "secrets",    count: "7",     meta: "gitleaks runs"),
-      .init(id: "cleanup",    count: "4",     meta: "trash actions"),
-      .init(id: "ui",         count: "61",    meta: "interaction")
+      .init(id: "bootstrap", count: "12", meta: "probe + install"),
+      .init(id: "secrets", count: "7", meta: "gitleaks runs"),
+      .init(id: "cleanup", count: "4", meta: "trash actions"),
+      .init(id: "ui", count: "61", meta: "interaction")
     ]
   }
 
@@ -826,15 +826,15 @@ struct DiagnosticsPane: View {
           .padding(.top, 6)
 
         VStack(alignment: .leading, spacing: 0) {
-          osLogLine("14:30:01", "[sync.info]",        "SyncCoordinator.push begin · 3 candidates",                                  .secondary)
-          osLogLine("14:30:01", "[subprocess.debug]", "/usr/bin/git status --porcelain=v2 --branch -z",                              .secondary)
-          osLogLine("14:30:02", "[secrets.info]",     "gitleaks dir --staged --no-git --report-format json",                        .secondary)
-          osLogLine("14:30:03", "[secrets.info]",     "0 findings · 2 allowlisted · 47 files",                                       .ok)
+          osLogLine("14:30:01", "[sync.info]", "SyncCoordinator.push begin · 3 candidates", .secondary)
+          osLogLine("14:30:01", "[subprocess.debug]", "/usr/bin/git status --porcelain=v2 --branch -z", .secondary)
+          osLogLine("14:30:02", "[secrets.info]", "gitleaks dir --staged --no-git --report-format json", .secondary)
+          osLogLine("14:30:03", "[secrets.info]", "0 findings · 2 allowlisted · 47 files", .ok)
           osLogLine("14:30:03", "[subprocess.debug]", "/usr/bin/tar -czf backups/2026-04-28T14-30-pre-push.tgz dotfiles preferences", .secondary)
-          osLogLine("14:30:05", "[subprocess.debug]", "/usr/bin/git commit -s -m \"install ripgrep, fd, eza · iterm2 prefs\"",       .secondary)
-          osLogLine("14:30:05", "[subprocess.debug]", "/usr/bin/git push origin main",                                               .secondary)
-          osLogLine("14:30:07", "[sync.info]",        "push ok · a3f9c2e → origin/main",                                             .ok)
-          osLogLine("14:30:07", "[ui.error]",         "AppleScript quit timed out for com.googlecode.iterm2 (5s)",                   .warn)
+          osLogLine("14:30:05", "[subprocess.debug]", "/usr/bin/git commit -s -m \"install ripgrep, fd, eza · iterm2 prefs\"", .secondary)
+          osLogLine("14:30:05", "[subprocess.debug]", "/usr/bin/git push origin main", .secondary)
+          osLogLine("14:30:07", "[sync.info]", "push ok · a3f9c2e → origin/main", .ok)
+          osLogLine("14:30:07", "[ui.error]", "AppleScript quit timed out for com.googlecode.iterm2 (5s)", .warn)
         }
         .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -925,7 +925,7 @@ struct DiagnosticsPane: View {
         .foregroundStyle(toneColor(tone))
       Text(msg)
         .font(.bzrMono(size: 11))
-        .foregroundStyle(Color(red: 220/255, green: 225/255, blue: 210/255).opacity(0.85))
+        .foregroundStyle(Color(red: 220 / 255, green: 225 / 255, blue: 210 / 255).opacity(0.85))
         .lineLimit(1)
         .truncationMode(.tail)
       Spacer(minLength: 0)
@@ -943,15 +943,15 @@ struct DiagnosticsPane: View {
 
   private var toolMatrix: some View {
     VStack(alignment: .leading, spacing: 0) {
-      toolRowExt("xcode-select", "/usr/bin/xcode-select",                "CLT 16.2",                              .ok)
-      toolRowExt("git",          "/usr/bin/git",                         "2.42.1 · system",                       .ok)
-      toolRowExt("brew",         "/opt/homebrew/bin/brew",               "4.4.7 · Apple-Silicon",                 .ok)
-      toolRowExt("mpm",          "/opt/homebrew/bin/mpm",                "6.3.0 · brew install",                  .ok)
-      toolRowExt("chezmoi",      "/opt/homebrew/bin/chezmoi",            "2.70.2 · brew",                         .ok)
-      toolRowExt("gitleaks",     "…/Resources/bin/gitleaks",             "8.30.1 · bundled · MIT",                .lime)
-      toolRowExt("age",          "…/Resources/bin/age",                  "1.2.0 · bundled · MIT",                 .lime)
-      toolRowExt("npm",          "~/.npm-global/bin/npm",                "— · on-demand · brew install node",     .secondary)
-      toolRowExt("pnpm",         "—",                                    "— · v2 deferred · not via mpm",         .secondary)
+      toolRowExt("xcode-select", "/usr/bin/xcode-select", "CLT 16.2", .ok)
+      toolRowExt("git", "/usr/bin/git", "2.42.1 · system", .ok)
+      toolRowExt("brew", "/opt/homebrew/bin/brew", "4.4.7 · Apple-Silicon", .ok)
+      toolRowExt("mpm", "/opt/homebrew/bin/mpm", "6.3.0 · brew install", .ok)
+      toolRowExt("chezmoi", "/opt/homebrew/bin/chezmoi", "2.70.2 · brew", .ok)
+      toolRowExt("gitleaks", "…/Resources/bin/gitleaks", "8.30.1 · bundled · MIT", .lime)
+      toolRowExt("age", "…/Resources/bin/age", "1.2.0 · bundled · MIT", .lime)
+      toolRowExt("npm", "~/.npm-global/bin/npm", "— · on-demand · brew install node", .secondary)
+      toolRowExt("pnpm", "—", "— · v2 deferred · not via mpm", .secondary)
       Text("HARDCODED CANDIDATES · NO `which` · APP-CONTEXT $PATH IS LAUNCHSERVICES-MINIMAL")
         .font(.bzrMono(size: 10))
         .foregroundStyle(Color.txtTertiary)
@@ -1108,14 +1108,14 @@ struct PackagesPane: View {
 
   private var managerSummaries: [ManagerSummary] {
     [
-      .init(id: "brew",     glyph: "BR", name: "Homebrew",      pkgs: 87, outdated: 12, tier: "B", tierKind: .tierB, sub: "formulae"),
-      .init(id: "cask",     glyph: "CA", name: "Cask",          pkgs: 31, outdated: 4,  tier: "C", tierKind: .tierC, sub: "gui apps"),
-      .init(id: "mas",      glyph: "MA", name: "Mac App Store", pkgs: 14, outdated: 1,  tier: "A", tierKind: .tierA, sub: "mas-cli"),
-      .init(id: "cargo",    glyph: "CA", name: "Cargo",         pkgs: 22, outdated: 0,  tier: "B", tierKind: .tierB, sub: "rust"),
-      .init(id: "pipx",     glyph: "PI", name: "pipx",          pkgs: 11, outdated: 0,  tier: "D", tierKind: .tierD, sub: "python tools"),
-      .init(id: "npm",      glyph: "NP", name: "npm (global)",  pkgs: 9,  outdated: 0,  tier: "E", tierKind: .tierE, sub: "pnpm n/a"),
-      .init(id: "gem",      glyph: "GE", name: "gem",           pkgs: 6,  outdated: 0,  tier: "D", tierKind: .tierD, sub: "ruby"),
-      .init(id: "composer", glyph: "CO", name: "composer",      pkgs: 4,  outdated: 0,  tier: "D", tierKind: .tierD, sub: "php")
+      .init(id: "brew", glyph: "BR", name: "Homebrew", pkgs: 87, outdated: 12, tier: "B", tierKind: .tierB, sub: "formulae"),
+      .init(id: "cask", glyph: "CA", name: "Cask", pkgs: 31, outdated: 4, tier: "C", tierKind: .tierC, sub: "gui apps"),
+      .init(id: "mas", glyph: "MA", name: "Mac App Store", pkgs: 14, outdated: 1, tier: "A", tierKind: .tierA, sub: "mas-cli"),
+      .init(id: "cargo", glyph: "CA", name: "Cargo", pkgs: 22, outdated: 0, tier: "B", tierKind: .tierB, sub: "rust"),
+      .init(id: "pipx", glyph: "PI", name: "pipx", pkgs: 11, outdated: 0, tier: "D", tierKind: .tierD, sub: "python tools"),
+      .init(id: "npm", glyph: "NP", name: "npm (global)", pkgs: 9, outdated: 0, tier: "E", tierKind: .tierE, sub: "pnpm n/a"),
+      .init(id: "gem", glyph: "GE", name: "gem", pkgs: 6, outdated: 0, tier: "D", tierKind: .tierD, sub: "ruby"),
+      .init(id: "composer", glyph: "CO", name: "composer", pkgs: 4, outdated: 0, tier: "D", tierKind: .tierD, sub: "php")
     ]
   }
 
@@ -1308,16 +1308,16 @@ struct PackagesPane: View {
 
   private var outdatedRows: [OutdatedRow] {
     [
-      .init(pkg: "ripgrep",     from: "14.1.1",  to: "14.1.4", mgr: "brew",  tier: "B", tierKind: .tierB, cooldown: "7d ✓",          state: .eligible),
-      .init(pkg: "fd",          from: "10.2.1",  to: "10.3.0", mgr: "brew",  tier: "B", tierKind: .tierB, cooldown: "8d ✓",          state: .eligible),
-      .init(pkg: "eza",         from: "0.18.24", to: "0.19.1", mgr: "brew",  tier: "B", tierKind: .tierB, cooldown: "12d ✓",         state: .eligible),
-      .init(pkg: "zoxide",      from: "0.9.6",   to: "0.9.8",  mgr: "brew",  tier: "B", tierKind: .tierB, cooldown: "3d / 7d",       state: .cooldown),
-      .init(pkg: "ghostty",     from: "1.0.4",   to: "1.1.2",  mgr: "cask",  tier: "C", tierKind: .tierC, cooldown: "9d · runs script", state: .prompt),
-      .init(pkg: "Raycast",     from: "1.84.5",  to: "1.85.1", mgr: "cask",  tier: "C", tierKind: .tierC, cooldown: "5d / 7d",       state: .prompt),
-      .init(pkg: "1Password 7", from: "7.9.11",  to: "7.10.0", mgr: "mas",   tier: "A", tierKind: .tierA, cooldown: "0d · ready",    state: .auto),
-      .init(pkg: "typescript",  from: "5.4.2",   to: "5.6.3",  mgr: "npm",   tier: "E", tierKind: .tierE, cooldown: "21d ✓ · advisory", state: .prompt),
-      .init(pkg: "mypy",        from: "1.8.0",   to: "1.11.2", mgr: "pipx",  tier: "D", tierKind: .tierD, cooldown: "14d ✓",         state: .prompt),
-      .init(pkg: "cargo-watch", from: "8.4.1",   to: "8.5.3",  mgr: "cargo", tier: "B", tierKind: .tierB, cooldown: "11d ✓",         state: .eligible)
+      .init(pkg: "ripgrep", from: "14.1.1", to: "14.1.4", mgr: "brew", tier: "B", tierKind: .tierB, cooldown: "7d ✓", state: .eligible),
+      .init(pkg: "fd", from: "10.2.1", to: "10.3.0", mgr: "brew", tier: "B", tierKind: .tierB, cooldown: "8d ✓", state: .eligible),
+      .init(pkg: "eza", from: "0.18.24", to: "0.19.1", mgr: "brew", tier: "B", tierKind: .tierB, cooldown: "12d ✓", state: .eligible),
+      .init(pkg: "zoxide", from: "0.9.6", to: "0.9.8", mgr: "brew", tier: "B", tierKind: .tierB, cooldown: "3d / 7d", state: .cooldown),
+      .init(pkg: "ghostty", from: "1.0.4", to: "1.1.2", mgr: "cask", tier: "C", tierKind: .tierC, cooldown: "9d · runs script", state: .prompt),
+      .init(pkg: "Raycast", from: "1.84.5", to: "1.85.1", mgr: "cask", tier: "C", tierKind: .tierC, cooldown: "5d / 7d", state: .prompt),
+      .init(pkg: "1Password 7", from: "7.9.11", to: "7.10.0", mgr: "mas", tier: "A", tierKind: .tierA, cooldown: "0d · ready", state: .auto),
+      .init(pkg: "typescript", from: "5.4.2", to: "5.6.3", mgr: "npm", tier: "E", tierKind: .tierE, cooldown: "21d ✓ · advisory", state: .prompt),
+      .init(pkg: "mypy", from: "1.8.0", to: "1.11.2", mgr: "pipx", tier: "D", tierKind: .tierD, cooldown: "14d ✓", state: .prompt),
+      .init(pkg: "cargo-watch", from: "8.4.1", to: "8.5.3", mgr: "cargo", tier: "B", tierKind: .tierB, cooldown: "11d ✓", state: .eligible)
     ]
   }
 
@@ -1394,10 +1394,10 @@ struct PackagesPane: View {
   @ViewBuilder
   private func stateBadge(_ state: OutdatedState) -> some View {
     switch state {
-    case .eligible: BzrBadge(text: "READY",  kind: .success)
-    case .cooldown: BzrBadge(text: "AGING",  kind: .mute)
+    case .eligible: BzrBadge(text: "READY", kind: .success)
+    case .cooldown: BzrBadge(text: "AGING", kind: .mute)
     case .prompt:   BzrBadge(text: "PROMPT", kind: .tierC)
-    case .auto:     BzrBadge(text: "AUTO",   kind: .lime)
+    case .auto:     BzrBadge(text: "AUTO", kind: .lime)
     }
   }
 
@@ -1416,7 +1416,7 @@ struct PackagesPane: View {
         .foregroundStyle(toneColor(tone))
       Text(msg)
         .font(.bzrMono(size: 11))
-        .foregroundStyle(Color(red: 220/255, green: 225/255, blue: 210/255).opacity(0.85))
+        .foregroundStyle(Color(red: 220 / 255, green: 225 / 255, blue: 210 / 255).opacity(0.85))
     }
     .padding(.vertical, 2)
   }
@@ -1459,16 +1459,16 @@ struct DotfilesPane: View {
 
   private var dotfileRows: [DotfileRow] {
     [
-      .init(id: ".zshrc",                       mark: "M", path: ".zshrc",                       kind: "modified",  meta: "4 lines"),
-      .init(id: ".gitconfig",                   mark: "M", path: ".gitconfig",                   kind: "modified",  meta: "1 line"),
-      .init(id: ".config/nvim/init.lua",        mark: "A", path: ".config/nvim/init.lua",        kind: "added",     meta: "+47 −0"),
-      .init(id: ".tmux.conf",                   mark: "M", path: ".tmux.conf",                   kind: "modified",  meta: "2 lines"),
-      .init(id: ".config/starship.toml",        mark: " ", path: ".config/starship.toml",        kind: "clean",     meta: nil),
-      .init(id: ".config/wezterm/wezterm.lua",  mark: " ", path: ".config/wezterm/wezterm.lua",  kind: "clean",     meta: nil),
-      .init(id: ".aws/config",                  mark: " ", path: ".aws/config",                  kind: "encrypted", meta: "age"),
-      .init(id: ".config/git/ignore",           mark: " ", path: ".config/git/ignore",           kind: "clean",     meta: nil),
-      .init(id: ".npmrc",                       mark: " ", path: ".npmrc",                       kind: "template",  meta: "{{.host}}"),
-      .init(id: ".config/karabiner/",           mark: " ", path: ".config/karabiner/",           kind: "clean",     meta: "12 files")
+      .init(id: ".zshrc", mark: "M", path: ".zshrc", kind: "modified", meta: "4 lines"),
+      .init(id: ".gitconfig", mark: "M", path: ".gitconfig", kind: "modified", meta: "1 line"),
+      .init(id: ".config/nvim/init.lua", mark: "A", path: ".config/nvim/init.lua", kind: "added", meta: "+47 −0"),
+      .init(id: ".tmux.conf", mark: "M", path: ".tmux.conf", kind: "modified", meta: "2 lines"),
+      .init(id: ".config/starship.toml", mark: " ", path: ".config/starship.toml", kind: "clean", meta: nil),
+      .init(id: ".config/wezterm/wezterm.lua", mark: " ", path: ".config/wezterm/wezterm.lua", kind: "clean", meta: nil),
+      .init(id: ".aws/config", mark: " ", path: ".aws/config", kind: "encrypted", meta: "age"),
+      .init(id: ".config/git/ignore", mark: " ", path: ".config/git/ignore", kind: "clean", meta: nil),
+      .init(id: ".npmrc", mark: " ", path: ".npmrc", kind: "template", meta: "{{.host}}"),
+      .init(id: ".config/karabiner/", mark: " ", path: ".config/karabiner/", kind: "clean", meta: "12 files")
     ]
   }
 
@@ -1549,8 +1549,8 @@ struct DotfilesPane: View {
 
   private func markColor(_ m: String) -> Color {
     switch m.trimmingCharacters(in: .whitespaces) {
-    case "M": return Color(red: 255/255, green: 184/255, blue: 74/255)
-    case "A": return Color(red: 108/255, green: 230/255, blue: 124/255)
+    case "M": return Color(red: 255 / 255, green: 184 / 255, blue: 74 / 255)
+    case "A": return Color(red: 108 / 255, green: 230 / 255, blue: 124 / 255)
     default:  return Color.txtSecondary
     }
   }
@@ -1574,9 +1574,9 @@ struct DotfilesPane: View {
           .foregroundStyle(Color.txtPrimary)
 
         HStack(spacing: 8) {
-          BzrBadge(text: "MODIFIED",            kind: .tierC)
+          BzrBadge(text: "MODIFIED", kind: .tierC)
           BzrBadge(text: "SOURCE · dot_zshrc.tmpl", kind: .mute)
-          BzrBadge(text: "+4 −1",               kind: .mute)
+          BzrBadge(text: "+4 −1", kind: .mute)
           Spacer()
           Button { } label: {
             HStack(spacing: 4) { Image(systemName: "xmark").font(.system(size: 10)); Text("Discard") }
@@ -1653,7 +1653,7 @@ struct DotfilesPane: View {
 
   private var diffLines: [DiffLine] {
     [
-      .init(kind: .hunk, lineNum: "",   text: "@@ -42,7 +42,10 @@ # path additions"),
+      .init(kind: .hunk, lineNum: "", text: "@@ -42,7 +42,10 @@ # path additions"),
       .init(kind: .ctx, lineNum: "42", text: "export PATH=\"$HOME/.local/bin:$PATH\""),
       .init(kind: .ctx, lineNum: "43", text: "export PATH=\"$HOME/.cargo/bin:$PATH\""),
       .init(kind: .rem, lineNum: "44", text: "export EDITOR=vim"),
@@ -1688,7 +1688,7 @@ struct DotfilesPane: View {
     case .hunk:
       Text(line.text)
         .font(.bzrMono(size: 10))
-        .foregroundStyle(Color(red: 155/255, green: 196/255, blue: 255/255))
+        .foregroundStyle(Color(red: 155 / 255, green: 196 / 255, blue: 255 / 255))
         .padding(.horizontal, 14)
         .padding(.vertical, 4)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -1736,8 +1736,8 @@ struct DotfilesPane: View {
 
   private func diffTextColor(_ k: DiffLine.Kind) -> Color {
     switch k {
-    case .add: return Color(red: 184/255, green: 240/255, blue: 192/255)
-    case .rem: return Color(red: 255/255, green: 184/255, blue: 188/255)
+    case .add: return Color(red: 184 / 255, green: 240 / 255, blue: 192 / 255)
+    case .rem: return Color(red: 255 / 255, green: 184 / 255, blue: 188 / 255)
     default:   return Color.txtTertiary
     }
   }
@@ -1776,16 +1776,16 @@ struct PreferencesPane: View {
 
   private var prefDomains: [PrefDomain] {
     [
-      .init(id: "com.googlecode.iterm2",       name: "iTerm2",      scope: "unsandboxed", mark: "M", format: "XML"),
-      .init(id: "com.apple.dock",              name: "Dock",        scope: "unsandboxed", mark: "M", format: "XML"),
-      .init(id: "com.apple.finder",            name: "Finder",      scope: "unsandboxed", mark: " ", format: "XML"),
-      .init(id: "com.raycast.macos",           name: "Raycast",     scope: "unsandboxed", mark: " ", format: "XML"),
-      .init(id: "com.knollsoft.Rectangle",     name: "Rectangle",   scope: "unsandboxed", mark: " ", format: "XML"),
-      .init(id: "org.pqrs.Karabiner-Elements", name: "Karabiner",   scope: "app-supp",    mark: "M", format: "JSON"),
-      .init(id: "com.agilebits.onepassword4",  name: "1Password 7", scope: "sandboxed",   mark: " ", format: "FDA"),
-      .init(id: "com.apple.Safari",            name: "Safari",      scope: "sandboxed",   mark: " ", format: "FDA"),
-      .init(id: "com.apple.TextEdit",          name: "TextEdit",    scope: "unsandboxed", mark: " ", format: "XML"),
-      .init(id: "com.apple.Terminal",          name: "Terminal",    scope: "unsandboxed", mark: " ", format: "XML")
+      .init(id: "com.googlecode.iterm2", name: "iTerm2", scope: "unsandboxed", mark: "M", format: "XML"),
+      .init(id: "com.apple.dock", name: "Dock", scope: "unsandboxed", mark: "M", format: "XML"),
+      .init(id: "com.apple.finder", name: "Finder", scope: "unsandboxed", mark: " ", format: "XML"),
+      .init(id: "com.raycast.macos", name: "Raycast", scope: "unsandboxed", mark: " ", format: "XML"),
+      .init(id: "com.knollsoft.Rectangle", name: "Rectangle", scope: "unsandboxed", mark: " ", format: "XML"),
+      .init(id: "org.pqrs.Karabiner-Elements", name: "Karabiner", scope: "app-supp", mark: "M", format: "JSON"),
+      .init(id: "com.agilebits.onepassword4", name: "1Password 7", scope: "sandboxed", mark: " ", format: "FDA"),
+      .init(id: "com.apple.Safari", name: "Safari", scope: "sandboxed", mark: " ", format: "FDA"),
+      .init(id: "com.apple.TextEdit", name: "TextEdit", scope: "unsandboxed", mark: " ", format: "XML"),
+      .init(id: "com.apple.Terminal", name: "Terminal", scope: "unsandboxed", mark: " ", format: "XML")
     ]
   }
 
@@ -1821,7 +1821,7 @@ struct PreferencesPane: View {
       HStack(spacing: 10) {
         Text(String(d.name.prefix(2)))
           .font(.bzrStencil(size: 12, weight: .bold))
-          .foregroundStyle(d.mark == "M" ? Color(red: 255/255, green: 184/255, blue: 74/255) : Color.txtSecondary)
+          .foregroundStyle(d.mark == "M" ? Color(red: 255 / 255, green: 184 / 255, blue: 74 / 255) : Color.txtSecondary)
           .frame(width: 28, height: 28)
           .background(
             RoundedRectangle(cornerRadius: 6, style: .continuous)
@@ -1868,9 +1868,9 @@ struct PreferencesPane: View {
           .foregroundStyle(Color.txtPrimary)
         HStack(spacing: 8) {
           BzrBadge(text: "UNSANDBOXED · NO FDA", kind: .success)
-          BzrBadge(text: "MODIFIED",            kind: .tierC)
-          BzrBadge(text: "XML · 47KB",          kind: .mute)
-          BzrBadge(text: "214 KEYS",            kind: .mute)
+          BzrBadge(text: "MODIFIED", kind: .tierC)
+          BzrBadge(text: "XML · 47KB", kind: .mute)
+          BzrBadge(text: "214 KEYS", kind: .mute)
           Spacer()
         }
         Text("Round-tripped through cfprefsd via defaults export + defaults import. Stored as XML so git diffs are legible. iTerm2 will be quit-and-relaunched on import.")
@@ -1904,10 +1904,10 @@ struct PreferencesPane: View {
 
         BzrCard(title: "Plist layers", eyebrow: "DEFAULTS · FOUR LAYER MODEL") {
           VStack(alignment: .leading, spacing: 10) {
-            layerRow("user",           "~/Library/Preferences/com.<app>.plist",                       .lime,   "default", .lime)
-            layerRow("system",         "/Library/Preferences/com.<app>.plist",                        .ok,     "root",    .mute)
-            layerRow("sandboxed",      "~/Library/Containers/<bundle>/Data/Library/Preferences/",     .warn,   "FDA",     .warn)
-            layerRow("apple-internal", "non-standard, undocumented",                                  .danger, "skip",    .danger)
+            layerRow("user", "~/Library/Preferences/com.<app>.plist", .lime, "default", .lime)
+            layerRow("system", "/Library/Preferences/com.<app>.plist", .ok, "root", .mute)
+            layerRow("sandboxed", "~/Library/Containers/<bundle>/Data/Library/Preferences/", .warn, "FDA", .warn)
+            layerRow("apple-internal", "non-standard, undocumented", .danger, "skip", .danger)
           }
         }
 
@@ -1964,13 +1964,13 @@ struct HistoryPane: View {
   // Demo data; replaced by store.history projection in Phase B.
   private var demoEntries: [TimelineEntry] {
     [
-      .init(sha: "a3f9c2e", when: "2h ago",  kind: "PUSH",     kindBadge: .lime,  message: "mpm install ripgrep, fd, eza",          machine: "work-mbp",       stats: "+24 −2",   snapshot: nil,                              nodeColor: .lime),
-      .init(sha: "7b1de44", when: "1d ago",  kind: "PULL",     kindBadge: .mute,  message: "sync from personal-mini · 6 changes",   machine: "work-mbp",       stats: "+183 −47", snapshot: "snap_2026-04-27T08-12.tgz",       nodeColor: .lime),
-      .init(sha: "c08fa12", when: "2d ago",  kind: "PUSH",     kindBadge: .mute,  message: "iterm2 prefs · zshrc edit",             machine: "personal-mini",  stats: "+12 −4",   snapshot: nil,                              nodeColor: .mute),
-      .init(sha: "ee31a09", when: "3d ago",  kind: "APPLY",    kindBadge: .mute,  message: "chezmoi apply --force after pull",      machine: "work-mbp",       stats: "4 files",  snapshot: "snap_2026-04-25T19-02.tgz",       nodeColor: .mute),
-      .init(sha: "114b8f0", when: "4d ago",  kind: "CLEAN",    kindBadge: .mute,  message: "trashed 8 dotfile orphans",             machine: "work-mbp",       stats: "−2.4GB",   snapshot: "deletions.db row#341",            nodeColor: .mute),
-      .init(sha: "82de019", when: "5d ago",  kind: "CONFLICT", kindBadge: .tierC, message: "resolved · keep local .zshrc",          machine: "work-mbp",       stats: nil,        snapshot: nil,                              nodeColor: .warn),
-      .init(sha: "44ab821", when: "6d ago",  kind: "PUSH",     kindBadge: .mute,  message: "cargo update + Raycast prefs",          machine: "personal-mini",  stats: "+9 −9",    snapshot: nil,                              nodeColor: .mute)
+      .init(sha: "a3f9c2e", when: "2h ago", kind: "PUSH", kindBadge: .lime, message: "mpm install ripgrep, fd, eza", machine: "work-mbp", stats: "+24 −2", snapshot: nil, nodeColor: .lime),
+      .init(sha: "7b1de44", when: "1d ago", kind: "PULL", kindBadge: .mute, message: "sync from personal-mini · 6 changes", machine: "work-mbp", stats: "+183 −47", snapshot: "snap_2026-04-27T08-12.tgz", nodeColor: .lime),
+      .init(sha: "c08fa12", when: "2d ago", kind: "PUSH", kindBadge: .mute, message: "iterm2 prefs · zshrc edit", machine: "personal-mini", stats: "+12 −4", snapshot: nil, nodeColor: .mute),
+      .init(sha: "ee31a09", when: "3d ago", kind: "APPLY", kindBadge: .mute, message: "chezmoi apply --force after pull", machine: "work-mbp", stats: "4 files", snapshot: "snap_2026-04-25T19-02.tgz", nodeColor: .mute),
+      .init(sha: "114b8f0", when: "4d ago", kind: "CLEAN", kindBadge: .mute, message: "trashed 8 dotfile orphans", machine: "work-mbp", stats: "−2.4GB", snapshot: "deletions.db row#341", nodeColor: .mute),
+      .init(sha: "82de019", when: "5d ago", kind: "CONFLICT", kindBadge: .tierC, message: "resolved · keep local .zshrc", machine: "work-mbp", stats: nil, snapshot: nil, nodeColor: .warn),
+      .init(sha: "44ab821", when: "6d ago", kind: "PUSH", kindBadge: .mute, message: "cargo update + Raycast prefs", machine: "personal-mini", stats: "+9 −9", snapshot: nil, nodeColor: .mute)
     ]
   }
 
@@ -2128,9 +2128,9 @@ struct MachinesPane: View {
 
   private var fleet: [Machine] {
     [
-      .init(id: "work-mbp",      host: "mbp16-acme.local", model: "MacBook Pro 16\" · M3 Max", os: "14.5 Sonoma",  lastSync: "2h ago", writer: true,  pkgs: 184, role: "PRIMARY"),
-      .init(id: "personal-mini", host: "mini-home.local",  model: "Mac mini · M4",             os: "15.1 Sequoia", lastSync: "2d ago", writer: false, pkgs: 142, role: "PERSONAL"),
-      .init(id: "ci-runner",     host: "gh-runner-arm-04", model: "M2 in a closet",            os: "14.2 Sonoma",  lastSync: "6h ago", writer: false, pkgs: 67,  role: "EPHEMERAL")
+      .init(id: "work-mbp", host: "mbp16-acme.local", model: "MacBook Pro 16\" · M3 Max", os: "14.5 Sonoma", lastSync: "2h ago", writer: true, pkgs: 184, role: "PRIMARY"),
+      .init(id: "personal-mini", host: "mini-home.local", model: "Mac mini · M4", os: "15.1 Sequoia", lastSync: "2d ago", writer: false, pkgs: 142, role: "PERSONAL"),
+      .init(id: "ci-runner", host: "gh-runner-arm-04", model: "M2 in a closet", os: "14.2 Sonoma", lastSync: "6h ago", writer: false, pkgs: 67, role: "EPHEMERAL")
     ]
   }
 
@@ -2220,8 +2220,8 @@ struct MachinesPane: View {
       )
 
       VStack(alignment: .leading, spacing: 6) {
-        machineRow("Model",    m.model)
-        machineRow("OS",       m.os)
+        machineRow("Model", m.model)
+        machineRow("OS", m.os)
         machineRow("Packages", "\(m.pkgs)", lime: true)
         machineRow("Last sync", m.lastSync)
         HStack(spacing: 6) {
@@ -2307,13 +2307,13 @@ struct CleanupPane: View {
   // Demo rows — replaced by store.orphans projection in Phase B.
   private var demoRows: [OrphanRow] {
     [
-      .init(selected: true,  path: "~/.rbenv/",                                    size: "412 MB", owner: "rbenv (brew · uninstalled 2025-12-04)",        klass: "SAFE",   klassKind: .success, lastTouched: "142 days", action: "TRASH"),
-      .init(selected: true,  path: "~/.nvm/",                                      size: "1.1 GB", owner: "nvm (curl · uninstalled)",                     klass: "SAFE",   klassKind: .success, lastTouched: "98 days",  action: "TRASH"),
-      .init(selected: true,  path: "~/.config/old-fish/",                          size: "8.4 MB", owner: "fish shell (not in brew · zsh active)",        klass: "REVIEW", klassKind: .tierC,   lastTouched: "211 days", action: "TRASH"),
-      .init(selected: true,  path: "~/Library/Application Support/Atom/",          size: "887 MB", owner: "com.github.atom (no bundle ID found)",         klass: "REVIEW", klassKind: .tierC,   lastTouched: "3 years",  action: "TRASH"),
-      .init(selected: false, path: "~/.docker/",                                   size: "3.2 MB", owner: "Docker (cask · still installed)",              klass: "KEEP",   klassKind: .mute,    lastTouched: "2 days",   action: "—"),
-      .init(selected: false, path: "~/.zsh_sessions/",                             size: "21 MB",  owner: "zsh (system · active)",                        klass: "RISKY",  klassKind: .tierE,   lastTouched: "2 hours",  action: "—"),
-      .init(selected: false, path: "~/Library/LaunchAgents/com.heroku.cli.plist",  size: "2 KB",   owner: "heroku (brew · uninstalled)",                  klass: "RISKY",  klassKind: .tierE,   lastTouched: "62 days",  action: "prompt")
+      .init(selected: true, path: "~/.rbenv/", size: "412 MB", owner: "rbenv (brew · uninstalled 2025-12-04)", klass: "SAFE", klassKind: .success, lastTouched: "142 days", action: "TRASH"),
+      .init(selected: true, path: "~/.nvm/", size: "1.1 GB", owner: "nvm (curl · uninstalled)", klass: "SAFE", klassKind: .success, lastTouched: "98 days", action: "TRASH"),
+      .init(selected: true, path: "~/.config/old-fish/", size: "8.4 MB", owner: "fish shell (not in brew · zsh active)", klass: "REVIEW", klassKind: .tierC, lastTouched: "211 days", action: "TRASH"),
+      .init(selected: true, path: "~/Library/Application Support/Atom/", size: "887 MB", owner: "com.github.atom (no bundle ID found)", klass: "REVIEW", klassKind: .tierC, lastTouched: "3 years", action: "TRASH"),
+      .init(selected: false, path: "~/.docker/", size: "3.2 MB", owner: "Docker (cask · still installed)", klass: "KEEP", klassKind: .mute, lastTouched: "2 days", action: "—"),
+      .init(selected: false, path: "~/.zsh_sessions/", size: "21 MB", owner: "zsh (system · active)", klass: "RISKY", klassKind: .tierE, lastTouched: "2 hours", action: "—"),
+      .init(selected: false, path: "~/Library/LaunchAgents/com.heroku.cli.plist", size: "2 KB", owner: "heroku (brew · uninstalled)", klass: "RISKY", klassKind: .tierE, lastTouched: "62 days", action: "prompt")
     ]
   }
 
@@ -2387,13 +2387,13 @@ struct CleanupPane: View {
     VStack(spacing: 0) {
       // Header
       HStack(spacing: 0) {
-        orphanHeader("",            width: 28)
-        orphanHeader("Path",        width: 240)
-        orphanHeader("Size",        width: 80)
+        orphanHeader("", width: 28)
+        orphanHeader("Path", width: 240)
+        orphanHeader("Size", width: 80)
         orphanHeader("Owner (missing)", width: 240)
-        orphanHeader("Class",       width: 80)
+        orphanHeader("Class", width: 80)
         orphanHeader("Last touched", width: 100)
-        orphanHeader("Action",      width: 80)
+        orphanHeader("Action", width: 80)
       }
       .background(Color.white.opacity(0.02))
       .overlay(

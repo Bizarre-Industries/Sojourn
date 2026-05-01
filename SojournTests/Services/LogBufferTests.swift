@@ -1,6 +1,6 @@
 import Foundation
-import Testing
 @testable import Sojourn
+import Testing
 
 struct LogBufferTests {
   @Test func appendAndSnapshot() async {

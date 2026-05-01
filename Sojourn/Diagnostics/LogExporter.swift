@@ -9,8 +9,8 @@
 // `/Users/<name>` paths are scrubbed to `/Users/<USER>`; high-confidence
 // secret patterns become placeholders.
 
-import Foundation
 import CryptoKit
+import Foundation
 
 internal actor LogExporter {
   private let redactor: Redactor

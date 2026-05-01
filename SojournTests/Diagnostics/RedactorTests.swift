@@ -2,12 +2,11 @@
 // scrubbing. Audit §3.1.5.
 
 import Foundation
-import Testing
 @testable import Sojourn
+import Testing
 
 @Suite("Redactor")
 struct RedactorTests {
-
   @Test("scrubs username path prefix")
   func usernamePath() {
     let r = Redactor(username: "alice", host: "fake-host")

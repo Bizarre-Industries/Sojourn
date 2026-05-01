@@ -4,43 +4,100 @@ All notable changes to Sojourn. Follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 [SemVer](https://semver.org/).
 
-## [Unreleased]
+## [Unreleased] — v0.2 pivot in progress
 
-### Planned (post-1.0)
+Tracking `docs/process/plans/v0.2-plan.md` (canonical, 510 lines). v1.0
+cosmetic preview withdrawn (see section below); v0.2 reboots architecture
+on top of that work.
 
-- Bootstrap sheet: full 9-state UI per
-  `docs/explain/bootstrap-state-machine.md` (current single-screen
-  consent prompt sufficient for ship; richer state-by-state copy in
-  v1.1).
-- Settings scene 4-tab rebuild (Schedule / Cooldown / Tool locations /
-  Diagnostics) per `screens.jsx:672`. Current single-form Settings
-  ships in v1.0 as the in-window proxy.
-- Architecture artboard surfaced from Help menu per
-  `project/architecture.jsx`.
-- App icon: 5-mode Sequoia/Tahoe `.icon` bundle (Icon Composer
-  authoring required). Current 11-PNG `.appiconset` fallback ships in
-  v1.0.
-- Phase 12 mpm + chezmoi feature gap: SBOM commit, externals tab,
-  unmanaged tab, forget action, doctor in diagnostics bundle, state
-  controls.
-- Phase 13 native backends: `BrewService`/`CaskService`/`MasService`
-  conforming to `PackageBackend`; brew taps + brew services capture;
-  LaunchAgents promotion; `SMAppService` Login Items; tool version
-  managers (mise/asdf/rustup/sdkman/volta).
-- Phase 14 plugin host + secret broker abstraction: keyless cosign
-  verification, 1Password → Keychain → age detection ladder,
-  reference plugins (mise / gh-extension / krew / helm-plugin).
-- Snapshot tests per pane (27 fixture-backed tests).
-- XCUITest navigation coverage across all sidebar entries.
-- Accessibility audit: VoiceOver labels, light-mode lime-on-white
-  legibility fix using `Color.bzrLimeInk` per chat 2 closing message.
+### Planned
+
+- **macOS 26.0 Tahoe deployment floor.** Bump in `project.yml`
+  (currently `14.0`), `Sojourn/Info.plist`, `Casks/sojourn.rb`,
+  `Package.swift`, Sparkle config. Delete all
+  `if #available(macOS XX, *)` checks below 26.
+- **Single backend: brew bundle.** `BrewBundleService` replaces
+  `MPMService` and the entire `Sojourn/Backends/` directory.
+  `Brewfile.common` + `Brewfile.<hostname>` layered install.
+  `cooldowns.toml` tier mapping (mas tier A through E for cargo/npm/go).
+  ADR-0018 supersedes ADR-0010.
+- **Nix mode rejected outright.** ADR-0022-rejected captures evidence
+  + flip conditions. No `Backend` protocol, no Phase 2 mode, no
+  speculative interface.
+- **Real `glassEffect()`** on macOS 26+. `Sojourn/UI/Components/LiquidGlass.swift`
+  deleted. Aurora wallpaper dropped. `NavigationSplitView` chrome gets
+  the glass treatment for free.
+- **Sidebar reduced to typed `Pane` enum, 10 cases:** dashboard,
+  packages, generations, macosFeatures, preferences, sync, machines,
+  advisories, jobs, settings.
+- **`Panes.swift` (2479 lines, 14 structs) split** — one struct per
+  file under `Sojourn/UI/Panes/`. Mechanical-subagent task.
+- **Generations panel** — first-class UI over git-tagged tarball
+  snapshots at `~/Library/Application Support/Sojourn/generations/N.tar.zst`.
+  Rollback runs `brew bundle install --cleanup --file=<snapshot>` →
+  `chezmoi apply` → `defaults import`. ~85% of nix-darwin's atomic
+  rollback UX without `/nix`. New `GenerationService` actor.
+- **macOS Features panel** — first-class UI over `defaults write` for
+  the knobs `nix-darwin`'s `system.defaults` would have wrapped: Touch
+  ID for sudo (with re-apply LaunchAgent against `softwareupdate`
+  rewrites), dock layout, Finder defaults, trackpad / keyboard repeat,
+  screencapture location/format, login window text, hotkey editor for
+  `com.apple.symbolichotkeys.plist`. New `MacOSFeaturesService` actor.
+- **Cask + CI rewrite.** Create `Casks/sojourn.rb` matching the Cask
+  Cookbook (`livecheck`, `uninstall quit:`, `zap trash:`, `verified:`,
+  `depends_on macos: ">= :tahoe"`, `depends_on formula: chezmoi, mas`).
+  `notarize.yml` adds `Homebrew/actions/setup-homebrew` + `brew audit
+  --cask --new --online` + `brew bump-cask-pr` + Sparkle EdDSA sign
+  step (private key in 1Password, read via `op`).
+- **`scripts/publish-homebrew-cask.sh` deleted** — replaced by `brew
+  bump-cask-pr`.
+- **`PrefService` extended** — sandboxed Containers paths, FDA TCC
+  flow, PlistBuddy escape hatch, 8ta4 fixture corpus, ship
+  `preference-domains.json` for offline lookup.
+- **`AdvisoryService` rewritten** as `brew vulns` shell-out. Drops the
+  92-line no-op. OSV-format JSON parser, 24h cache at
+  `~/Library/Caches/Sojourn/advisories.json`. ADR-0021.
+- **Docs purge.** Delete 9 UPPERCASE redirect files +
+  `_legacy_architecture.md` + 4 pref-domain dups → single canonical
+  `docs/reference/preferences.md`. One source per Diátaxis quadrant.
+- **ADRs 0018–0022.** 0018 drop mpm; 0019 cask `depends_on`; 0020
+  Sparkle + cask hybrid; 0021 brew vulns; 0022-rejected Nix mode.
+  Amend 0001 (narrow IPC scope post-mpm) + 0010 (mark superseded).
+- **Mas integration** surfaces "Open in App Store" for unowned
+  purchases. Touch-ID-gated helper for `mas install`/`mas upgrade`
+  (per CVE-2025-43411 sudo requirement on macOS 14.8.2+ / 15.7.2+ /
+  26.1+); never blanket sudo.
+
+### Deferred to v0.3
+
+- Containers panel — Apple `container` CLI (macOS 26+) > OrbStack >
+  Docker Desktop > Lima > Colima detection ladder. Stub navigation
+  entry only in v0.2.
+- mas Touch-ID privileged helper hardening (basic
+  AuthorizationServices prompt suffices for v0.2).
+- Sparkle delta updates (~85% bandwidth saving).
+- Multi-machine sync conflict UX polish.
+
+### Deferred to v1.x
+
 - Discover pane (record-session model) per
-  `docs/explain/discover-pane.md` — ships in v1.1.
-- Bitwarden broker — ships in v1.1+.
-- Native CargoService re-evaluation — see
-  `docs/process/open-questions.md` §1.
+  `docs/explain/discover-pane.md`.
+- Bitwarden secret broker (deferred per ADR-0016).
+- Native Cargo re-evaluation per `docs/process/open-questions.md` §1.
 
-## [1.0.0] — 2026-05-01
+## [v1.0-cosmetic-preview, withdrawn] — 2026-05-01
+
+> **Withdrawn 2026-05-01.** Tag `v1.0.0` deleted from local + remote.
+> This release shipped the visual design surface (22 panes, aurora
+> shell, AccentColor, MenuBarExtra, XCUITest scaffolding, VoiceOver
+> labels) but did **not** execute the v0.2 architectural pivot —
+> `MPMService`, `Sojourn/Backends/`, `LiquidGlass.swift`, the 22-pane
+> sidebar, and the macOS 14 deployment floor were all untouched. The
+> SHA `cd84792` remains in `git log` for archaeology; the tag and the
+> notion of a "v1.0 release" are gone. v0.2 reboots architecture on
+> top of this work, salvaging compatible bits and replacing the rest.
+> The GitHub Release artifact (`Sojourn.dmg`) at v1.0.0 is preserved
+> with a "superseded — cosmetic preview" notice.
 
 ### Added — Wave A · Design surface
 

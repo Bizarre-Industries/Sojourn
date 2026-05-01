@@ -69,6 +69,7 @@ internal struct MainWindowView: View {
       List(Pane.allCases, selection: $selection) { pane in
         Label(pane.label, systemImage: pane.icon)
           .tag(pane)
+          .accessibilityIdentifier("sidebar.\(pane.rawValue)")
       }
       .navigationTitle("Sojourn")
       .navigationSplitViewColumnWidth(min: 220, ideal: 240, max: 320)

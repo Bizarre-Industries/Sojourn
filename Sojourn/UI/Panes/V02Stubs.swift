@@ -23,6 +23,7 @@ import SwiftUI
 internal struct GenerationsPane: View {
   var body: some View {
     StubView(
+      paneID: "pane.generations",
       title: "Generations",
       subtitle: "Tarball-snapshot rollback (v0.2 step 6)",
       icon: "clock.arrow.circlepath",
@@ -44,6 +45,7 @@ internal struct GenerationsPane: View {
 internal struct MacOSFeaturesPane: View {
   var body: some View {
     StubView(
+      paneID: "pane.macosFeatures",
       title: "macOS Features",
       subtitle: "Touch ID, dock, Finder, hotkeys (v0.2 step 7)",
       icon: "switch.2",
@@ -68,6 +70,7 @@ internal struct MacOSFeaturesPane: View {
 internal struct SyncPane: View {
   var body: some View {
     StubView(
+      paneID: "pane.sync",
       title: "Sync",
       subtitle: "Push / pull / history / conflicts (v0.2 step 5+6)",
       icon: "arrow.triangle.2.circlepath",
@@ -87,6 +90,7 @@ internal struct SyncPane: View {
 internal struct AdvisoriesPane: View {
   var body: some View {
     StubView(
+      paneID: "pane.advisories",
       title: "Advisories",
       subtitle: "brew vulns shell-out (v0.2 step 10)",
       icon: "exclamationmark.shield",
@@ -108,6 +112,7 @@ internal struct AdvisoriesPane: View {
 }
 
 private struct StubView: View {
+  let paneID: String
   let title: String
   let subtitle: String
   let icon: String
@@ -140,5 +145,6 @@ private struct StubView: View {
     }
     .padding(24)
     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+    .accessibilityIdentifier(paneID)
   }
 }

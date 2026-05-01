@@ -23,29 +23,24 @@ final class SojournUITests: XCTestCase {
     app.launch()
     XCTAssertTrue(app.wait(for: .runningForeground, timeout: 10))
 
+    // v0.2 sidebar: 10 typed Pane enum cases per
+    // docs/process/plans/v0.2-plan.md step 3. Pane IDs match the
+    // accessibilityIdentifier wired in MainWindowView (sidebar.<rawValue>)
+    // and the existing pane-side identifier convention. The .dashboard
+    // case maps to OverviewPane (rawValue "dashboard"), which still
+    // exposes its v0.1 "pane.overview" identifier until the v0.2
+    // step 4 Panes.swift split rewires it.
     let entries: [(String, String)] = [
-      ("sidebar.overview",          "pane.overview"),
-      ("sidebar.packages",          "pane.packages"),
-      ("sidebar.dotfiles",          "pane.dotfiles"),
-      ("sidebar.preferences",       "pane.preferences"),
-      ("sidebar.machines",          "pane.machines"),
-      ("sidebar.history",           "pane.history"),
-      ("sidebar.conflicts",         "pane.conflicts"),
-      ("sidebar.onboard",           "pane.onboard"),
-      ("sidebar.secrets",           "pane.secrets"),
-      ("sidebar.cleanup",           "pane.cleanup"),
-      ("sidebar.diagnostics",       "pane.diagnostics"),
-      ("sidebar.settings",          "pane.settings"),
-      ("sidebar.jobs",              "pane.jobs"),
-      ("sidebar.schedule",          "pane.schedule"),
-      ("sidebar.age",               "pane.age"),
-      ("sidebar.chezmoi-templates", "pane.chezmoi-templates"),
-      ("sidebar.gitleaks-rules",    "pane.gitleaks-rules"),
-      ("sidebar.authorization",     "pane.authorization"),
-      ("sidebar.manager-detail",    "pane.manager-detail"),
-      ("sidebar.backups",           "pane.backups"),
-      ("sidebar.defaults-discover", "pane.defaults-discover"),
-      ("sidebar.repo-setup",        "pane.repo-setup")
+      ("sidebar.dashboard",     "pane.overview"),
+      ("sidebar.packages",      "pane.packages"),
+      ("sidebar.generations",   "pane.generations"),
+      ("sidebar.macosFeatures", "pane.macosFeatures"),
+      ("sidebar.preferences",   "pane.preferences"),
+      ("sidebar.sync",          "pane.sync"),
+      ("sidebar.machines",      "pane.machines"),
+      ("sidebar.advisories",    "pane.advisories"),
+      ("sidebar.jobs",          "pane.jobs"),
+      ("sidebar.settings",      "pane.settings")
     ]
 
     for (sidebarID, paneID) in entries {

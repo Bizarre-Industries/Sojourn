@@ -5,8 +5,10 @@
 // `@Environment(AppStore.self)`. Never `@State` at the root — see CLAUDE.md
 // "Do not use @State to hold the root AppStore."
 //
-// Holds persistence + all long-lived service actors. Phase 10 wires
-// SyncCoordinator, BootstrapService, and CleanupService into the root.
+// v0.2 (ADR-0018): single backend is brew bundle. mpm + BackendRegistry +
+// Plugins host removed. `brewBundle: BrewBundleService` replaces `mpm` +
+// `managers` snapshot table; the parsed `brewfile: BrewfileAST?` is the
+// in-memory source of truth.
 
 import Foundation
 import Observation
@@ -22,7 +24,7 @@ internal final class AppStore {
   internal let backups: BackupsDirectory
   internal let deletionsDB: DeletionsDB
 
-  internal let mpm: MPMService?
+  internal let brewBundle: BrewBundleService
   internal let git: GitService?
   internal let chezmoi: ChezmoiService?
   internal let pref: PrefService
@@ -34,24 +36,26 @@ internal final class AppStore {
   internal let bootstrap: BootstrapService
   internal let backgroundActivity: BackgroundActivity
 
-  // Audit phases 10–11: scaffolded modules wired pure-additively for v0.1.0.
-  // Concrete actors above stay primary; v0.2.0 callers switch to these.
-  internal let registry: BackendRegistry
   internal let historyDB: HistoryDB?
   internal let bootstrapCoordinator: BootstrapCoordinator
 
   internal var sync: SyncCoordinator?
   internal var settings: Settings = .empty
-  internal var managers: [String: ManagerSnapshot] = [:]
+  internal var brewfile: BrewfileAST?
   internal var history: [HistoryEntry] = []
   internal var orphans: [OrphanCandidate] = []
+
+  // v0.2 transitional: panes that read `store.managers` continue to
+  // compile against an empty dictionary. Real package counts come from
+  // `brewfile` once OverviewPane is rewired in step 6.
+  internal var managers: [String: ManagerSnapshot] = [:]
 
   internal init(
     paths: AppSupportPaths,
     settingsStore: SettingsStore,
     deletionsDB: DeletionsDB,
     historyDB: HistoryDB?,
-    mpm: MPMService?,
+    brewBundle: BrewBundleService,
     git: GitService?,
     chezmoi: ChezmoiService?,
     secrets: SecretScanService?
@@ -65,7 +69,7 @@ internal final class AppStore {
     let backups = BackupsDirectory(paths: paths)
     self.backups = backups
     self.deletionsDB = deletionsDB
-    self.mpm = mpm
+    self.brewBundle = brewBundle
     self.git = git
     self.chezmoi = chezmoi
     self.secrets = secrets
@@ -78,7 +82,6 @@ internal final class AppStore {
     self.bootstrap = BootstrapService(locator: toolLocator, brew: brew, subprocess: runner)
     self.backgroundActivity = BackgroundActivity()
     self.historyDB = historyDB
-    self.registry = BackendRegistry()
     self.bootstrapCoordinator = BootstrapCoordinator(
       probe: ToolProbe(locator: toolLocator),
       installer: ToolInstaller(brew: brew)
@@ -97,28 +100,22 @@ internal final class AppStore {
 
     let runner = SubprocessRunner()
     let locator = ToolLocator()
-    let mpm = await MPMService.live(runner: runner, locator: locator)
+    let brewURL = (await locator.locate("brew"))?.url
+      ?? URL(fileURLWithPath: "/opt/homebrew/bin/brew")
+    let brewBundle = BrewBundleService(runner: runner, brewURL: brewURL)
     let git = await GitService.live(runner: runner, locator: locator)
     let chezmoi = await ChezmoiService.live(runner: runner, locator: locator)
     let secrets = SecretScanService.live(runner: runner)
 
-    let store = AppStore(
+    return AppStore(
       paths: paths, settingsStore: settings, deletionsDB: deletions, historyDB: history,
-      mpm: mpm, git: git, chezmoi: chezmoi, secrets: secrets
+      brewBundle: brewBundle, git: git, chezmoi: chezmoi, secrets: secrets
     )
-    if let mpm {
-      for managerID in MPMPackageBackend.knownManagerIDs {
-        await store.registry.register(MPMPackageBackend(managerID: managerID, mpm: mpm))
-      }
-    }
-    return store
   }
 
   /// Hydrate in-memory snapshots from disk. Safe to call multiple times.
   internal func reloadFromDisk() async {
     self.settings = await settingsStore.value
-    // Prefer HistoryDB; fall back to legacy Settings.history during the
-    // v0.1 migration window. v0.2 removes the legacy mirror.
     if let historyDB, let rows = try? await historyDB.list(limit: 200) {
       self.history = rows
     } else {
@@ -137,7 +134,7 @@ internal final class AppStore {
       repoURL: repoURL,
       git: git,
       chezmoi: chezmoi,
-      mpm: mpm,
+      brewBundle: brewBundle,
       pref: pref,
       secrets: secrets,
       snapshots: snapshots,
@@ -153,19 +150,23 @@ internal final class AppStore {
     if let historyDB {
       try? await historyDB.insert(entry)
     }
-    // Legacy mirror — deprecated, removed in v0.2.0.
     var snapshot = await settingsStore.value
     snapshot.history.append(entry)
     try? await settingsStore.replace(snapshot)
   }
 
-  /// Refresh managers via mpm. No-op if mpm is missing.
-  internal func refreshManagers() async {
-    guard let mpm else { return }
-    if let snap = try? await mpm.installed() {
-      self.managers = snap
+  /// Refresh the in-memory Brewfile snapshot via `brew bundle dump`.
+  /// Runs the subprocess; on success replaces `self.brewfile`.
+  internal func refreshBrewfile() async {
+    if let snap = try? await brewBundle.dump() {
+      self.brewfile = snap
     }
   }
+
+  /// v0.2 transitional alias for callers (SojournApp launch hook) that
+  /// expect the v0.1 `refreshManagers()` name. Removed once OverviewPane
+  /// is rewired to read `brewfile` directly in step 6.
+  internal func refreshManagers() async { await refreshBrewfile() }
 
   /// Rescan orphan candidates.
   internal func rescanOrphans() async {

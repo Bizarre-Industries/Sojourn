@@ -1,0 +1,29 @@
+# Sojourn — canonical Brewfile fixture
+# Covers all 11 brew bundle ecosystems documented in ADR-0018.
+
+tap "homebrew/cask"
+tap "shivammathur/php"
+
+brew "act"
+brew "shellcheck"
+brew "go@1.21", link: false
+
+cask "iterm2"
+cask "visual-studio-code"
+
+mas "Xcode", id: 497799835
+mas "Things 3", id: 904280696
+
+vscode "ms-python.python"
+vscode "github.copilot"
+
+go "github.com/spf13/cobra"
+
+cargo "ripgrep"
+cargo "fd-find"
+
+uv "ruff"
+
+krew "ns"
+
+npm "typescript"

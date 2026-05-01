@@ -135,10 +135,14 @@ struct SyncCoordinatorTests {
     let settings = try SettingsStore(paths: paths)
     let cooldown = CooldownGate(settings: settings, fetch: { _ in (Data(), URLResponse()) })
 
+    let brewBundle = BrewBundleService(
+      runner: runner,
+      brewURL: URL(fileURLWithPath: "/opt/homebrew/bin/brew")
+    )
     let coordinator = SyncCoordinator(
       repoURL: workA,
       git: git,
-      chezmoi: nil, mpm: nil, pref: nil, secrets: nil,
+      chezmoi: nil, brewBundle: brewBundle, pref: nil, secrets: nil,
       snapshots: snap, cooldown: cooldown
     )
 

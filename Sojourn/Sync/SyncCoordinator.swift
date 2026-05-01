@@ -1,9 +1,11 @@
 // Sojourn — SyncCoordinator
 //
 // Orchestrates push (local → remote) and pull (remote → local) against the
-// user's data repo. See docs/ARCHITECTURE.md §6. Pull must complete +
-// resolve any conflicts before push is allowed. Pre-op snapshot on every
-// destructive step.
+// user's data repo. Pull must complete + resolve any conflicts before push
+// is allowed. Pre-op snapshot on every destructive step.
+//
+// v0.2 (ADR-0018): the package source of truth is `Brewfile.common` +
+// `Brewfile.<hostname>` (brew bundle), no longer `packages.toml` (mpm).
 
 import Foundation
 import Observation
@@ -26,7 +28,7 @@ internal final class SyncCoordinator {
   private let repoURL: URL
   private let git: GitService
   private let chezmoi: ChezmoiService?
-  private let mpm: MPMService?
+  private let brewBundle: BrewBundleService
   private let pref: PrefService?
   private let secrets: SecretScanService?
   private let snapshots: SnapshotService
@@ -36,7 +38,7 @@ internal final class SyncCoordinator {
     repoURL: URL,
     git: GitService,
     chezmoi: ChezmoiService?,
-    mpm: MPMService?,
+    brewBundle: BrewBundleService,
     pref: PrefService?,
     secrets: SecretScanService?,
     snapshots: SnapshotService,
@@ -45,7 +47,7 @@ internal final class SyncCoordinator {
     self.repoURL = repoURL
     self.git = git
     self.chezmoi = chezmoi
-    self.mpm = mpm
+    self.brewBundle = brewBundle
     self.pref = pref
     self.secrets = secrets
     self.snapshots = snapshots
@@ -64,10 +66,10 @@ internal final class SyncCoordinator {
       _ = try await snapshots.capture(operation: .syncPull, sources: [repoURL])
       try await git.pull(remote: "origin", branch: branch, cwd: repoURL)
       if let chezmoi {
-        // Audit §2.2.3 — three-way merge text dotfiles via the user's
-        // configured `merge.command` before falling back to `apply`.
-        // Binaries / plists keep the apply path because chezmoi merge
-        // doesn't handle them.
+        // Three-way merge text dotfiles via the user's configured
+        // `merge.command` before falling back to `apply`. Binaries /
+        // plists keep the apply path because chezmoi merge doesn't
+        // handle them.
         let status = (try? await chezmoi.status(cwd: nil)) ?? ""
         for target in Self.textMergeTargets(fromStatus: status) {
           do {
@@ -80,11 +82,15 @@ internal final class SyncCoordinator {
         }
         try await chezmoi.apply(dryRun: false, cwd: nil)
       }
-      if let mpm {
-        let packages = repoURL.appendingPathComponent("packages.toml")
-        if FileManager.default.fileExists(atPath: packages.path) {
-          try await mpm.restore(from: packages)
-        }
+      // Apply Brewfile.common then Brewfile.<host>. Either may be
+      // absent (single-machine setup) — skip silently.
+      let host = Self.hostname()
+      let candidates = [
+        repoURL.appendingPathComponent("Brewfile.common"),
+        repoURL.appendingPathComponent("Brewfile.\(host)")
+      ].filter { FileManager.default.fileExists(atPath: $0.path) }
+      for brewfile in candidates {
+        _ = try await brewBundle.install(file: brewfile, upgrade: false, cleanup: false)
       }
       phase = .done(.syncPull)
       SojournLog.sync.info("pull done")
@@ -128,7 +134,14 @@ internal final class SyncCoordinator {
     do {
       _ = try await snapshots.capture(operation: .syncPush, sources: [repoURL])
 
-      let syncFiles = ["packages.toml", "dotfiles", "prefs", ".sojourn"]
+      let host = Self.hostname()
+      let syncFiles = [
+        "Brewfile.common",
+        "Brewfile.\(host)",
+        "dotfiles",
+        "prefs",
+        ".sojourn"
+      ]
       let stageable = syncFiles
         .map { repoURL.appendingPathComponent($0) }
         .filter { FileManager.default.fileExists(atPath: $0.path) }
@@ -148,6 +161,23 @@ internal final class SyncCoordinator {
     phase = .idle
   }
 
+  // MARK: - Hostname
+
+  private nonisolated static func hostname() -> String {
+    if let env = ProcessInfo.processInfo.environment["HOST"], !env.isEmpty {
+      return env
+    }
+    var buffer = [CChar](repeating: 0, count: 256)
+    if gethostname(&buffer, buffer.count) == 0 {
+      let host = String(cString: buffer)
+      if let dot = host.firstIndex(of: ".") {
+        return String(host[..<dot])
+      }
+      return host
+    }
+    return "unknown-host"
+  }
+
   // MARK: - Status parsing
 
   /// Extensions chezmoi cannot mergefully (binary/plist) — these paths
@@ -162,7 +192,7 @@ internal final class SyncCoordinator {
   ]
 
   /// Parse `chezmoi status` output into the subset of modified targets
-  /// suitable for `chezmoi merge`. Audit §2.2.3.
+  /// suitable for `chezmoi merge`.
   ///
   /// chezmoi status format: 2-char status code, space, target path. The
   /// first column is source state, second is target state. Either being

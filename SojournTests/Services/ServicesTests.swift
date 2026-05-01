@@ -21,33 +21,6 @@ struct GitServiceTests {
   }
 }
 
-struct MPMServiceMockTests {
-  @Test func mockDecodesInstalled() async throws {
-    let url = try #require(
-      Bundle.sojournFixtureURL(name: "mpm-installed", ext: "json"),
-      "mpm-installed.json fixture not found in test bundle"
-    )
-    let data = try Data(contentsOf: url)
-    let mpm = MPMService.mock { _ in data }
-    let snap = try await mpm.installed()
-    #expect(snap["brew"] != nil)
-    #expect((snap["brew"]?.packages.count ?? 0) >= 3)
-    #expect((snap["cask"]?.packages.count ?? 0) >= 2)
-  }
-
-  @Test func mockSurfacesDecodeErrors() async {
-    let mpm = MPMService.mock { _ in Data("{not json".utf8) }
-    do {
-      _ = try await mpm.installed()
-      Issue.record("expected decodeFailed")
-    } catch is MPMError {
-      // ok
-    } catch {
-      Issue.record("unexpected: \(error)")
-    }
-  }
-}
-
 struct ChezmoiServiceTests {
   @Test func decodesManagedFixture() async throws {
     let url = try #require(

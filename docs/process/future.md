@@ -15,8 +15,8 @@ For audit-driven post-v1 work that **is** scheduled (phases 10–14), see
 - **Sandboxed-app preference sync** (FDA-gated). Requires
   `com.apple.security.files.all` entitlement and a per-app
   quit-relaunch dance. See
-  [reference/preference-sync.md](../reference/preference-sync.md) and
-  [reference/pref-domains.md](../reference/pref-domains.md).
+  [reference/preferences.md](../reference/preferences.md) and
+  [reference/preferences.md](../reference/preferences.md).
 - **Concurrent-write merge** for multi-user Macs. Current v1 assumes
   one active writer at a time via `.sojourn/active.toml`. See
   [decisions/0012-cooperative-writer-lock.md](../decisions/0012-cooperative-writer-lock.md).

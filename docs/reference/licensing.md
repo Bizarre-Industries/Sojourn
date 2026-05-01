@@ -24,7 +24,7 @@ Architecturally, the invariant is enforced by `SubprocessRunner` (see [/Sojourn/
 
 ## Why GPL-3.0-or-later
 
-Full rationale lives in [ARCHITECTURE.md §13](ARCHITECTURE.md#13-licensing-decision). Summary:
+Full rationale (preserved in `git log -- docs/_legacy_architecture.md` §13). Summary:
 
 - **Not AGPL-3.0.** Sojourn is a desktop app, not a network service. AGPL-3.0 would also block any future decision to ever link `mpm` as a library, because AGPL-3.0 is incompatible with GPL-2.0-only.
 - **Not GPL-2.0-or-later.** Lacks GPL-3's anti-tivoization and patent-retaliation clauses that matter for a signed, notarized macOS binary.
@@ -44,7 +44,7 @@ All code in `Sojourn/Resources/bin/` ships as separately-licensed binaries re-si
 
 ### Invoked but not bundled
 
-Discovered or installed on the user's system via the bootstrap flow (see [BOOTSTRAP.md](BOOTSTRAP.md)):
+Discovered or installed on the user's system via the bootstrap flow (see [bootstrap-state-machine](../explain/bootstrap-state-machine.md)):
 
 | Tool | Upstream | License | Role |
 |---|---|---|---|
@@ -58,7 +58,7 @@ Discovered or installed on the user's system via the bootstrap flow (see [BOOTST
 
 | Path | Source | License | Status |
 |---|---|---|---|
-| `Sojourn/Resources/data/applications/*.toml` | Derived from [lra/mackup](https://github.com/lra/mackup)'s `applications/` registry. | GPL-3.0-or-later | Fork, re-classified per [ARCHITECTURE.md §8](ARCHITECTURE.md#8-plist-app-preference-sync-strategy). Upstream credited in each file header. |
+| `Sojourn/Resources/data/applications/*.toml` | Derived from [lra/mackup](https://github.com/lra/mackup)'s `applications/` registry. | GPL-3.0-or-later | Fork, re-classified per [reference/preferences.md](preferences.md). Upstream credited in each file header. |
 | `Sojourn/Resources/data/gitleaks.toml` | Derived from gitleaks default rules. | MIT (upstream) | Locally tuned. |
 | `Sojourn/Resources/data/dotfile_owners.toml` | Original to Sojourn. | GPL-3.0-or-later | Hand-curated. |
 

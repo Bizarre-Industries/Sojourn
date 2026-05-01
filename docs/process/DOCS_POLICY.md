@@ -68,36 +68,22 @@ Allowed `Status` values:
 
 CI flags edits to existing ADRs (`Status` line is the only allowed change).
 
-## Redirect stub rules
+## Moves and renames
 
-When moving a doc, leave a stub at the old path:
+When moving a doc, do it cleanly: `git mv` the file, update every inbound
+link, commit. **No redirect stubs.** `git log -- docs/<old-path>` is the
+redirect — it tells future readers where the content went.
 
-```
-# Moved
+This rule replaces the v0.1 redirect-window policy (Phases 2/3/7 sunset at
+v0.3, ARCHITECTURE.md sunset at v0.4) per the v0.2 pivot
+(`docs/process/plans/v0.2-plan.md`). All redirect stubs from the prior
+restructure were deleted in the v0.2 docs purge; `docs/redirects.toml` is
+historical record only and may itself be removed once external link
+traffic decays.
 
-This page moved to [docs/<quadrant>/<new>.md](../<quadrant>/<new>.md).
-
-The redirect will be removed in **vX.Y**. See
-[docs/process/DOCS_POLICY.md](DOCS_POLICY.md).
-```
-
-Three lines body (the `# Moved` heading + 2 sentences). Exception: pages with
-heavy external link traffic (e.g., the original `docs/ARCHITECTURE.md`) may
-include an anchor map so external `#section` links keep resolving.
-
-Every redirect is recorded in `docs/redirects.toml` with `sunset_version`
-metadata. CI uses the file as a markdown-link-check allowlist.
-
-## Stub sunset cadence
-
-| Stub | Sunset |
-|---|---|
-| Most stubs created in restructure Phases 2/3/7 | v0.3 (one minor after rework lands) |
-| `docs/ARCHITECTURE.md` stub (high inbound link density) | v0.4 |
-
-`docs/process/release.md` includes a "remove expired stubs" checklist item.
-The release pipeline reads `docs/redirects.toml` and lists any whose
-`sunset_version <= release_version` for removal.
+If a future move has external link traffic that justifies a transition
+window, write a one-page ADR proposing the exception, list the affected
+URLs, and commit to a hard-coded removal date — not a "soon" promise.
 
 ## Content split rules
 

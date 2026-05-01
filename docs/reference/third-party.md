@@ -22,7 +22,7 @@ repo.
 Discovered or installed on the user's system via the bootstrap flow described
 in [docs/explain/bootstrap-state-machine.md](docs/explain/bootstrap-state-machine.md). Sojourn invokes these as separate
 processes only (see
-[docs/LICENSING.md](docs/LICENSING.md#the-ipc-not-linking-invariant)).
+[docs/reference/licensing.md](docs/reference/licensing.md#the-ipc-not-linking-invariant)).
 
 | Tool | Upstream | License | Role |
 |---|---|---|---|

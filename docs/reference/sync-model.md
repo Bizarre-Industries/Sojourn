@@ -29,7 +29,7 @@ and loudly flagged in UI. See
   see [reference/cooldown-policy.md](cooldown-policy.md));
   `chezmoi apply` with `--force` after user-confirmed diff; `defaults import`
   for each tracked domain (round-tripped through cfprefsd —
-  see [reference/preference-sync.md](preference-sync.md)).
+  see [reference/preferences.md](preferences.md)).
 - **Take writer lock**: explicit action. Writes a new `active.toml` in a
   commit. Prevents another Mac from pushing without also pulling and taking
   the lock. This is cooperative, not authoritative — git has no locking —

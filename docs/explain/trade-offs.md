@@ -2,7 +2,7 @@
 
 Honest list of what Sojourn does not do and why. Sourced from the
 v0.1 risk register and v1 scope cut in
-[`docs/_legacy_architecture.md` §13–§15](../_legacy_architecture.md).
+[`docs/process/audit-2026-04.md` §13–§15](../process/audit-2026-04.md).
 Tracking continues in [process/future.md](../process/future.md).
 
 ## Capabilities Sojourn ships in v1
@@ -72,7 +72,7 @@ These are real and the mitigations are partial:
    keeps dotfile + package sync working even if pref sync breaks. Watch
    Apple security guides every WWDC. Fallback plan: ship preferences
    as declarative `defaults write` scripts. See
-   [reference/preference-sync.md](../reference/preference-sync.md).
+   [reference/preferences.md](../reference/preferences.md).
 2. **mpm bus factor.** Single maintainer. *Mitigation*: keep
    `MPMService` surface small enough that each method can be
    reimplemented against the underlying managers within ~1 week.

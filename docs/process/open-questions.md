@@ -230,7 +230,7 @@ sunset `v0.3`. Recorded in `docs/redirects.toml`.
 | --------------------------------------- | ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
 | `docs/reference/managers/`              | `docs/reference/package-managers/`                                | Match proposal §3 vocabulary                                                                          |
 | `docs/reference/managers/README.md`     | `docs/reference/package-managers/index.md`                        | Proposal §3 landing-file convention                                                                   |
-| `docs/reference/preference-domains.md`  | `docs/reference/pref-domains.md`                                  | Proposal §3 short-form                                                                                |
+| `docs/reference/preferences.md`  | `docs/reference/preferences.md`                                  | Proposal §3 short-form                                                                                |
 | `docs/reference/bootstrap-flow.md`      | `docs/explain/bootstrap-state-machine.md`                         | Reclassified reference → explain (rationale-heavy)                                                    |
 | `docs/reference/observability.md`       | `docs/explain/observability.md`                                   | Reclassified reference → explain                                                                      |
 | `docs/explain/competitive-landscape.md` | `docs/explain/why-sojourn.md`                                     | Scope-expanded from competitive matrix to wider framing                                               |

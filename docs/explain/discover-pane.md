@@ -82,7 +82,7 @@ Explicitly excluded from the whitelist:
   `com.apple.Spotlight`, `com.apple.dock`).
 - Any keychain-backed preference domain.
 - Any sandboxed-container preference (FDA-gated; out of scope per
-  [reference/preference-sync.md](../reference/preference-sync.md) Layer 4).
+  [reference/preferences.md](../reference/preferences.md) Layer 4).
 
 Users can extend the whitelist via Settings → Preferences → Discover →
 "Recordable domains" with explicit per-domain opt-in. Adding a system
@@ -127,9 +127,9 @@ of Preferences or its own thing?") to: session-mode.
 
 ## See also
 
-- [reference/preference-sync.md](../reference/preference-sync.md) —
+- [reference/preferences.md](../reference/preferences.md) —
   the four-layer transport that Discover ultimately commits into.
-- [reference/pref-domains.md](../reference/pref-domains.md) — domain
+- [reference/preferences.md](../reference/preferences.md) — domain
   classification and cfprefsd relaunch behaviour.
 - [decisions/0002-no-symlink-preferences.md](../decisions/0002-no-symlink-preferences.md)
   — `defaults` round-trip is the only first-class transport.

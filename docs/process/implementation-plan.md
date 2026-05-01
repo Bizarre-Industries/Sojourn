@@ -114,7 +114,9 @@ docs/reference/third-party.md.
 The Phase 8 originally listed `SUPPORTED_MANAGERS.md`, `RELEASE.md`,
 `CONFLICTS.md`, `PREFS_DOMAINS.md`. **All shipped + reorganized** under
 the Diátaxis tree in the audit-driven docs restructure (Phases 0–5 of
-the docs rework, see [redirects.toml](../redirects.toml)).
+the docs rework). v0.2 docs purge then deleted the redirect stubs and
+`docs/redirects.toml` itself; `git log -- docs/<old-path>` is the
+redirect now.
 
 **Audit slot-in §1.1–§1.3**: doc-drift fixes (module tree, Cork license,
 cask cooldown) shipped in the docs restructure.

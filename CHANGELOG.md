@@ -261,7 +261,7 @@ on top of that work.
     `decisions/`, `process/`, `design/`, `assets/`).
   - 14 ADRs at `docs/decisions/`.
   - `ARCHITECTURE.md` split into 14 destinations; legacy preserved
-    at `docs/_legacy_architecture.md` for `git log --follow`.
+    at `docs/process/audit-2026-04.md` for `git log --follow`.
   - `SUPPORTED_MANAGERS.md` split into 18 per-manager pages under
     `docs/reference/package-managers/` + `index.md`.
   - 5 net-new audit reference docs (externals, secret-brokers,

@@ -84,7 +84,7 @@ are the local equivalents of the macOS jobs in `build.yml`.
 - Bump `MARKETING_VERSION` past the release to mark
   development-toward-next.
 - Update `docs/reference/third-party.md` if dep versions changed.
-- Update `docs/SUPPORTED_MANAGERS.md` if manager coverage changed.
+- Update `docs/reference/package-managers/index.md` if manager coverage changed.
 
 ### Replan-on-ship hook
 

@@ -75,8 +75,8 @@ Sojourn's docs follow [Diátaxis](https://diataxis.fr) — start here:
 - [Sync model](docs/reference/sync-model.md) — push/pull semantics.
 - [Cooldown policy](docs/reference/cooldown-policy.md) — supply-chain tiers.
 - [Conflict shapes](docs/reference/conflict-shapes.md) — sync-merge shapes.
-- [Preference sync](docs/reference/preference-sync.md) +
-  [Preference domains](docs/reference/pref-domains.md) — plist round-trip.
+- [Preference sync](docs/reference/preferences.md) +
+  [Preference domains](docs/reference/preferences.md) — plist round-trip.
 - [Cleanup](docs/reference/cleanup.md) — orphan detection.
 - [Licensing](docs/reference/licensing.md) — GPL-3.0-or-later, IPC-not-linking.
 - [Testing](docs/reference/testing.md), [Observability](docs/explain/observability.md).

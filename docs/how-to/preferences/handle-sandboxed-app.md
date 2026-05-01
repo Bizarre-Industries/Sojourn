@@ -82,7 +82,7 @@ critical, leave it untracked and revisit when v1.x ships.
 
 ## See also
 
-- [reference/pref-domains.md](../../reference/pref-domains.md) —
+- [reference/preferences.md](../../reference/preferences.md) —
   classification matrix.
 - [explain/threat-model.md](../../explain/threat-model.md) — FDA
   trust surface.

@@ -45,9 +45,9 @@ so git diffs are legible.
 
 - The four-layer strategy (plain dotfile / unsandboxed plist / sandboxed
   plist / Application Support blob) is documented in
-  [reference/preference-sync.md](../reference/preference-sync.md).
+  [reference/preferences.md](../reference/preferences.md).
 - The Mackup `applications/` registry is reused as **seed material**, not
-  verbatim truth — see [reference/pref-domains.md](../reference/pref-domains.md).
+  verbatim truth — see [reference/preferences.md](../reference/preferences.md).
 
 ## Alternatives considered
 

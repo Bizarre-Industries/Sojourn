@@ -42,4 +42,4 @@ The catch: it's a snapshot, not a live sync. Sojourn pays the snapshot cost
 on every push/pull. The win is correctness — we never silently desync.
 
 For the four-layer strategy in detail, see
-[reference/preference-sync.md](../reference/preference-sync.md).
+[reference/preferences.md](../reference/preferences.md).

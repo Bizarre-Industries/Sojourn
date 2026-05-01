@@ -65,9 +65,9 @@ pane.
 
 ## See also
 
-- [reference/pref-domains.md](../../reference/pref-domains.md) —
+- [reference/preferences.md](../../reference/preferences.md) —
   full list of supported domains + classification.
-- [reference/preference-sync.md](../../reference/preference-sync.md)
+- [reference/preferences.md](../../reference/preferences.md)
   — the export/import flow.
 - [decisions/0002-no-symlink-preferences.md](../../decisions/0002-no-symlink-preferences.md)
   — why `defaults import`, not symlinks.

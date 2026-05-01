@@ -105,9 +105,9 @@ so its plist gets exported / imported by `PrefService`.
 
 ## See also
 
-- [reference/pref-domains.md](../../reference/pref-domains.md) —
+- [reference/preferences.md](../../reference/preferences.md) —
   full classification matrix.
-- [reference/preference-sync.md](../../reference/preference-sync.md)
+- [reference/preferences.md](../../reference/preferences.md)
   — export/import flow.
 - [decisions/0002-no-symlink-preferences.md](../../decisions/0002-no-symlink-preferences.md).
 - [process/audit-2026-04.md §1.5](../../process/audit-2026-04.md#1-doc-level-inconsistencies)

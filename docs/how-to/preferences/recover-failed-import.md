@@ -77,7 +77,7 @@ may have logged an error you missed.
 
 ## See also
 
-- [reference/preference-sync.md](../../reference/preference-sync.md)
+- [reference/preferences.md](../../reference/preferences.md)
   — full export/import flow.
 - [reference/cleanup.md](../../reference/cleanup.md) — backup
   retention.

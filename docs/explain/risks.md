@@ -13,7 +13,7 @@ Sojourn's whole preference-sync story degrades.
 Mitigation: classification system means dotfile + package sync keeps working
 even if pref sync breaks. Watch Apple security guides at each WWDC. Have a
 plan to ship "preferences as declarative `defaults write` scripts" as a
-fallback. See [reference/preference-sync.md](../reference/preference-sync.md).
+fallback. See [reference/preferences.md](../reference/preferences.md).
 
 ## 2. mpm bus factor
 

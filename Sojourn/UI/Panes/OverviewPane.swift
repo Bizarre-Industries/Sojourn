@@ -8,7 +8,7 @@ struct OverviewPane: View {
   var body: some View {
     ScrollView {
       VStack(alignment: .leading, spacing: 24) {
-        EyebrowLabel(text: "BIZARRE / SOJOURN / V1.0 / GPL-3.0-OR-LATER · GUI OVER mpm × chezmoi × defaults")
+        EyebrowLabel(text: "BIZARRE / SOJOURN / V1.0 / GPL-3.0-OR-LATER · GUI OVER brew bundle × chezmoi × defaults")
           .padding(.top, 8)
 
         // Hero — "PACKAGES. DOTFILES. PREFS."
@@ -26,7 +26,7 @@ struct OverviewPane: View {
               .font(.bzrStencil(size: 38, weight: .heavy))
               .foregroundStyle(Color.bzrLime)
           }
-          Text("A native macOS app that carries your setup across machines. mpm fans out to 12 managers in parallel. chezmoi handles dotfile templating + age. defaults round-trips plists through cfprefsd. We never link GPL-2 backends — only invoke them as subprocesses with JSON/TOML output.")
+          Text("A native macOS app that carries your setup across machines. brew bundle manages 11 ecosystems natively (ADR-0018). chezmoi handles dotfile templating + age. defaults round-trips plists through cfprefsd. We never link GPL-2 backends — only invoke them as subprocesses with JSON/TOML output.")
             .font(.bzrBody(size: 13))
             .foregroundStyle(Color.txtSecondary)
             .lineSpacing(2)
@@ -83,7 +83,7 @@ struct OverviewPane: View {
             .font(.bzrMono(size: 11, weight: .medium))
             .foregroundStyle(Color.bzrLime)
         }
-        Text("mpm 6.3.0 · 12 MANAGERS · `--table-format json` · 90s/call · parallel fanout")
+        Text("brew bundle · 11 ECOSYSTEMS · `--cyclonedx` SBOM via brew vulns · single-pass install")
           .font(.bzrMono(size: 10))
           .foregroundStyle(Color.txtTertiary)
       }

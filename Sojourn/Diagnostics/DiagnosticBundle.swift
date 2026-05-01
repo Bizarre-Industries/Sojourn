@@ -40,7 +40,6 @@ internal struct DiagnosticBundle: Sendable, Hashable, Codable {
 internal struct ToolReportSummary: Sendable, Hashable, Codable {
   internal let git: Bool
   internal let brew: Bool
-  internal let mpm: Bool
   internal let chezmoi: Bool
   internal let age: Bool
   internal let gitleaks: Bool

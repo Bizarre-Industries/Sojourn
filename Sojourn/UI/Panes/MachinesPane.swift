@@ -54,7 +54,7 @@ struct MachinesPane: View {
         BzrCard {
           BzrCodeBlock(text: """
             my-mac/
-            ├── packages.toml                 // mpm backup output
+            ├── Brewfile.common               // brew bundle dump
             ├── dotfiles/                     // chezmoi source dir
             │   ├── dot_zshrc.tmpl
             │   ├── dot_gitconfig.tmpl

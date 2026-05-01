@@ -4,9 +4,9 @@
 // `packages.toml`. Spec: <https://cyclonedx.org/specification/overview/>
 //
 // We model only the fields Sojourn writes today. Stage 10 fills in
-// `components` from `mpm sbom --cyclonedx` output; the file is
-// `Codable` so consumers (OSV cross-reference, Advisories pane) can
-// round-trip without re-shelling to mpm.
+// `components` from `brew vulns --brewfile <path> --cyclonedx` output;
+// the file is `Codable` so consumers (Advisories pane, future OSV
+// cross-reference) can round-trip without re-shelling.
 
 import Foundation
 

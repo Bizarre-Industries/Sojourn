@@ -19,7 +19,6 @@ internal actor ToolProbe {
   internal func probe() async -> ToolProbeReport {
     let git      = await locator.locate("git")?.url
     let brew     = await locator.locate("brew")?.url
-    let mpm      = await locator.locate("mpm")?.url
     let chezmoi  = await locator.locate("chezmoi")?.url
     let age      = await locator.locate("age")?.url
     let gitleaks = await locator.locate("gitleaks")?.url
@@ -28,7 +27,6 @@ internal actor ToolProbe {
     return ToolProbeReport(
       git: git,
       brew: brew,
-      mpm: mpm,
       chezmoi: chezmoi,
       age: age,
       gitleaks: gitleaks,
@@ -40,7 +38,6 @@ internal actor ToolProbe {
 internal struct ToolProbeReport: Sendable, Hashable {
   internal let git: URL?
   internal let brew: URL?
-  internal let mpm: URL?
   internal let chezmoi: URL?
   internal let age: URL?
   internal let gitleaks: URL?
@@ -50,7 +47,6 @@ internal struct ToolProbeReport: Sendable, Hashable {
     var m: [String] = []
     if git == nil { m.append("git") }
     if brew == nil { m.append("brew") }
-    if mpm == nil { m.append("mpm") }
     if chezmoi == nil { m.append("chezmoi") }
     if age == nil { m.append("age") }
     if gitleaks == nil { m.append("gitleaks") }

@@ -18,7 +18,6 @@ struct ToolProbeTests {
     // the underlying state rather than asserting any particular system.
     let hasAllTools = report.git != nil
       && report.brew != nil
-      && report.mpm != nil
       && report.chezmoi != nil
       && report.age != nil
       && report.gitleaks != nil

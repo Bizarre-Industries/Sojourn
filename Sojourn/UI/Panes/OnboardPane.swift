@@ -14,12 +14,12 @@ struct OnboardPane: View {
 
   private var steps: [Step] {
     [
-      .init(id: "1", label: "PROBE", detail: "Found brew, mpm, chezmoi, git, age", state: .done),
+      .init(id: "1", label: "PROBE", detail: "Found brew, chezmoi, git, age", state: .done),
       .init(id: "2", label: "REMOTE", detail: "git@github.com:you/my-mac.git · clone ok", state: .done),
       .init(id: "3", label: "MACHINE ID", detail: "mini-home.local · 8d2a-... · stored", state: .done),
       .init(id: "4", label: "AGE IDENTITY", detail: "Generated · public recipient ready to share", state: .active),
       .init(id: "5", label: "WRITER ADDS", detail: "Old Mac re-encrypts on next push", state: .pending),
-      .init(id: "6", label: "PULL", detail: "mpm restore + chezmoi apply + defaults import", state: .pending),
+      .init(id: "6", label: "PULL", detail: "brew bundle install + chezmoi apply + defaults import", state: .pending),
       .init(id: "7", label: "READY", detail: "Reader joined fleet", state: .pending)
     ]
   }

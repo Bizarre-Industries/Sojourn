@@ -24,7 +24,7 @@ struct JobInspectorPane: View {
         VStack(spacing: 6) {
           jobRow("git push origin main", "exit 0", "1.4s", .ok)
           jobRow("gitleaks dir --staged --no-git", "exit 0", "0.8s", .ok)
-          jobRow("mpm --table-format json outdated", "exit 0", "12.3s", .ok)
+          jobRow("brew bundle list --all", "exit 0", "12.3s", .ok)
           jobRow("brew outdated --json", "exit 0", "3.1s", .ok)
           jobRow("chezmoi diff --no-pager --color=false", "running", "0.4s", .lime)
         }
@@ -258,8 +258,8 @@ struct ManagerDetailPane: View {
   var body: some View {
     PowerScaffold(eyebrow: "POWER / MANAGER / Cargo as the template",
                   title: "MANAGER · CARGO.",
-                  subtitle: "Per-manager deep view. Raw mpm JSON, advisory bypass, pin syntax, --ignore-failure semantics.") {
-      BzrCard(eyebrow: "RAW · mpm --table-format json outdated --include cargo") {
+                  subtitle: "Per-ecosystem deep view. Raw brew bundle output, advisory bypass, pin syntax, ignore-on-fail semantics.") {
+      BzrCard(eyebrow: "RAW · brew bundle list --all --cargo") {
         BzrCodeBlock(text: """
           [
             {

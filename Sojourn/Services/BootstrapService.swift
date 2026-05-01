@@ -4,7 +4,7 @@
 // docs/ARCHITECTURE.md §9:
 //
 //   .unknown
-//     → .probingSystem          // parallel locate brew/git/mpm/chezmoi/age/gitleaks/CLT
+//     → .probingSystem          // parallel locate brew/git/chezmoi/age/gitleaks/CLT
 //     → .reportingStatus        // show inventory
 //     → .awaitingUserConsent    // single "Install missing" sheet
 //     → .installingCLT          // xcode-select --install; poll
@@ -54,7 +54,7 @@ internal final class BootstrapService {
     self.subprocess = subprocess
   }
 
-  internal static let probeTools = ["brew", "git", "mpm", "chezmoi", "age", "gitleaks"]
+  internal static let probeTools = ["brew", "git", "chezmoi", "age", "gitleaks"]
 
   internal func probe() async {
     let signpost = SojournSignpost.bootstrap
@@ -107,14 +107,6 @@ internal final class BootstrapService {
         _ = try await brew.postVerify()
       } catch {
         state = .failed("brew install failed: \(error)")
-        return
-      }
-    }
-
-    if inv.missing.contains("mpm") {
-      state = .installingMPM
-      if await brewInstall(formula: "meta-package-manager") == false {
-        state = .failed("mpm install via brew failed.")
         return
       }
     }

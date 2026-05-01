@@ -160,7 +160,7 @@ struct BootstrapView: View {
     switch state {
     case .unknown, .probingSystem:
       stepHeader(stepLabel: "STEP 1 / 7 · PROBING", title: "WHAT'S ON THIS MAC?")
-      Text("Walking ToolLocator's hardcoded candidate paths for git, brew, mpm, chezmoi, age, gitleaks. App-context $PATH is LaunchServices-minimal — `which` lies here, so we probe explicit paths.")
+      Text("Walking ToolLocator's hardcoded candidate paths for git, brew, chezmoi, age, gitleaks. App-context $PATH is LaunchServices-minimal — `which` lies here, so we probe explicit paths.")
         .font(.bzrBody(size: 13))
         .foregroundStyle(Color.txtSecondary)
         .frame(maxWidth: 64 * 9, alignment: .leading)
@@ -218,7 +218,7 @@ struct BootstrapView: View {
       installingPane(
         stepLabel: "STEP 5 / 7 · INSTALLING",
         title: "META-PACKAGE-MANAGER",
-        subtitle: "brew install mpm. mpm fans out to 12 managers in parallel. Pinned 6.3.0+ for the --table-format json flag (renamed from --output-format json in 6.0).",
+        subtitle: "brew install --no-quarantine. Sojourn shells out to brew bundle for the declarative source of truth. brew bundle natively manages 11 ecosystems (brew, cask, mas, vscode, go, cargo, uv, krew, npm, flatpak, tap) per ADR-0018.",
         progress: 0.70
       )
 

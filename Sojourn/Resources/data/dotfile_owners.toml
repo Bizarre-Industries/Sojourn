@@ -3,7 +3,7 @@
 #
 # Each entry maps a path (relative to $HOME) to the tool/manager that
 # typically owns it. Consumed by CleanupService to classify orphan
-# candidates. Values for `owner`: chezmoi / mpm / user / system /
+# candidates. Values for `owner`: chezmoi / brew-bundle / user / system /
 # third-party / unknown. See docs/ARCHITECTURE.md §10.
 
 [[owner]]
@@ -78,7 +78,7 @@ owner = "user"
 
 [[owner]]
 path = ".npmrc"
-owner = "mpm"
+owner = "brew-bundle"
 manager = "npm"
 
 [[owner]]
@@ -91,7 +91,7 @@ owner = "third-party"
 
 [[owner]]
 path = ".yarnrc"
-owner = "mpm"
+owner = "brew-bundle"
 manager = "yarn"
 
 [[owner]]
@@ -112,17 +112,17 @@ owner = "third-party"
 
 [[owner]]
 path = ".gem"
-owner = "mpm"
+owner = "brew-bundle"
 manager = "gem"
 
 [[owner]]
 path = ".bundle"
-owner = "mpm"
+owner = "brew-bundle"
 manager = "gem"
 
 [[owner]]
 path = ".cargo"
-owner = "mpm"
+owner = "brew-bundle"
 manager = "cargo"
 
 [[owner]]
@@ -131,7 +131,7 @@ owner = "third-party"
 
 [[owner]]
 path = ".composer"
-owner = "mpm"
+owner = "brew-bundle"
 manager = "composer"
 
 [[owner]]

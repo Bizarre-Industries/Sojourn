@@ -23,7 +23,7 @@ struct HistoryPane: View {
   // Demo data; replaced by store.history projection in Phase B.
   private var demoEntries: [TimelineEntry] {
     [
-      .init(sha: "a3f9c2e", when: "2h ago", kind: "PUSH", kindBadge: .lime, message: "mpm install ripgrep, fd, eza", machine: "work-mbp", stats: "+24 −2", snapshot: nil, nodeColor: .lime),
+      .init(sha: "a3f9c2e", when: "2h ago", kind: "PUSH", kindBadge: .lime, message: "brew bundle install ripgrep + fd + eza", machine: "work-mbp", stats: "+24 −2", snapshot: nil, nodeColor: .lime),
       .init(sha: "7b1de44", when: "1d ago", kind: "PULL", kindBadge: .mute, message: "sync from personal-mini · 6 changes", machine: "work-mbp", stats: "+183 −47", snapshot: "snap_2026-04-27T08-12.tgz", nodeColor: .lime),
       .init(sha: "c08fa12", when: "2d ago", kind: "PUSH", kindBadge: .mute, message: "iterm2 prefs · zshrc edit", machine: "personal-mini", stats: "+12 −4", snapshot: nil, nodeColor: .mute),
       .init(sha: "ee31a09", when: "3d ago", kind: "APPLY", kindBadge: .mute, message: "chezmoi apply --force after pull", machine: "work-mbp", stats: "4 files", snapshot: "snap_2026-04-25T19-02.tgz", nodeColor: .mute),

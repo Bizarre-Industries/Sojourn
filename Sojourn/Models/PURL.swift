@@ -5,7 +5,7 @@
 //
 // Audit §2.1.2: PURL specifiers in `packages.toml` per-machine override
 // schema disambiguate same-name packages across managers. Stage 10 wires
-// PURL parsing into the mpm round-trip.
+// PURL parsing into the brew bundle round-trip.
 
 import Foundation
 

@@ -3,7 +3,7 @@
 // SwiftUI translation of `project/architecture.jsx`. Opened from the
 // Help menu (`SojournApp.commands`). The view is the "how Sojourn talks
 // to your Mac" diagram — UI / State / Services / Backends with the
-// GPL-2 mpm licensing firewall called out, plus a bottom strip for
+// brew bundle / chezmoi licensing firewall called out, plus a bottom strip for
 // persistence layout, scheduler config, and the user's repo shape.
 
 import SwiftUI
@@ -46,7 +46,7 @@ struct ArchitectureView: View {
             .foregroundStyle(Color.bzrLime)
         }
 
-        Text("Sojourn is a SwiftUI app over swift-subprocess. Every backend (mpm, chezmoi, git, gitleaks, age, defaults) runs as a separate process with structured I/O. This is the licensing firewall — GPL-3-or-later code lives at arm's length from GPL-2 mpm. JSON in, TOML out, exit codes everywhere.")
+        Text("Sojourn is a SwiftUI app over swift-subprocess. Every backend (chezmoi, brew, git, gitleaks, age, defaults) runs as a separate process with structured I/O. This is the licensing firewall — GPL-3-or-later code lives at arms length from GPL-2 git via subprocess only. JSON in, TOML out, exit codes everywhere.")
           .font(.bzrBody(size: 13))
           .foregroundStyle(Color.txtSecondary)
           .frame(maxWidth: 980, alignment: .leading)
@@ -107,7 +107,7 @@ struct ArchitectureView: View {
 
   private var servicesLayer: some View {
     Layer(label: "SERVICES", sub: "actor per CLI · structured I/O", tone: .white) {
-      Svc(name: "MPMService", cli: "mpm", out: "--table-format json", kind: .normal)
+      Svc(name: "BrewBundleService", cli: "brew bundle", out: "dump install check cyclonedx", kind: .normal)
       Svc(name: "ChezmoiService", cli: "chezmoi", out: "--format=json · status · diff", kind: .normal)
       Svc(name: "GitService", cli: "/usr/bin/git", out: "--porcelain=v2 -z", kind: .normal)
       Svc(name: "PrefService", cli: "defaults", out: "export/import + plutil xml1", kind: .normal)
@@ -122,7 +122,7 @@ struct ArchitectureView: View {
 
   private var backendsLayer: some View {
     Layer(label: "BACKENDS", sub: "user's binaries · arm's length", tone: .amber) {
-      Backend(bin: "mpm", path: "/opt/homebrew/bin/mpm", license: "GPL-2.0", pinned: "6.3.0+")
+      Backend(bin: "brew", path: "/opt/homebrew/bin/brew", license: "BSD-2", pinned: "5.x+")
       Backend(bin: "chezmoi", path: "/opt/homebrew/bin/chezmoi", license: "MIT", pinned: "2.70.2+")
       Backend(bin: "brew", path: "/opt/homebrew/bin/brew", license: "BSD-2", pinned: "4.4.7+")
       Backend(bin: "git", path: "/usr/bin/git", license: "GPL-2", pinned: "system")
@@ -188,7 +188,7 @@ struct ArchitectureView: View {
         ("v1.1 opt-in", "SMAppService.agent · LaunchAgent")
       ])
       BottomCard(title: "USER REPO · YOUR REMOTE", sub: "git@github.com:you/my-mac.git", rows: [
-        ("packages.toml", "mpm backup · root · TOML"),
+        ("Brewfile.common", "brew bundle dump · root · DSL"),
         ("dotfiles/", "chezmoi source dir · age-encrypted secrets"),
         ("preferences/*.plist", "XML · per-domain · git-diffable"),
         (".sojourn/", "machines/ · active.toml · backups/ · version.toml")

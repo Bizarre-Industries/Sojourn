@@ -34,7 +34,6 @@ internal actor BootstrapCoordinator {
       tools: [
         "git": report.git,
         "brew": report.brew,
-        "mpm": report.mpm,
         "chezmoi": report.chezmoi,
         "age": report.age,
         "gitleaks": report.gitleaks
@@ -49,10 +48,10 @@ internal actor BootstrapCoordinator {
     state = .installingBrew
     do {
       try await installer.installHomebrew()
-      state = .installingMPM
-      // Stage 12 wires native mpm install. Today this is a marker —
-      // the legacy `BootstrapService` handles the actual brew + mpm +
-      // chezmoi install path.
+      state = .installingChezmoi
+      // v0.2: brew bundle is the single backend. mpm install path
+      // removed per ADR-0018; chezmoi install proceeds directly.
+      
       state = .installingChezmoi
       state = .ready
     } catch {

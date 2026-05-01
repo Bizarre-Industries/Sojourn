@@ -13,7 +13,7 @@ struct ConflictsPane: View {
   private var shapes: [Shape] {
     [
       .init(id: "1", title: "TEXT EDIT", context: ".zshrc edited on both Macs", resolution: "Keep local · Keep remote · Manual merge"),
-      .init(id: "2", title: "PACKAGES.TOML", context: "mpm install/remove diverged", resolution: "Merge per-manager (grouped UI)"),
+      .init(id: "2", title: "BREWFILE", context: "brew bundle install/remove diverged", resolution: "Merge per-manager (grouped UI)"),
       .init(id: "3", title: "CHEZMOI TEMPLATE", context: "dot_gitconfig.tmpl conditional clash", resolution: "Always surfaces · cannot auto-merge Go templates"),
       .init(id: "4", title: "PLIST", context: "iterm2 same key, different values", resolution: "Keyed diff · per-key pick"),
       .init(id: "5", title: "RENAME × EDIT", context: ".tmux.conf renamed + edited", resolution: "User picks final path · git rename hint"),

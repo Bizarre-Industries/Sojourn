@@ -3,7 +3,7 @@
 // Mapping from a dotfile path (relative to $HOME) to the tool/manager
 // that owns it. Populated from
 // `Sojourn/Resources/data/dotfile_owners.toml` (Phase 5) plus runtime
-// augmentation from chezmoi/mpm output. Used by CleanupService to classify
+// augmentation from chezmoi/brew-bundle output. Used by CleanupService to classify
 // orphan candidates. See docs/ARCHITECTURE.md §10.
 
 import Foundation
@@ -17,7 +17,7 @@ internal struct DotfileOwner: Sendable, Codable, Hashable, Identifiable {
 
   internal enum Owner: String, Sendable, Codable, Hashable {
     case chezmoi
-    case mpm
+    case brewBundle
     case user
     case system
     case thirdParty = "third-party"

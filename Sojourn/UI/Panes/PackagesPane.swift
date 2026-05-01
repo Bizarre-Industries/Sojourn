@@ -187,7 +187,7 @@ struct PackagesPane: View {
               logLine("14:22:02", "→", "warming JSON API cache", .tertiary)
               logLine("14:22:04", "✓", "87 formulae checked", .ok)
               logLine("14:22:04", "→", "12 outdated", .lime)
-              logLine("14:22:05", "$", "mpm --table-format json outdated", .secondary)
+              logLine("14:22:05", "$", "brew bundle list --all", .secondary)
               logLine("14:22:09", "⚠", "pip: search not implemented", .warn)
               logLine("14:22:11", "✓", "aggregated 8 managers", .ok)
               logLine("14:22:11", "━", "17 outdated total", .lime)

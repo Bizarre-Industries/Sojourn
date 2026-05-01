@@ -1,9 +1,9 @@
 // Sojourn — ManagerSnapshot
 //
-// Decoded shape of `mpm 6.x --table-format json`. One entry per package
+// Decoded shape of legacy v0.1 mpm output kept for the AppStore.managers shim
 // manager (brew, cask, mas, pip, pipx, npm, cargo, gem, composer, yarn,
 // vscode, uvx). See docs/ARCHITECTURE.md §5.1 and the golden fixture at
-// SojournTests/Fixtures/mpm-installed.json.
+// v0.2 callers use BrewfileAST instead.
 
 import Foundation
 

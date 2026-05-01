@@ -138,6 +138,26 @@ jobs:
           files: Sojourn.dmg
           generate_release_notes: true
 
+      - name: Setup Homebrew
+        if: "!contains(github.ref, '-')"
+        uses: Homebrew/actions/setup-homebrew@master
+
+      - name: Audit cask
+        if: "!contains(github.ref, '-')"
+        run: brew audit --cask --new --online ./Casks/sojourn.rb
+
       - name: Publish Homebrew cask update
         if: "!contains(github.ref, '-')"
-        run: bash scripts/publish-homebrew-cask.sh "${GITHUB_REF_NAME}"
+        env:
+          HOMEBREW_GITHUB_API_TOKEN: ${{ env.HOMEBREW_TAP_TOKEN }}
+        run: |
+          set -euo pipefail
+          version="${GITHUB_REF_NAME#v}"
+          sha=$(shasum -a 256 Sojourn.dmg | cut -d' ' -f1)
+          brew tap Bizarre-Industries/sojourn
+          brew bump-cask-pr \
+            --version="${version}" \
+            --sha256="${sha}" \
+            --no-browse \
+            --no-fork \
+            Bizarre-Industries/sojourn/sojourn

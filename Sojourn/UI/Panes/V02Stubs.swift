@@ -20,31 +20,6 @@
 
 import SwiftUI
 
-internal struct MacOSFeaturesPane: View {
-  var body: some View {
-    StubView(
-      paneID: "pane.macosFeatures",
-      title: "macOS Features",
-      subtitle: "Touch ID, dock, Finder, hotkeys (v0.2 step 7)",
-      icon: "switch.2",
-      detail: """
-      First-class UI over `defaults write` for the knobs nix-darwin's
-      system.defaults would have wrapped:
-
-      • Touch ID for sudo (re-apply LaunchAgent vs softwareupdate)
-      • Dock: drag-to-reorder persistent-apps editor
-      • Finder: ShowAllExtensions, ShowPathbar, _FXSortFoldersFirst, …
-      • Trackpad / keyboard repeat (InitialKeyRepeat, KeyRepeat)
-      • Screencapture location and format
-      • Login window text
-      • Hotkey editor for com.apple.symbolichotkeys.plist
-
-      Each toggle is reversible from the Generations pane.
-      """
-    )
-  }
-}
-
 internal struct SyncPane: View {
   var body: some View {
     StubView(

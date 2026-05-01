@@ -16,6 +16,7 @@
 		0ED1AAAEAADA7250AF998BA2 /* JobRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4207776C9EC0D4B31D82E91 /* JobRunner.swift */; };
 		13CED2766FF188E9F0C1D8A9 /* GitHubDeviceAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DED6874FE4B27207A890E6E /* GitHubDeviceAuth.swift */; };
 		14AC4C6C18F2127EE503F9B6 /* Fonts in Resources */ = {isa = PBXBuildFile; fileRef = 6E6EE61BCBB43941CBEF30F4 /* Fonts */; };
+		191866534A9570E447AEA969 /* MacOSFeaturesService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF0F7E5B022F32A9CF6BF028 /* MacOSFeaturesService.swift */; };
 		19ED9BB99FD79A3F00DE09A4 /* SyncCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 197100C16F14E6EF4B75D6E3 /* SyncCoordinator.swift */; };
 		1B511F22B7852AF15BAE3CE2 /* Bundle+Fixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = A64D32536414511C9E9911C6 /* Bundle+Fixtures.swift */; };
 		1D1AFC6E3F699596754D80BE /* Snapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = B17DA112F156FC13EBFD8B18 /* Snapshot.swift */; };
@@ -98,6 +99,7 @@
 		B5B77E5BF67EB533A05BB8E1 /* PowerSurfaces.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4EE7ECBC1A37D8F0DFF9DCD /* PowerSurfaces.swift */; };
 		B71E89C2CE6E01C7C708E066 /* SecretsPane.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E78DBDD1F8570D95723E0D /* SecretsPane.swift */; };
 		B8384A446BAC0005B38572E7 /* OverviewPane.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E84E3C18E0943ADC546FB00 /* OverviewPane.swift */; };
+		BACB75269B81A8C0DAF85490 /* MacOSFeaturesPane.swift in Sources */ = {isa = PBXBuildFile; fileRef = C943BF48C79C037DE50364AE /* MacOSFeaturesPane.swift */; };
 		BCD0622CDB162310CFD7A2E3 /* Generation.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2DAB6CE172EE5970FC7D6BB /* Generation.swift */; };
 		BFB171F5BB6318C71D640141 /* AutoUpdateTier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B90A0FD134A7FCFD56850E8F /* AutoUpdateTier.swift */; };
 		C26B80A1439501C9C8E646D5 /* SettingsPaneEmbedded.swift in Sources */ = {isa = PBXBuildFile; fileRef = B196BE3A97C394DA91D92949 /* SettingsPaneEmbedded.swift */; };
@@ -228,6 +230,7 @@
 		BB1FBD91A2515C0261DD4EFF /* AdvisoryReference.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvisoryReference.swift; sourceTree = "<group>"; };
 		BC0CD2FDD4876C335C51A7F6 /* SojournUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SojournUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		BE87553CA8CCFF236BAD7935 /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
+		BF0F7E5B022F32A9CF6BF028 /* MacOSFeaturesService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacOSFeaturesService.swift; sourceTree = "<group>"; };
 		C0814F9583EAFEE9FAF041AE /* Job.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Job.swift; sourceTree = "<group>"; };
 		C198F65D627EB6805DC3C20A /* CleanupService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CleanupService.swift; sourceTree = "<group>"; };
 		C40858EDF69CF14EA473AF3F /* Sojourn.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sojourn.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -235,6 +238,7 @@
 		C51F95DC3AF05E699D7B7E96 /* BrewService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrewService.swift; sourceTree = "<group>"; };
 		C5BE1F259CD0D1BD30DA7DE1 /* Atoms.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Atoms.swift; sourceTree = "<group>"; };
 		C715FB2104E0602E477DC8AF /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
+		C943BF48C79C037DE50364AE /* MacOSFeaturesPane.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacOSFeaturesPane.swift; sourceTree = "<group>"; };
 		CA1C48BDB71227E5F1B7662A /* AppStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStore.swift; sourceTree = "<group>"; };
 		CA4F5ED6020A23F564C5E5AD /* HistoryPane.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryPane.swift; sourceTree = "<group>"; };
 		CC7AC9EC2C343DE83DB1830A /* SojournApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SojournApp.swift; sourceTree = "<group>"; };
@@ -490,6 +494,7 @@
 				51654B4F53BDA5905226D68E /* GitService.swift */,
 				F4207776C9EC0D4B31D82E91 /* JobRunner.swift */,
 				75102F527B8749FB644C0444 /* LogBuffer.swift */,
+				BF0F7E5B022F32A9CF6BF028 /* MacOSFeaturesService.swift */,
 				8CF3E7F8591B56E1E9859A73 /* PrefService.swift */,
 				07993C2265D99A08965BAA61 /* SecretScanService.swift */,
 				D6059260CDDBEFAD1D8B25EE /* SojournLog.swift */,
@@ -596,6 +601,7 @@
 				0DFAB02C29720FAB30864DCB /* GenerationsPane.swift */,
 				CA4F5ED6020A23F564C5E5AD /* HistoryPane.swift */,
 				A32D3727C5D946D5B3FF0878 /* MachinesPane.swift */,
+				C943BF48C79C037DE50364AE /* MacOSFeaturesPane.swift */,
 				382E9466BCD14C7A5C4CA0A7 /* OnboardPane.swift */,
 				6E84E3C18E0943ADC546FB00 /* OverviewPane.swift */,
 				E85F38538D64D3F9E1B06485 /* PackagesPane.swift */,
@@ -822,6 +828,8 @@
 				2A8DAE1EF876120D899253E7 /* LiquidGlass.swift in Sources */,
 				52EDC71EEB3F6B1019200816 /* LogBuffer.swift in Sources */,
 				A89F889B6885C77574D1A9DB /* LogExporter.swift in Sources */,
+				BACB75269B81A8C0DAF85490 /* MacOSFeaturesPane.swift in Sources */,
+				191866534A9570E447AEA969 /* MacOSFeaturesService.swift in Sources */,
 				C44DB6B79B4C736DEC87106E /* MachineMetadata.swift in Sources */,
 				368EF18A0521C70C0CFA7796 /* MachinesPane.swift in Sources */,
 				E72C0687340E4387E829A79E /* MainWindowView.swift in Sources */,

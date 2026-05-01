@@ -152,17 +152,59 @@ jobs:
         run: brew style ./Casks/sojourn.rb
 
       - name: Publish Homebrew cask update
+        # Two-step hybrid (council 2026-05-01-notarize-publish-direct-push):
+        # 1. `brew bump-cask-pr` opens a PR against the tap with the bumped
+        #    version + sha. We keep this because it does AST-aware Ruby edits
+        #    of the cask DSL (resilient to future grammar changes) and runs
+        #    the full online audit (re-downloads the published release asset
+        #    and verifies the sha — catches asset-upload corruption).
+        # 2. `gh pr merge --squash --delete-branch` immediately collapses the
+        #    PR into a single commit on `main`. End state: no lingering PR,
+        #    one commit per release on the tap's main branch.
         if: "!contains(github.ref, '-')"
         env:
           HOMEBREW_GITHUB_API_TOKEN: ${{ env.HOMEBREW_TAP_TOKEN }}
+          GH_TOKEN: ${{ env.HOMEBREW_TAP_TOKEN }}
         run: |
           set -euo pipefail
           version="${GITHUB_REF_NAME#v}"
+
+          # Tag-format guard: refuse anything that isn't strict semver.
+          # Defense-in-depth against shell-interpolation surprises and
+          # catches typos like `v.0.2.4`.
+          if ! [[ "${version}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Tag '${GITHUB_REF_NAME}' is not in vN.N.N form; refusing to publish"
+            exit 1
+          fi
+
           sha=$(shasum -a 256 Sojourn.dmg | cut -d' ' -f1)
           brew tap Bizarre-Industries/sojourn
+
+          # bump-cask-pr writes its PR URL to stdout. Capture the full log
+          # via `tee` so we can both surface it in the runner output and
+          # extract the PR URL for the auto-merge step.
+          # `--message` overrides the default commit-message template so
+          # the squashed commit on tap main carries useful provenance.
+          bump_log=$(mktemp)
           brew bump-cask-pr \
             --version="${version}" \
             --sha256="${sha}" \
             --no-browse \
             --no-fork \
-            Bizarre-Industries/sojourn/sojourn
+            --message="release: bump sojourn to v${version}
+
+source: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/releases/tag/${GITHUB_REF_NAME}
+workflow-run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" \
+            Bizarre-Industries/sojourn/sojourn 2>&1 | tee "${bump_log}"
+
+          pr_url=$(grep -oE 'https://github.com/Bizarre-Industries/homebrew-sojourn/pull/[0-9]+' "${bump_log}" | tail -1)
+          if [ -z "${pr_url}" ]; then
+            echo "::error::brew bump-cask-pr did not surface a PR URL; aborting auto-merge"
+            exit 1
+          fi
+          echo "Opened tap PR: ${pr_url}"
+
+          # Squash-merge so tap main gets exactly one commit per release.
+          # --delete-branch cleans up the bump-cask-pr/* branch on the tap.
+          gh pr merge --squash --delete-branch "${pr_url}"
+          echo "Merged ${pr_url} to tap main"

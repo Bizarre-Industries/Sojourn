@@ -71,11 +71,10 @@ targets:
         GENERATE_INFOPLIST_FILE: NO
         SWIFT_EMIT_LOC_STRINGS: YES
         ENABLE_USER_SCRIPT_SANDBOXING: NO  # scripts/sign.sh needs codesign access
-        # Lock min macOS at the project's stated floor. Without this
-        # explicit override per-target Xcode 16.4 picks up the SDK
-        # default (15.x), which mismatches LSMinimumSystemVersion in
-        # Info.plist and triggers a build warning.
-        MACOSX_DEPLOYMENT_TARGET: "14.0"
+        # Lock min macOS at v0.2 floor (Tahoe) per CLAUDE.md invariant 10.
+        # ADR-0018 + v0.2-plan.md require glassEffect() and
+        # NavigationSplitView macOS 26 chrome; no #available gates below.
+        MACOSX_DEPLOYMENT_TARGET: "26.0"
       configs:
         Debug:
           xcconfig: Sojourn/Config/Debug.xcconfig

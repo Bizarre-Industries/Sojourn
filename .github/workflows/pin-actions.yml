@@ -43,6 +43,14 @@ jobs:
       contents: read # PAT supplies write
       pull-requests: read # PAT supplies write
     steps:
+      - name: Load 1Password secrets
+        uses: 1password/load-secrets-action@v2
+        with:
+          export-env: true
+        env:
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          WORKFLOWS_PAT: op://Bizarre-Industries/sojourn-workflows-pat/credential
+
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           # PAT instead of GITHUB_TOKEN — needed because the post-job
@@ -50,7 +58,7 @@ jobs:
           # to modify .github/workflows/. persist-credentials: true
           # so the token sticks for the create-pull-request step's
           # implicit branch operations.
-          token: ${{ secrets.WORKFLOWS_PAT }}
+          token: ${{ env.WORKFLOWS_PAT }}
           persist-credentials: true
 
       - name: Install pinact
@@ -80,7 +88,7 @@ jobs:
         with:
           # Same WORKFLOWS_PAT — peter-evans/create-pull-request needs
           # workflow scope to push the branch with workflow file diffs.
-          token: ${{ secrets.WORKFLOWS_PAT }}
+          token: ${{ env.WORKFLOWS_PAT }}
           branch: chore/pin-actions
           delete-branch: true
           base: main

@@ -2,11 +2,11 @@
 //
 // Signed, hardened-runtime archive build. DEVELOPMENT_TEAM MUST be set
 // either in Local.xcconfig or via CI env at build time. Notarization runs
-// via .github/workflows/notarize.yml; see docs/RELEASE.md.
+// via .github/workflows/notarize.yml; see docs/process/release.md.
 
 #include? "Local.xcconfig"
 
-MACOSX_DEPLOYMENT_TARGET = 15.6
+MACOSX_DEPLOYMENT_TARGET = 26.0
 
 SWIFT_ACTIVE_COMPILATION_CONDITIONS = RELEASE SOJOURN_RELEASE
 SWIFT_OPTIMIZATION_LEVEL = -O

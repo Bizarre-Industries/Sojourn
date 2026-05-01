@@ -19,7 +19,7 @@ import PackageDescription
 let package = Package(
   name: "Sojourn",
   platforms: [
-    .macOS(.v14)
+    .macOS("26.0")
   ],
   products: [
     .library(name: "Sojourn", targets: ["Sojourn"])

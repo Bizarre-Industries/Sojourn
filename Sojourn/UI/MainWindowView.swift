@@ -1,56 +1,81 @@
-// Sojourn — MainWindowView
+// Sojourn — MainWindowView (v0.2)
 //
-// Primary window. Carry-first 12-entry sidebar (`SojournSidebarMenu`),
-// Liquid Glass shell over the wallpaper, glass toolbar with Push/Pull.
-// Pane content gets richer in Stage 3; Stage 2 establishes the chrome.
+// NavigationSplitView shell with typed `Pane` enum. macOS 26 Tahoe
+// applies the Liquid Glass material to the split-view chrome
+// automatically; no manual `.ultraThinMaterial` overlays. Aurora
+// wallpaper dropped per v0.2-pivot-plan §3.
+//
+// Refs: docs/process/plans/v0.2-plan.md step 3;
+//       lessons.md "Real Liquid Glass needs `glassEffect`,
+//                   not `.ultraThinMaterial`".
 
 import SwiftUI
 
-struct MainWindowView: View {
+/// Top-level navigation surface. v0.2 fixes 10 first-class panes;
+/// power-surface entries from v0.1 cosmetic-preview no longer appear
+/// in the sidebar but remain reachable via Settings → Diagnostics or
+/// the Jobs pane (step 4 wires the routing).
+internal enum Pane: String, Hashable, CaseIterable, Identifiable {
+  case dashboard
+  case packages
+  case generations
+  case macosFeatures
+  case preferences
+  case sync
+  case machines
+  case advisories
+  case jobs
+  case settings
+
+  internal var id: String { rawValue }
+
+  internal var label: String {
+    switch self {
+    case .dashboard:     return "Dashboard"
+    case .packages:      return "Packages"
+    case .generations:   return "Generations"
+    case .macosFeatures: return "macOS Features"
+    case .preferences:   return "Preferences"
+    case .sync:          return "Sync"
+    case .machines:      return "Machines"
+    case .advisories:    return "Advisories"
+    case .jobs:          return "Jobs"
+    case .settings:      return "Settings"
+    }
+  }
+
+  internal var icon: String {
+    switch self {
+    case .dashboard:     return "rocket"
+    case .packages:      return "shippingbox"
+    case .generations:   return "clock.arrow.circlepath"
+    case .macosFeatures: return "switch.2"
+    case .preferences:   return "slider.horizontal.3"
+    case .sync:          return "arrow.triangle.2.circlepath"
+    case .machines:      return "laptopcomputer.and.iphone"
+    case .advisories:    return "exclamationmark.shield"
+    case .jobs:          return "terminal"
+    case .settings:      return "gear"
+    }
+  }
+}
+
+internal struct MainWindowView: View {
   @Environment(AppStore.self) private var store
-  @State private var selection: String = "overview"
+  @State private var selection: Pane = .dashboard
 
   var body: some View {
-    ZStack {
-      // Deepest layer: aurora wallpaper that the glass refracts.
-      GlassWallpaper()
-
-      // Floating tiles (Tahoe-spec). Sidebar inset from titlebar; content
-      // is its own glass tile next to it. Per liquid-glass.css:131-198 +
-      // chat 1's "doesn't even use Liquid Glass" rewrite.
-      HStack(spacing: 8) {
-        LiquidGlassSidebar(
-          selection: $selection,
-          machineName: machineDisplayName,
-          machineRole: "ACTIVE WRITER",
-          machineActivity: "2h AGO",
-          machineSha: "a3f9c2e"
-        )
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-        .overlay(
-          RoundedRectangle(cornerRadius: 14, style: .continuous)
-            .stroke(Color.white.opacity(0.10), lineWidth: 0.5)
-        )
-        .shadow(color: Color.black.opacity(0.50), radius: 20, x: 0, y: 14)
-
-        VStack(spacing: 0) {
-          SojournToolbar(title: titleFor(selection), eyebrow: "BIZARRE / SOJOURN")
-          Rectangle()
-            .fill(Color.white.opacity(0.10))
-            .frame(height: 0.5)
-          detail(for: selection)
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-        .overlay(
-          RoundedRectangle(cornerRadius: 14, style: .continuous)
-            .stroke(Color.white.opacity(0.10), lineWidth: 0.5)
-        )
-        .shadow(color: Color.black.opacity(0.50), radius: 20, x: 0, y: 14)
-        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+    NavigationSplitView {
+      List(Pane.allCases, selection: $selection) { pane in
+        Label(pane.label, systemImage: pane.icon)
+          .tag(pane)
       }
-      .padding(8)
+      .navigationTitle("Sojourn")
+      .navigationSplitViewColumnWidth(min: 220, ideal: 240, max: 320)
+    } detail: {
+      detail(for: selection)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .navigationTitle(selection.label)
     }
     .frame(minWidth: 1024, minHeight: 640)
     .sheet(isPresented: bootstrapSheetPresented) {
@@ -66,14 +91,6 @@ struct MainWindowView: View {
     }
   }
 
-  private var machineDisplayName: String {
-    Host.current().localizedName ?? "this-mac"
-  }
-
-  private func titleFor(_ id: String) -> String {
-    SojournSidebarMenu.entries.first { $0.id == id }?.label ?? "Sojourn"
-  }
-
   private var bootstrapSheetPresented: Binding<Bool> {
     Binding(
       get: {
@@ -87,31 +104,18 @@ struct MainWindowView: View {
   }
 
   @ViewBuilder
-  private func detail(for id: String) -> some View {
-    switch id {
-    case "overview":            OverviewPane()
-    case "packages":            PackagesPane()
-    case "dotfiles":            DotfilesPane()
-    case "preferences":         PreferencesPane()
-    case "machines":            MachinesPane()
-    case "history":             HistoryPane()
-    case "conflicts":           ConflictsPane()
-    case "onboard":             OnboardPane()
-    case "secrets":             SecretsPane()
-    case "cleanup":             CleanupPane()
-    case "diagnostics":         DiagnosticsPane()
-    case "settings":            SettingsPaneEmbedded()
-    case "jobs":                JobInspectorPane()
-    case "schedule":            ScheduleInspectorPane()
-    case "age":                 AgeKeysPane()
-    case "chezmoi-templates":   ChezmoiTemplatesPane()
-    case "gitleaks-rules":      GitleaksRulesPane()
-    case "authorization":       AuthorizationPane()
-    case "manager-detail":      ManagerDetailPane()
-    case "backups":             BackupsPane()
-    case "defaults-discover":   DefaultsDiscoverPane()
-    case "repo-setup":          RepoSetupPane()
-    default:                    OverviewPane()
+  private func detail(for pane: Pane) -> some View {
+    switch pane {
+    case .dashboard:     OverviewPane()
+    case .packages:      PackagesPane()
+    case .generations:   GenerationsPane()
+    case .macosFeatures: MacOSFeaturesPane()
+    case .preferences:   PreferencesPane()
+    case .sync:          SyncPane()
+    case .machines:      MachinesPane()
+    case .advisories:    AdvisoriesPane()
+    case .jobs:          JobInspectorPane()
+    case .settings:      SettingsPaneEmbedded()
     }
   }
 }

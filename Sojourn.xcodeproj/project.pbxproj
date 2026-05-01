@@ -84,6 +84,7 @@
 		A89F889B6885C77574D1A9DB /* LogExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B138DB8D40A2A098C28ED4CB /* LogExporter.swift */; };
 		ABB5C20DDEE082F71A36EF69 /* SojournIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81F879A8DCA19A0D5AA7B0AB /* SojournIcon.swift */; };
 		ABF59B843BD9670834DF9AB3 /* ServicesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 012D1D3CEBF6D99B901ABA36 /* ServicesTests.swift */; };
+		AC18825BFD4E02CF41B6C03C /* V02Stubs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ABC2036FA3F9FAFEEC00ED2 /* V02Stubs.swift */; };
 		AE7C259E9B5D4CE6322916C8 /* SecretScanService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07993C2265D99A08965BAA61 /* SecretScanService.swift */; };
 		AF41D0A179C38D3AFA59E55A /* ANSIParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55D844D1916BAD352E960418 /* ANSIParserTests.swift */; };
 		B179B127C52855C03A973F00 /* data in Resources */ = {isa = PBXBuildFile; fileRef = 3A0B5A8BB60D9FFFA8948472 /* data */; };
@@ -132,6 +133,7 @@
 /* Begin PBXFileReference section */
 		012D1D3CEBF6D99B901ABA36 /* ServicesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServicesTests.swift; sourceTree = "<group>"; };
 		07993C2265D99A08965BAA61 /* SecretScanService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecretScanService.swift; sourceTree = "<group>"; };
+		0ABC2036FA3F9FAFEEC00ED2 /* V02Stubs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V02Stubs.swift; sourceTree = "<group>"; };
 		0BADEBA10CB6637299E6E07E /* CooldownPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CooldownPolicy.swift; sourceTree = "<group>"; };
 		0E16DA51B87576598BAB7134 /* BackupsDirectory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupsDirectory.swift; sourceTree = "<group>"; };
 		101837DD34BDE8DB72BE4924 /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
@@ -604,6 +606,7 @@
 			isa = PBXGroup;
 			children = (
 				B155502B536A71BBC60866A8 /* .gitkeep */,
+				0ABC2036FA3F9FAFEEC00ED2 /* V02Stubs.swift */,
 				CF76E690AD8AD900E4A6E886 /* Power */,
 			);
 			path = Panes;
@@ -854,6 +857,7 @@
 				0E792AE4E8E5115DA09570DA /* ToolInstaller.swift in Sources */,
 				09E0C0FA877B857BB17F524D /* ToolLocator.swift in Sources */,
 				7DC5BAB597CF4ECE62CDE01C /* ToolProbe.swift in Sources */,
+				AC18825BFD4E02CF41B6C03C /* V02Stubs.swift in Sources */,
 				FC1D01347E391EEB39B26838 /* VersionFile.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1009,7 +1013,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
 				MARKETING_VERSION = "0.2.0-dev";
 				PRODUCT_BUNDLE_IDENTIFIER = app.bizarre.sojourn;
 				PRODUCT_NAME = Sojourn;
@@ -1051,7 +1055,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
 				MARKETING_VERSION = "0.2.0-dev";
 				PRODUCT_BUNDLE_IDENTIFIER = app.bizarre.sojourn;
 				PRODUCT_NAME = Sojourn;

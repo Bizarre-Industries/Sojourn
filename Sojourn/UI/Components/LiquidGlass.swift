@@ -34,86 +34,13 @@ extension View {
   }
 }
 
-// MARK: - Wallpaper layer
-
-/// Authentic Tahoe aurora wallpaper. Translation of `liquid-glass.css:8-40`
-/// — the high-saturation, photographic-grain layer that Liquid Glass
-/// surfaces refract above. Five radial color blooms (lime / pink / amber /
-/// blue / purple) over a deep void gradient, with star-dust speckle.
-///
-/// Use as the deepest layer of the window. The Liquid Glass material on
-/// the sidebar / content tiles needs *something* saturated to refract;
-/// a flat dark fill produces fog, not glass.
-internal struct GlassWallpaper: View {
-  var body: some View {
-    GeometryReader { geo in
-      let w = geo.size.width
-      let h = geo.size.height
-      ZStack {
-        // Base diagonal gradient.
-        LinearGradient(
-          gradient: Gradient(colors: [
-            Color(red: 10 / 255, green: 10 / 255, blue: 20 / 255),
-            Color(red: 26 / 255, green: 14 / 255, blue: 31 / 255)
-          ]),
-          startPoint: .topLeading,
-          endPoint: .bottomTrailing
-        )
-
-        // Aurora blooms — sized to the viewport so the refraction holds
-        // at every window dimension.
-        bloom(color: Color.bzrLime, x: 0.12 * w, y: 0.18 * h, r: 0.55 * max(w, h))
-        bloom(color: Color(red: 255 / 255, green: 91 / 255, blue: 138 / 255), x: 0.88 * w, y: 0.82 * h, r: 0.65 * max(w, h))
-        bloom(color: Color(red: 255 / 255, green: 209 / 255, blue: 102 / 255), x: 0.78 * w, y: 0.18 * h, r: 0.55 * max(w, h))
-        bloom(color: Color.bzrInfo, x: 0.22 * w, y: 0.78 * h, r: 0.60 * max(w, h))
-        bloom(color: Color(red: 138 / 255, green: 61 / 255, blue: 255 / 255), x: 0.50 * w, y: 0.50 * h, r: 0.50 * max(w, h))
-
-        // Star-dust speckle. Twelve fixed offsets — deterministic so the
-        // wallpaper doesn't flicker between renders.
-        ForEach(Self.stardust, id: \.self) { dot in
-          Circle()
-            .fill(Color.white.opacity(dot.opacity))
-            .frame(width: dot.size, height: dot.size)
-            .offset(x: dot.x * w - w / 2, y: dot.y * h - h / 2)
-        }
-      }
-      .saturation(1.10)
-    }
-    .ignoresSafeArea()
-  }
-
-  private func bloom(color: Color, x: CGFloat, y: CGFloat, r: CGFloat) -> some View {
-    Circle()
-      .fill(color)
-      .frame(width: r * 1.6, height: r * 1.2)
-      .blur(radius: r * 0.45)
-      .offset(x: x - r * 0.8, y: y - r * 0.6)
-      .blendMode(.plusLighter)
-      .opacity(0.55)
-  }
-
-  private struct Speck: Hashable {
-    let x: Double; let y: Double
-    let size: CGFloat; let opacity: Double
-  }
-
-  private static let stardust: [Speck] = [
-    Speck(x: 0.12, y: 0.18, size: 2.0, opacity: 0.85),
-    Speck(x: 0.28, y: 0.67, size: 1.5, opacity: 0.70),
-    Speck(x: 0.71, y: 0.44, size: 1.5, opacity: 0.75),
-    Speck(x: 0.86, y: 0.81, size: 2.0, opacity: 0.85),
-    Speck(x: 0.92, y: 0.23, size: 1.0, opacity: 0.60),
-    Speck(x: 0.36, y: 0.89, size: 1.0, opacity: 0.50),
-    Speck(x: 0.54, y: 0.12, size: 1.5, opacity: 0.70),
-    Speck(x: 0.08, y: 0.56, size: 1.5, opacity: 0.65),
-    Speck(x: 0.62, y: 0.32, size: 1.0, opacity: 0.55),
-    Speck(x: 0.18, y: 0.42, size: 1.0, opacity: 0.45),
-    Speck(x: 0.74, y: 0.71, size: 1.5, opacity: 0.65),
-    Speck(x: 0.46, y: 0.58, size: 1.0, opacity: 0.50)
-  ]
-}
-
 // MARK: - Glass buttons
+//
+// Note: GlassWallpaper (aurora blooms + stardust) was removed in v0.2
+// step 3 — NavigationSplitView on macOS 26 applies system Liquid Glass
+// material to the chrome automatically; no manual saturated wallpaper
+// needed for refraction. Button-style helpers below remain until step 4
+// migrates call sites to native macOS 26 button styles.
 
 internal struct GlassCapsuleButtonStyle: ButtonStyle {
   func makeBody(configuration: Configuration) -> some View {

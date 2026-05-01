@@ -19,7 +19,23 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
-
+      # ADD this step after the checkout (~line 20):
+      - name: Load 1Password secrets
+        uses: 1password/load-secrets-action@v2
+        with:
+          export-env: true
+        env:
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          DEVELOPER_ID_P12_BASE64: op://Bizarre-Industries/sojourn-developer-id-p12/credential
+          DEVELOPER_ID_P12_PASSWORD: op://Bizarre-Industries/sojourn-developer-id-p12/p12-password
+          DEVELOPER_ID_IDENTITY: op://Bizarre-Industries/sojourn-developer-id-p12/identity
+          DEVELOPMENT_TEAM: op://Bizarre-Industries/sojourn-developer-id-p12/team-id
+          KEYCHAIN_PASSWORD: op://Bizarre-Industries/sojourn-keychain-password/password
+          OAUTH_CLIENT_ID: op://Bizarre-Industries/sojourn-github-oauth/client-id
+          APPSTORE_API_KEY_ID: op://Bizarre-Industries/sojourn-appstore-connect-api/key-id
+          APPSTORE_API_ISSUER_ID: op://Bizarre-Industries/sojourn-appstore-connect-api/issuer-id
+          APPSTORE_API_KEY_P8: op://Bizarre-Industries/sojourn-appstore-connect-api/key
+          HOMEBREW_TAP_TOKEN: op://Bizarre-Industries/sojourn-homebrew-tap-token/credential
       - name: Select Xcode
         uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1.7.0
         with:
@@ -45,10 +61,6 @@ jobs:
             ${{ runner.os }}-spm-
 
       - name: Import Developer ID certificate
-        env:
-          DEVELOPER_ID_P12_BASE64: ${{ secrets.DEVELOPER_ID_P12_BASE64 }}
-          DEVELOPER_ID_P12_PASSWORD: ${{ secrets.DEVELOPER_ID_P12_PASSWORD }}
-          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
         run: |
           echo "$DEVELOPER_ID_P12_BASE64" | base64 --decode -o /tmp/dev-id.p12
           security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
@@ -61,9 +73,6 @@ jobs:
           rm /tmp/dev-id.p12
 
       - name: Inject Local.xcconfig
-        env:
-          OAUTH_CLIENT_ID: ${{ secrets.SOJOURN_OAUTH_CLIENT_ID }}
-          DEVELOPMENT_TEAM: ${{ secrets.DEVELOPMENT_TEAM }}
         run: |
           cat > Sojourn/Config/Local.xcconfig <<EOF
           DEVELOPMENT_TEAM = $DEVELOPMENT_TEAM
@@ -79,14 +88,9 @@ jobs:
         run: bash scripts/download-bundled-bins.sh
 
       - name: Re-sign bundled binaries
-        env:
-          DEVELOPER_ID_IDENTITY: ${{ secrets.DEVELOPER_ID_IDENTITY }}
         run: bash scripts/sign.sh
 
       - name: Build Sojourn.app
-        env:
-          DEVELOPER_ID_IDENTITY: ${{ secrets.DEVELOPER_ID_IDENTITY }}
-          DEVELOPMENT_TEAM: ${{ secrets.DEVELOPMENT_TEAM }}
         run: |
           xcodebuild -project Sojourn.xcodeproj \
             -scheme Sojourn \
@@ -99,8 +103,6 @@ jobs:
             clean build
 
       - name: Create DMG
-        env:
-          DEVELOPER_ID_IDENTITY: ${{ secrets.DEVELOPER_ID_IDENTITY }}
         run: bash scripts/make-dmg.sh build/Build/Products/Release/Sojourn.app
 
       # Upload the signed-but-not-yet-notarized DMG. If notarization
@@ -119,10 +121,6 @@ jobs:
           if-no-files-found: error
 
       - name: Notarize DMG
-        env:
-          APPSTORE_API_KEY_ID: ${{ secrets.APPSTORE_API_KEY_ID }}
-          APPSTORE_API_ISSUER_ID: ${{ secrets.APPSTORE_API_ISSUER_ID }}
-          APPSTORE_API_KEY_P8: ${{ secrets.APPSTORE_API_KEY_P8 }}
         run: bash scripts/notarize.sh Sojourn.dmg
 
       - name: Verify Gatekeeper acceptance
@@ -142,6 +140,4 @@ jobs:
 
       - name: Publish Homebrew cask update
         if: "!contains(github.ref, '-')"
-        env:
-          HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
         run: bash scripts/publish-homebrew-cask.sh "${GITHUB_REF_NAME}"

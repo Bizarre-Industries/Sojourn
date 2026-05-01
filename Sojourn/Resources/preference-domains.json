@@ -1,0 +1,104 @@
+[
+  {
+    "bundleID": "com.apple.Terminal",
+    "displayName": "Terminal",
+    "layer": "user",
+    "syncable": true
+  },
+  {
+    "bundleID": "com.googlecode.iterm2",
+    "displayName": "iTerm2",
+    "layer": "user",
+    "syncable": true
+  },
+  {
+    "bundleID": "com.apple.dock",
+    "displayName": "Dock",
+    "layer": "user",
+    "syncable": true
+  },
+  {
+    "bundleID": "com.apple.finder",
+    "displayName": "Finder",
+    "layer": "user",
+    "syncable": true
+  },
+  {
+    "bundleID": "com.apple.screencapture",
+    "displayName": "Screen Capture",
+    "layer": "user",
+    "syncable": true
+  },
+  {
+    "bundleID": "NSGlobalDomain",
+    "displayName": "Global Defaults",
+    "layer": "user",
+    "syncable": true
+  },
+  {
+    "bundleID": "com.apple.symbolichotkeys",
+    "displayName": "Symbolic Hotkeys",
+    "layer": "user",
+    "syncable": true
+  },
+  {
+    "bundleID": "com.apple.universalaccess",
+    "displayName": "Accessibility",
+    "layer": "user",
+    "syncable": true
+  },
+  {
+    "bundleID": "com.apple.WindowManager",
+    "displayName": "Stage Manager / Window Manager",
+    "layer": "user",
+    "syncable": true
+  },
+  {
+    "bundleID": "com.apple.menuextra.battery",
+    "displayName": "Battery Menu Extra",
+    "layer": "user",
+    "syncable": true
+  },
+  {
+    "bundleID": "com.apple.menuextra.clock",
+    "displayName": "Clock Menu Extra",
+    "layer": "user",
+    "syncable": true
+  },
+  {
+    "bundleID": "com.apple.weather",
+    "displayName": "Weather",
+    "layer": "sandboxed",
+    "syncable": false
+  },
+  {
+    "bundleID": "com.apple.Safari",
+    "displayName": "Safari",
+    "layer": "sandboxed",
+    "syncable": false
+  },
+  {
+    "bundleID": "com.apple.Notes",
+    "displayName": "Notes",
+    "layer": "sandboxed",
+    "syncable": false
+  },
+  {
+    "bundleID": "com.apple.loginwindow",
+    "displayName": "Login Window",
+    "layer": "system",
+    "syncable": false
+  },
+  {
+    "bundleID": "com.apple.LaunchServices.secure",
+    "displayName": "LaunchServices Secure",
+    "layer": "apple-internal",
+    "syncable": false
+  },
+  {
+    "bundleID": "com.apple.LaunchServices.secure.codebless",
+    "displayName": "LaunchServices Codebless",
+    "layer": "apple-internal",
+    "syncable": false
+  }
+]

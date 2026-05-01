@@ -167,9 +167,15 @@ internal final class SyncCoordinator {
     if let env = ProcessInfo.processInfo.environment["HOST"], !env.isEmpty {
       return env
     }
-    var buffer = [CChar](repeating: 0, count: 256)
-    if gethostname(&buffer, buffer.count) == 0 {
-      let host = String(cString: buffer)
+    var buffer = [UInt8](repeating: 0, count: 256)
+    let ok = buffer.withUnsafeMutableBufferPointer { ptr -> Bool in
+      ptr.baseAddress!.withMemoryRebound(to: CChar.self, capacity: ptr.count) { cptr in
+        gethostname(cptr, ptr.count) == 0
+      }
+    }
+    if ok {
+      let nullIndex = buffer.firstIndex(of: 0) ?? buffer.count
+      let host = String(decoding: buffer[..<nullIndex], as: UTF8.self)
       if let dot = host.firstIndex(of: ".") {
         return String(host[..<dot])
       }

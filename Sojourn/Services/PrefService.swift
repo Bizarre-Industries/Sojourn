@@ -16,6 +16,20 @@ internal enum PrefError: Error, Sendable {
   case exportFailed(String)
   case importFailed(String)
   case conversionFailed(String)
+  case plistBuddyFailed(String)
+  case corpusUnavailable
+}
+
+/// One entry in the v0.2 ship-with-app preference-domain corpus.
+/// Mirrors `Sojourn/Resources/preference-domains.json`. Forked from
+/// 8ta4's preferences.sh per docs/reference/preferences.md.
+internal struct PreferenceDomainEntry: Sendable, Hashable, Codable, Identifiable {
+  internal let bundleID: String
+  internal let displayName: String
+  internal let layer: String        // "user" | "sandboxed" | "system" | "apple-internal"
+  internal let syncable: Bool
+
+  internal var id: String { bundleID }
 }
 
 internal actor PrefService {
@@ -101,5 +115,83 @@ internal actor PrefService {
       written.append(try await export(domain: d, to: target))
     }
     return written
+  }
+
+  // MARK: - v0.2 — sandboxed paths + FDA canary + PlistBuddy + corpus
+
+  /// Resolve the canonical Container-scoped plist URL for a sandboxed
+  /// app's bundle ID. Sojourn isn't sandboxed but reading these still
+  /// requires Full Disk Access — see `hasFullDiskAccess()`.
+  internal nonisolated func sandboxedPlistURL(for bundleID: String) -> URL {
+    let home = FileManager.default.homeDirectoryForCurrentUser
+    return home
+      .appendingPathComponent("Library/Containers/\(bundleID)/Data/Library/Preferences/\(bundleID).plist")
+  }
+
+  /// FDA canary probe. Reads `/Library/Preferences/com.apple.TimeMachine.plist` —
+  /// a system-owned plist whose contents are protected by the Full Disk
+  /// Access TCC service. Apple DevForums thread 114452 is the canonical
+  /// reference for this technique.
+  internal nonisolated func hasFullDiskAccess() -> Bool {
+    let canary = URL(fileURLWithPath: "/Library/Preferences/com.apple.TimeMachine.plist")
+    return (try? Data(contentsOf: canary)) != nil
+  }
+
+  /// PlistBuddy read for a nested keypath (`:Section:NestedKey`). Used
+  /// when `defaults read` can't reach into deeply-nested arrays/dicts.
+  internal func plistBuddyRead(plist: URL, keypath: String) async throws -> String {
+    let plistBuddy = URL(fileURLWithPath: "/usr/libexec/PlistBuddy")
+    do {
+      let result = try await runCommand(plistBuddy, ["-c", "Print \(keypath)", plist.path], nil)
+      if result.exitCode != 0 {
+        throw PrefError.plistBuddyFailed(result.stderrString)
+      }
+      return result.stdoutString.trimmingCharacters(in: .whitespacesAndNewlines)
+    } catch {
+      throw PrefError.plistBuddyFailed("\(plist.path) \(keypath): \(error)")
+    }
+  }
+
+  /// PlistBuddy write for a nested keypath. PlistBuddy auto-detects the
+  /// type of the existing node; for new nodes the caller specifies the
+  /// type (`string`, `bool`, `integer`, `array`, `dict`).
+  internal func plistBuddyWrite(
+    plist: URL,
+    keypath: String,
+    value: String,
+    type: String? = nil
+  ) async throws {
+    let plistBuddy = URL(fileURLWithPath: "/usr/libexec/PlistBuddy")
+    let cmd: String = {
+      if let type {
+        return "Add \(keypath) \(type) \(value)"
+      } else {
+        return "Set \(keypath) \(value)"
+      }
+    }()
+    do {
+      let result = try await runCommand(plistBuddy, ["-c", cmd, plist.path], nil)
+      if result.exitCode != 0 {
+        throw PrefError.plistBuddyFailed(result.stderrString)
+      }
+    } catch {
+      throw PrefError.plistBuddyFailed("\(plist.path) \(keypath): \(error)")
+    }
+  }
+
+  /// Load the v0.2 ship-with-app preference-domain corpus from
+  /// `Sojourn/Resources/preference-domains.json`. Pure file IO; no
+  /// subprocess. Falls back to an empty array if the resource is
+  /// missing (test bundle without resources, etc.).
+  internal nonisolated func loadDomainCorpus(
+    bundle: Bundle = .main
+  ) -> [PreferenceDomainEntry] {
+    guard let url = bundle.url(forResource: "preference-domains", withExtension: "json"),
+          let data = try? Data(contentsOf: url),
+          let decoded = try? JSONDecoder().decode([PreferenceDomainEntry].self, from: data)
+    else {
+      return []
+    }
+    return decoded
   }
 }

@@ -1,6 +1,6 @@
 # 0010 — Selectively native brew/cask/mas; keep mpm for the rest
 
-- **Status**: Proposed (lands in implementation-plan phase 10/13)
+- **Status**: Superseded by [0018](./0018-drop-mpm-for-brew-bundle.md)
 - **Date**: 2026-04-28
 - **Deciders**: Sojourn maintainer
 

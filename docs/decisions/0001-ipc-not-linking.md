@@ -69,3 +69,38 @@ Sojourn does **not**:
 - **Bundle mpm/chezmoi as helper binaries** — rejected per
   [0009-bundle-binary-policy.md](0009-bundle-binary-policy.md). They update
   more often than Sojourn; bundling complicates notarisation.
+
+---
+
+## Amended — 2026-05-01 (v0.2 pivot)
+
+The IPC-not-linking invariant **narrows in scope** with the v0.2 pivot
+([ADR-0018](./0018-drop-mpm-for-brew-bundle.md)). `mpm` is no longer a
+backend; `Sojourn/Services/MPMService.swift` and `Sojourn/Backends/`
+are deleted. The remaining external CLIs Sojourn invokes via subprocess
+are:
+
+- `chezmoi` (MIT) — dotfile templating + apply
+- `git` (GPL-2.0) — VCS operations (provided by Xcode CLT)
+- `brew` (BSD-2-Clause) — package manager + Brewfile bundle install
+- `gitleaks` (MIT) — pre-commit secret scanning (also bundled per ADR-0009)
+- `age` (MIT) — chezmoi passphrase/SSH backend (also bundled per ADR-0009)
+- `defaults`, `plutil`, `killall`, `xattr` (Apple) — system CLIs
+
+The license-firewall rationale **still applies but is no longer
+load-bearing for GPL-3-vs-GPL-2 compatibility**. With `mpm` removed,
+Sojourn's runtime composition is GPL-3-or-later (Sojourn) +
+MIT/BSD-2/Apple-system + a GPL-2.0 invocation (`git`). Subprocess
+arm's-length is now an architectural hygiene rule, not a copyleft
+escape valve. The original §"Why" still reads correctly for `git`,
+which remains GPL-2.0.
+
+**Re-licensing flexibility note**: With mpm gone, Sojourn could in
+principle adopt AGPL-3.0 or MPL-2.0 without the GPL-2-only block.
+That is a separate decision (governed by ADR-0004); this amendment
+just observes that the option re-opens.
+
+The architectural enforcement via `SubprocessRunner` and the CLAUDE.md
+ban on FFI/library-linking are unchanged.
+
+Diff source: `git log --follow docs/decisions/0001-ipc-not-linking.md`.

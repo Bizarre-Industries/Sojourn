@@ -58,6 +58,8 @@ notarize-*.json
 .claude/*
 !.claude/settings.json
 !.claude/hooks/
+!.claude/agents/
+!.claude/council-logs/
 .claude/.last-shipped-tag
 .claude/settings.local.json
 .claude-cache/

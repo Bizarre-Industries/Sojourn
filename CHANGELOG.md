@@ -6,9 +6,41 @@ All notable changes to Sojourn. Follows
 
 ## [Unreleased]
 
-### Planned (post-v0.2.3)
+### Planned (post-v0.2.4)
 
 (See `docs/process/plans/v0.3-plan.md`.)
+
+## [0.2.4] — 2026-05-01
+
+### Fixed
+
+- v0.2.0 → v0.2.3 notarize runs all failed at the publish step because
+  the Homebrew tap repo `Bizarre-Industries/homebrew-sojourn` did not
+  exist on GitHub. `brew bump-cask-pr` was downloading a stale
+  `v1.0.0/Sojourn.dmg` URL (404) from a phantom tap state. Created the
+  tap, seeded `Casks/sojourn.rb` at v0.2.3 with the real DMG sha256, and
+  removed the redundant `verified:` parameter (URL domain matched
+  homepage domain — `brew audit` was rejecting it).
+
+### Changed
+
+- `notarize.yml` "Publish Homebrew cask update" step is now a hybrid:
+  `brew bump-cask-pr --no-fork` opens the PR (kept for AST-aware Ruby
+  edits + online sha verification of the published release asset),
+  immediately followed by `gh pr merge --squash --delete-branch` to
+  collapse it into one commit on tap main. End state: no lingering PR,
+  one commit per release. Council deliberation:
+  `.claude/council-logs/2026-05-01-notarize-publish-direct-push.md`.
+- Tag-format guard added before any string interpolation: refuses
+  anything that doesn't match `^v[0-9]+\.[0-9]+\.[0-9]+$`. Defense in
+  depth.
+
+### Internal
+
+- In-repo `Casks/sojourn.rb` template synced to v0.2.3 + real sha256.
+  This file is style-checked by `brew style ./Casks/sojourn.rb` in CI
+  but is not the runtime cask — the runtime lives in
+  `Bizarre-Industries/homebrew-sojourn`.
 
 ## [0.2.3] — 2026-05-01
 

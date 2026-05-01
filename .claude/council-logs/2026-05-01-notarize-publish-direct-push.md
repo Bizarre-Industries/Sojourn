@@ -82,3 +82,90 @@ Rationale:
 - `docs/decisions/0020-sparkle-plus-cask-hybrid-update.md` — tap-as-runtime-source design
 - `CLAUDE.md` — council trigger rules + "smallest diff" + "shell out to mature tools" guidance
 - `lessons.md` — pending append
+
+---
+
+## RE-VOTE — same day, after CI evidence
+
+**Trigger for re-vote:** v0.2.5 CI run 25224297831 ran the hybrid this
+council approved. bump-cask-pr did the cask edit, commit, and branch
+push successfully — but its PR-creation API call exited with `Your
+HOMEBREW_GITHUB_API_TOKEN credentials do not have sufficient scope!
+Scopes required: repo. Scopes present: none.` Local probe of `gh pr
+create` with the same PAT confirmed: `GraphQL: Resource not accessible
+by personal access token (createPullRequest)`.
+
+Root cause: HOMEBREW_TAP_TOKEN is a fine-grained PAT with `Contents:
+Read and write` (branch push works) but lacks `Pull requests: Read and
+write`. bump-cask-pr's legacy classic-PAT scope check sees fine-grained
+PATs as "no scopes".
+
+User decision: rather than ask the user to add Pull requests: write to
+the PAT (would unblock the hybrid), switch to direct-push.
+
+**Re-vote tally:**
+
+| Member         | Original                | Re-vote                  |
+|----------------|-------------------------|--------------------------|
+| architect      | APPROVE-WITH-CONDITIONS | APPROVE-WITH-CONDITIONS  |
+| security       | REJECT                  | APPROVE-WITH-CONDITIONS  |
+| devil-advocate | REJECT                  | APPROVE-WITH-CONDITIONS  |
+| ux-critic      | APPROVE-WITH-CONDITIONS | APPROVE                  |
+| perf-skeptic   | APPROVE                 | APPROVE-WITH-CONDITIONS  |
+
+5/5 approve direct-push given the new evidence + safeguards.
+
+## Re-vote rationale highlights
+
+**Security flipped REJECT → APPROVE-WITH-CONDITIONS:**
+- Token scrub via `git remote set-url origin <no-token>` post-clone +
+  ephemeral `-c http.extraheader` on the push closes the `.git/config`
+  leak.
+- `brew audit --cask --online` after the edit restores the upload-corruption
+  detection.
+- Tag-format guard closes the shell-injection vector.
+- Conditions: `::add-mask::` on the token, post-edit assertions (positive
+  AND negative grep), TODO comment for self-hosted runner migration.
+
+**Devil-advocate flipped REJECT → APPROVE-WITH-CONDITIONS:**
+- Maintained the engineering preference for option (a) — adding Pull
+  requests: write to the PAT — but conceded the user has firmly chosen
+  (b).
+- Required: local `brew style` + `brew audit --strict --online` before
+  push, fail-closed; sha computed from notarized DMG only (not re-fetched);
+  no force-push; livecheck-stanza check.
+
+**Architect APPROVE-WITH-CONDITIONS unchanged:**
+- Don't swallow `brew tap-new` failures with `|| true`.
+- `mkdir -p Casks/` before the `cp` to handle tap-layout drift.
+- Verify push landed via `git ls-remote origin main`.
+
+**UX-critic upgraded APPROVE-WITH-CONDITIONS → APPROVE:**
+- Commit-message format already meets the previous conditions
+  (release-url, workflow-run, sha256). No new concerns from removing the
+  PR.
+
+**Perf-skeptic APPROVE-WITH-CONDITIONS:**
+- `brew audit --cask` adds 30-60s, total ~45-75s (still ~5x faster than
+  bump-cask-pr's 5-8 min).
+- Conditions: `timeout 180` on `brew audit`, `timeout 30` on `git push`.
+
+## Implemented safeguards (mapped to conditions)
+
+In the rewritten `Publish Homebrew cask update` step:
+
+| Council condition                                               | Implementation                                                                       |
+|------------------------------------------------------------------|---------------------------------------------------------------------------------------|
+| Tag-format guard before any interpolation                        | `[[ "${version}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]` line ~25                            |
+| `::add-mask::` on token                                          | `echo "::add-mask::${TAP_TOKEN}"` line ~22                                            |
+| Token scrub post-clone                                           | `git remote set-url origin https://github.com/...` (no token)                         |
+| Ephemeral push token (argv only)                                 | `git -c "http.https://github.com/.extraheader=AUTHORIZATION: bearer ${TAP_TOKEN}" push` |
+| Post-edit positive grep (version + sha)                          | Two `grep -q` blocks with `exit 1` on miss                                            |
+| Post-edit negative grep (old version + sha absent)               | Two more `grep -q` blocks comparing `${old_version}` / `${old_sha}`                   |
+| Online audit on bumped cask                                      | `brew tap … && cp … && brew audit --cask --online sojourn`                            |
+| Audit timeout                                                    | `timeout 180 brew audit`                                                              |
+| Push timeout                                                     | `timeout 30 git push`                                                                 |
+| Push-landed verification                                         | `git ls-remote origin refs/heads/main` compared against local HEAD                    |
+| Self-hosted runner caveat                                        | TODO comment at top of step                                                           |
+| Lessons.md entry                                                 | Appended above the original entry                                                     |
+| Follow-up: revisit at v0.3 PAT rotation                          | GitHub issue (next action)                                                            |

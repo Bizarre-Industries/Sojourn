@@ -6,9 +6,34 @@ All notable changes to Sojourn. Follows
 
 ## [Unreleased]
 
-### Planned (post-v0.2.5)
+### Planned (post-v0.2.6)
 
 (See `docs/process/plans/v0.3-plan.md`.)
+
+## [0.2.6] — 2026-05-01
+
+### Changed
+
+- `notarize.yml` "Publish Homebrew cask update" step rewritten as
+  direct-push to tap main. The hybrid (`brew bump-cask-pr --no-fork`
+  + `gh pr merge --squash --delete-branch`) approved by council in
+  v0.2.4 was blocked at the PR-creation step in v0.2.5 CI: the
+  `HOMEBREW_TAP_TOKEN` PAT is fine-grained with `Contents: Read and
+  write` but lacks `Pull requests: Read and write`. Both bump-cask-pr's
+  PR API call and `gh pr create` returned `Resource not accessible by
+  personal access token`. Council re-voted 5/5 APPROVE-WITH-CONDITIONS
+  on direct-push (security flipped from REJECT, devil-advocate flipped
+  from REJECT) given the new evidence. Implementation includes all
+  consolidated safeguards: tag-format guard, token scrub via
+  `git remote set-url`, ephemeral push-only token via
+  `-c http.extraheader=…`, `::add-mask::` on the PAT, post-edit
+  positive + negative grep verification of `version` and `sha256`
+  lines, online audit via `brew audit --cask --online` on the bumped
+  cask, `timeout 180`/`timeout 30` wrappers, `git ls-remote` push-landed
+  check. Council deliberation log:
+  `.claude/council-logs/2026-05-01-notarize-publish-direct-push.md`.
+  Follow-up issue: #5 (revisit at v0.3 PAT rotation; adding
+  `Pull requests: write` to the PAT would unblock the hybrid).
 
 ## [0.2.5] — 2026-05-01
 

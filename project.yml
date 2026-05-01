@@ -66,8 +66,8 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: app.bizarre.sojourn
         INFOPLIST_FILE: Sojourn/Info.plist
         CODE_SIGN_ENTITLEMENTS: Sojourn/Sojourn.entitlements
-        MARKETING_VERSION: 0.2.5
-        CURRENT_PROJECT_VERSION: 25
+        MARKETING_VERSION: 0.2.6
+        CURRENT_PROJECT_VERSION: 26
         GENERATE_INFOPLIST_FILE: NO
         SWIFT_EMIT_LOC_STRINGS: YES
         ENABLE_USER_SCRIPT_SANDBOXING: NO  # scripts/sign.sh needs codesign access

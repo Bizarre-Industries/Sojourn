@@ -77,7 +77,6 @@
 		96569C952E7FBF0DA8BF89A5 /* PrefService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CF3E7F8591B56E1E9859A73 /* PrefService.swift */; };
 		96F5B9D644CDA14A4F97D25B /* SubprocessRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22DFD3E375E49A6409AE3812 /* SubprocessRunner.swift */; };
 		A1000D74EE7DBDEDD6CB5F79 /* ArchitectureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C2E6D67A2EE7A536B7FED0A /* ArchitectureView.swift */; };
-		A2D1AF316804BBA294A15872 /* Panes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61D831860D1BF9AB00856D95 /* Panes.swift */; };
 		A4531FC6FA003E4476493DCE /* PluginManifest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59C098E4B45983691540665E /* PluginManifest.swift */; };
 		A73BAE6B0DA18AE332A12AF6 /* SyncMergeTargetTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2F3D8B1FA0E7E41B914FD76 /* SyncMergeTargetTests.swift */; };
 		A7B98E701D5EBDB9570D49F7 /* DiagnosticBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4852A96E28C5AE7EFD35C49 /* DiagnosticBundle.swift */; };
@@ -111,6 +110,19 @@
 		F92E6B88164044C942516052 /* PURL.swift in Sources */ = {isa = PBXBuildFile; fileRef = D95EF49879108ECD1297E756 /* PURL.swift */; };
 		FC1D01347E391EEB39B26838 /* VersionFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90C0FA8590D68C1D74288A32 /* VersionFile.swift */; };
 		FEC5097A5FFAE8DAAA7D7B3A /* Subprocess in Frameworks */ = {isa = PBXBuildFile; productRef = 39BF93AAF2A4FCFC7EBAD55E /* Subprocess */; };
+		XE61B4A1FBFD253D28872B8C2B11FB6A /* OverviewPane.swift in Sources */ = {isa = PBXBuildFile; fileRef = XD61612117E385C0E8111EDBA33587B1 /* OverviewPane.swift */; };
+		XABD1927F7DA15708955DDC74F10820B /* ConflictsPane.swift in Sources */ = {isa = PBXBuildFile; fileRef = X4BAD68F8202E518DAF8A2DF41EE8766 /* ConflictsPane.swift */; };
+		XC8FD02DD18BD5E3F8C3EDA97E97D6AE /* OnboardPane.swift in Sources */ = {isa = PBXBuildFile; fileRef = XCB186F90DA315CADA3400B5B13AA39E /* OnboardPane.swift */; };
+		XC78DCBFF479A55848B76507692CACA7 /* SecretsPane.swift in Sources */ = {isa = PBXBuildFile; fileRef = X45D759598EBC5777BFB670299E29D9D /* SecretsPane.swift */; };
+		X353D7603195153E8AD5ABBF4DAA8BEF /* DiagnosticsPane.swift in Sources */ = {isa = PBXBuildFile; fileRef = X8511B3A8D41F5FEF9D848FF75586A51 /* DiagnosticsPane.swift */; };
+		X468D705AF66352F6B39B9F26F63DAAE /* SettingsPaneEmbedded.swift in Sources */ = {isa = PBXBuildFile; fileRef = XD1E5C440B42E5A23AB0CDE7F73228DA /* SettingsPaneEmbedded.swift */; };
+		XB478068D91905BC98DE51803DE5206D /* PaneHero.swift in Sources */ = {isa = PBXBuildFile; fileRef = X4EEB3CEA7961577B9C5612ED4FD46D0 /* PaneHero.swift */; };
+		XDB0FC3C2B2D5510090B67AD1E0A1D68 /* PackagesPane.swift in Sources */ = {isa = PBXBuildFile; fileRef = X97896ABDDA125130A0D8A521F43C4C5 /* PackagesPane.swift */; };
+		XAEAF3B6581505DB0A5A846C4E92D746 /* DotfilesPane.swift in Sources */ = {isa = PBXBuildFile; fileRef = XE48788E58D105DEBADCCD36F965FF8F /* DotfilesPane.swift */; };
+		X3AA7B163D985592AADFB82F205B1D0B /* PreferencesPane.swift in Sources */ = {isa = PBXBuildFile; fileRef = X6C2E5C06DADB5B8F86C7B1AD1EF6ED5 /* PreferencesPane.swift */; };
+		X5854055B98865632BEB4C72249B82BF /* HistoryPane.swift in Sources */ = {isa = PBXBuildFile; fileRef = X91183D9F957455EF8C4C47A009C1E10 /* HistoryPane.swift */; };
+		X3F563F4C863B54CF9A7E83B744BB59B /* MachinesPane.swift in Sources */ = {isa = PBXBuildFile; fileRef = X18C3D2BF7A2F54FBA16996BA9C7D745 /* MachinesPane.swift */; };
+		XFE5C5816523B58D58D285A02F902234 /* CleanupPane.swift in Sources */ = {isa = PBXBuildFile; fileRef = X64E5E6805890548F8DB4A38C5FD4AFB /* CleanupPane.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -172,7 +184,6 @@
 		55D844D1916BAD352E960418 /* ANSIParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANSIParserTests.swift; sourceTree = "<group>"; };
 		59C098E4B45983691540665E /* PluginManifest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginManifest.swift; sourceTree = "<group>"; };
 		5F02754CC930D40A6E8EC831 /* Radii.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Radii.swift; sourceTree = "<group>"; };
-		61D831860D1BF9AB00856D95 /* Panes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Panes.swift; sourceTree = "<group>"; };
 		6351478579F8219B376DB5F7 /* KeychainBrokerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainBrokerTests.swift; sourceTree = "<group>"; };
 		6534B3DB0424AE8E3E280F03 /* Font+Sojourn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Font+Sojourn.swift"; sourceTree = "<group>"; };
 		6759066E988970C0FDB44D7E /* SettingsScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsScene.swift; sourceTree = "<group>"; };
@@ -241,6 +252,19 @@
 		F4207776C9EC0D4B31D82E91 /* JobRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobRunner.swift; sourceTree = "<group>"; };
 		F6B2E4CDB667C8A900D0EC01 /* Fixtures */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Fixtures; path = SojournTests/Fixtures; sourceTree = SOURCE_ROOT; };
 		FF63E8F9CAA2A0B02F398EB9 /* Spacing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Spacing.swift; sourceTree = "<group>"; };
+		XD61612117E385C0E8111EDBA33587B1 /* OverviewPane.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sojourn/UI/Panes/OverviewPane.swift"; sourceTree = SOURCE_ROOT; };
+		X4BAD68F8202E518DAF8A2DF41EE8766 /* ConflictsPane.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sojourn/UI/Panes/ConflictsPane.swift"; sourceTree = SOURCE_ROOT; };
+		XCB186F90DA315CADA3400B5B13AA39E /* OnboardPane.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sojourn/UI/Panes/OnboardPane.swift"; sourceTree = SOURCE_ROOT; };
+		X45D759598EBC5777BFB670299E29D9D /* SecretsPane.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sojourn/UI/Panes/SecretsPane.swift"; sourceTree = SOURCE_ROOT; };
+		X8511B3A8D41F5FEF9D848FF75586A51 /* DiagnosticsPane.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sojourn/UI/Panes/DiagnosticsPane.swift"; sourceTree = SOURCE_ROOT; };
+		XD1E5C440B42E5A23AB0CDE7F73228DA /* SettingsPaneEmbedded.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sojourn/UI/Panes/SettingsPaneEmbedded.swift"; sourceTree = SOURCE_ROOT; };
+		X4EEB3CEA7961577B9C5612ED4FD46D0 /* PaneHero.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sojourn/UI/Panes/PaneHero.swift"; sourceTree = SOURCE_ROOT; };
+		X97896ABDDA125130A0D8A521F43C4C5 /* PackagesPane.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sojourn/UI/Panes/PackagesPane.swift"; sourceTree = SOURCE_ROOT; };
+		XE48788E58D105DEBADCCD36F965FF8F /* DotfilesPane.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sojourn/UI/Panes/DotfilesPane.swift"; sourceTree = SOURCE_ROOT; };
+		X6C2E5C06DADB5B8F86C7B1AD1EF6ED5 /* PreferencesPane.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sojourn/UI/Panes/PreferencesPane.swift"; sourceTree = SOURCE_ROOT; };
+		X91183D9F957455EF8C4C47A009C1E10 /* HistoryPane.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sojourn/UI/Panes/HistoryPane.swift"; sourceTree = SOURCE_ROOT; };
+		X18C3D2BF7A2F54FBA16996BA9C7D745 /* MachinesPane.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sojourn/UI/Panes/MachinesPane.swift"; sourceTree = SOURCE_ROOT; };
+		X64E5E6805890548F8DB4A38C5FD4AFB /* CleanupPane.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sojourn/UI/Panes/CleanupPane.swift"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -327,7 +351,6 @@
 				3E2C81F1F7CEDB139F93278C /* Components.swift */,
 				82A52B4280B84BAE4A95BCBF /* MainWindowView.swift */,
 				B0A7A91337334537033977DB /* Modals.swift */,
-				61D831860D1BF9AB00856D95 /* Panes.swift */,
 				6759066E988970C0FDB44D7E /* SettingsScene.swift */,
 				670DC90A355D13E29835E079 /* Components */,
 				F8282113DB6E84A8E9CAA88C /* Help */,
@@ -826,7 +849,6 @@
 				C63650F6F57BDB8D36CDC7E9 /* OrphanCandidate.swift in Sources */,
 				F92E6B88164044C942516052 /* PURL.swift in Sources */,
 				61C0A1EA57C0EE77DF3C9815 /* PackageBackend.swift in Sources */,
-				A2D1AF316804BBA294A15872 /* Panes.swift in Sources */,
 				E734A65E958172564C4D9E9A /* PluginHost.swift in Sources */,
 				A4531FC6FA003E4476493DCE /* PluginManifest.swift in Sources */,
 				C2734100D8B08801334238F4 /* PluginProtocol.swift in Sources */,
@@ -859,6 +881,19 @@
 				7DC5BAB597CF4ECE62CDE01C /* ToolProbe.swift in Sources */,
 				AC18825BFD4E02CF41B6C03C /* V02Stubs.swift in Sources */,
 				FC1D01347E391EEB39B26838 /* VersionFile.swift in Sources */,
+				XE61B4A1FBFD253D28872B8C2B11FB6A /* OverviewPane.swift in Sources */,
+				XABD1927F7DA15708955DDC74F10820B /* ConflictsPane.swift in Sources */,
+				XC8FD02DD18BD5E3F8C3EDA97E97D6AE /* OnboardPane.swift in Sources */,
+				XC78DCBFF479A55848B76507692CACA7 /* SecretsPane.swift in Sources */,
+				X353D7603195153E8AD5ABBF4DAA8BEF /* DiagnosticsPane.swift in Sources */,
+				X468D705AF66352F6B39B9F26F63DAAE /* SettingsPaneEmbedded.swift in Sources */,
+				XB478068D91905BC98DE51803DE5206D /* PaneHero.swift in Sources */,
+				XDB0FC3C2B2D5510090B67AD1E0A1D68 /* PackagesPane.swift in Sources */,
+				XAEAF3B6581505DB0A5A846C4E92D746 /* DotfilesPane.swift in Sources */,
+				X3AA7B163D985592AADFB82F205B1D0B /* PreferencesPane.swift in Sources */,
+				X5854055B98865632BEB4C72249B82BF /* HistoryPane.swift in Sources */,
+				X3F563F4C863B54CF9A7E83B744BB59B /* MachinesPane.swift in Sources */,
+				XFE5C5816523B58D58D285A02F902234 /* CleanupPane.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -11,6 +11,7 @@ internal enum SidebarSection: String, CaseIterable, Identifiable {
   case sync = "Sync"
   case hygiene = "Hygiene"
   case app = "App"
+  case power = "Power"
   internal var id: String { rawValue }
 }
 
@@ -58,6 +59,17 @@ internal enum SojournSidebarMenu {
 
     .init(id: "diagnostics", label: "Diagnostics", icon: "waveform.path.ecg",          section: .app),
     .init(id: "settings",    label: "Settings",    icon: "gear",                       section: .app),
+
+    .init(id: "jobs",                label: "Jobs",          icon: "terminal",                  section: .power),
+    .init(id: "schedule",            label: "Schedule",      icon: "clock",                     section: .power),
+    .init(id: "age",                 label: "age Keys",      icon: "key.fill",                  section: .power),
+    .init(id: "chezmoi-templates",   label: "Templates",     icon: "doc.text.below.ecg",        section: .power),
+    .init(id: "gitleaks-rules",      label: "Rules",         icon: "shield.lefthalf.filled",    section: .power),
+    .init(id: "authorization",       label: "Authorization", icon: "checkmark.seal",            section: .power),
+    .init(id: "manager-detail",      label: "Manager",       icon: "shippingbox.and.arrow.backward", section: .power),
+    .init(id: "backups",             label: "Backups",       icon: "archivebox",                section: .power),
+    .init(id: "defaults-discover",   label: "Discover",      icon: "magnifyingglass",           section: .power),
+    .init(id: "repo-setup",          label: "Repo",          icon: "arrow.triangle.branch",     section: .power),
   ]
 }
 

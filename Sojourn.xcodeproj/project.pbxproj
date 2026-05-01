@@ -89,6 +89,7 @@
 		B1E47258664B961849BF56AE /* TierClassifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4FDE1104A51EA62C619BA04 /* TierClassifier.swift */; };
 		B462C421F269F246B38E3987 /* MPMPackageBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FF950ED9586886A724D5672 /* MPMPackageBackend.swift */; };
 		B475679D0AD785BB136FC9D2 /* BackupsDirectory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E16DA51B87576598BAB7134 /* BackupsDirectory.swift */; };
+		B5B77E5BF67EB533A05BB8E1 /* PowerSurfaces.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4EE7ECBC1A37D8F0DFF9DCD /* PowerSurfaces.swift */; };
 		BFB171F5BB6318C71D640141 /* AutoUpdateTier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B90A0FD134A7FCFD56850E8F /* AutoUpdateTier.swift */; };
 		C2734100D8B08801334238F4 /* PluginProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9385C5DAFA98202A3D42B739 /* PluginProtocol.swift */; };
 		C44DB6B79B4C736DEC87106E /* MachineMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDF057685B19AB3503933B08 /* MachineMetadata.swift */; };
@@ -132,7 +133,7 @@
 		07993C2265D99A08965BAA61 /* SecretScanService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecretScanService.swift; sourceTree = "<group>"; };
 		0BADEBA10CB6637299E6E07E /* CooldownPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CooldownPolicy.swift; sourceTree = "<group>"; };
 		0E16DA51B87576598BAB7134 /* BackupsDirectory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupsDirectory.swift; sourceTree = "<group>"; };
-		101837DD34BDE8DB72BE4924 /* .gitkeep */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitkeep; sourceTree = "<group>"; };
+		101837DD34BDE8DB72BE4924 /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
 		14A5F035C01184E1BF26CB2F /* BootstrapService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BootstrapService.swift; sourceTree = "<group>"; };
 		197100C16F14E6EF4B75D6E3 /* SyncCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncCoordinator.swift; sourceTree = "<group>"; };
 		1BDD342FB453E37289043AB0 /* ANSIParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANSIParser.swift; sourceTree = "<group>"; };
@@ -141,7 +142,7 @@
 		22514EEE2D61221B194F8C5F /* HistoryDBTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryDBTests.swift; sourceTree = "<group>"; };
 		22DFD3E375E49A6409AE3812 /* SubprocessRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubprocessRunner.swift; sourceTree = "<group>"; };
 		26AC85D34AC1D8A31E0EC1C3 /* RedactorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RedactorTests.swift; sourceTree = "<group>"; };
-		27657F22347EC0CCD4B14D5C /* .gitkeep */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitkeep; sourceTree = "<group>"; };
+		27657F22347EC0CCD4B14D5C /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
 		277FC75194E246A84AB1A2A9 /* HistoryDB.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryDB.swift; sourceTree = "<group>"; };
 		2A07B987FC38D4FE488E8704 /* ToolProbe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolProbe.swift; sourceTree = "<group>"; };
 		2A4824F5864A9EC3B55E6600 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -202,23 +203,24 @@
 		B0A7A91337334537033977DB /* Modals.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Modals.swift; sourceTree = "<group>"; };
 		B10DD40CBD9A7ADFED1E94D4 /* SojournUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SojournUITests.swift; sourceTree = "<group>"; };
 		B138DB8D40A2A098C28ED4CB /* LogExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogExporter.swift; sourceTree = "<group>"; };
-		B155502B536A71BBC60866A8 /* .gitkeep */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitkeep; sourceTree = "<group>"; };
+		B155502B536A71BBC60866A8 /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
 		B17DA112F156FC13EBFD8B18 /* Snapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Snapshot.swift; sourceTree = "<group>"; };
 		B2F3D8B1FA0E7E41B914FD76 /* SyncMergeTargetTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncMergeTargetTests.swift; sourceTree = "<group>"; };
+		B4EE7ECBC1A37D8F0DFF9DCD /* PowerSurfaces.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerSurfaces.swift; sourceTree = "<group>"; };
 		B5540A13628D2CEAF0961029 /* BackgroundActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundActivity.swift; sourceTree = "<group>"; };
 		B8E05CAA843B5A8B62671E5E /* MPMServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MPMServiceTests.swift; sourceTree = "<group>"; };
 		B90A0FD134A7FCFD56850E8F /* AutoUpdateTier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoUpdateTier.swift; sourceTree = "<group>"; };
 		BAA9080155649D715C75F072 /* PluginHost.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginHost.swift; sourceTree = "<group>"; };
 		BB1FBD91A2515C0261DD4EFF /* AdvisoryReference.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvisoryReference.swift; sourceTree = "<group>"; };
 		BC0CD2FDD4876C335C51A7F6 /* SojournUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SojournUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		BE87553CA8CCFF236BAD7935 /* .gitkeep */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitkeep; sourceTree = "<group>"; };
+		BE87553CA8CCFF236BAD7935 /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
 		C0814F9583EAFEE9FAF041AE /* Job.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Job.swift; sourceTree = "<group>"; };
 		C198F65D627EB6805DC3C20A /* CleanupService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CleanupService.swift; sourceTree = "<group>"; };
 		C40858EDF69CF14EA473AF3F /* Sojourn.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sojourn.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C454DA661BE5AA7E7BB4A276 /* SettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsStore.swift; sourceTree = "<group>"; };
 		C51F95DC3AF05E699D7B7E96 /* BrewService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrewService.swift; sourceTree = "<group>"; };
 		C5BE1F259CD0D1BD30DA7DE1 /* Atoms.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Atoms.swift; sourceTree = "<group>"; };
-		C715FB2104E0602E477DC8AF /* .gitkeep */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitkeep; sourceTree = "<group>"; };
+		C715FB2104E0602E477DC8AF /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
 		CA1C48BDB71227E5F1B7662A /* AppStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStore.swift; sourceTree = "<group>"; };
 		CC7AC9EC2C343DE83DB1830A /* SojournApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SojournApp.swift; sourceTree = "<group>"; };
 		CEB61D584E0EE55BABD08713 /* DotfileBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DotfileBackend.swift; sourceTree = "<group>"; };
@@ -526,6 +528,14 @@
 			path = Backends;
 			sourceTree = "<group>";
 		};
+		CF76E690AD8AD900E4A6E886 /* Power */ = {
+			isa = PBXGroup;
+			children = (
+				B4EE7ECBC1A37D8F0DFF9DCD /* PowerSurfaces.swift */,
+			);
+			path = Power;
+			sourceTree = "<group>";
+		};
 		E34DB116FC2DC6D41E6A6108 /* SojournTests */ = {
 			isa = PBXGroup;
 			children = (
@@ -591,6 +601,7 @@
 			isa = PBXGroup;
 			children = (
 				B155502B536A71BBC60866A8 /* .gitkeep */,
+				CF76E690AD8AD900E4A6E886 /* Power */,
 			);
 			path = Panes;
 			sourceTree = "<group>";
@@ -664,7 +675,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 2630;
+				LastUpgradeCheck = 1600;
 				TargetAttributes = {
 					336FFBA988AC531D54137038 = {
 						DevelopmentTeam = "";
@@ -804,6 +815,7 @@
 				E734A65E958172564C4D9E9A /* PluginHost.swift in Sources */,
 				A4531FC6FA003E4476493DCE /* PluginManifest.swift in Sources */,
 				C2734100D8B08801334238F4 /* PluginProtocol.swift in Sources */,
+				B5B77E5BF67EB533A05BB8E1 /* PowerSurfaces.swift in Sources */,
 				E7DD15ED79FF05217EF1025C /* PrefBackend.swift in Sources */,
 				96569C952E7FBF0DA8BF89A5 /* PrefService.swift in Sources */,
 				7BD820423453D94C76D6AC14 /* PreferenceDomain.swift in Sources */,
@@ -887,7 +899,6 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COMBINE_HIDPI_IMAGES = YES;
-				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -906,7 +917,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -938,7 +949,6 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -964,7 +974,6 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_STRICT_CONCURRENCY = complete;
@@ -980,8 +989,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Sojourn/Sojourn.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
-				DEAD_CODE_STRIPPING = YES;
+				CURRENT_PROJECT_VERSION = 100;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Sojourn/Info.plist;
@@ -990,7 +998,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 0.1.0;
+				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = app.bizarre.sojourn;
 				PRODUCT_NAME = Sojourn;
 				SDKROOT = macosx;
@@ -1004,7 +1012,6 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COMBINE_HIDPI_IMAGES = YES;
-				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1024,8 +1031,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Sojourn/Sojourn.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
-				DEAD_CODE_STRIPPING = YES;
+				CURRENT_PROJECT_VERSION = 100;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Sojourn/Info.plist;
@@ -1034,7 +1040,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 0.1.0;
+				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = app.bizarre.sojourn;
 				PRODUCT_NAME = Sojourn;
 				SDKROOT = macosx;
@@ -1048,7 +1054,6 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COMBINE_HIDPI_IMAGES = YES;
-				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1067,7 +1072,6 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COMBINE_HIDPI_IMAGES = YES;
-				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1086,7 +1090,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -1118,7 +1122,6 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1137,7 +1140,6 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_STRICT_CONCURRENCY = complete;

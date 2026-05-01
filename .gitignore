@@ -89,6 +89,9 @@ Sojourn/Resources/bin/gitleaks
 Sojourn/Resources/bin/age
 Sojourn/Resources/bin/cosign
 
+# Design handoff (tarball tracked, extracted dir is build artifact)
+docs/design/handoff/extracted/
+
 # Docs how-to subdir; not the same as Swift packages
 !docs/how-to/packages/
 !docs/how-to/packages/*

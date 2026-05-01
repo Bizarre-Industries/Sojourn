@@ -21,6 +21,12 @@ All notable changes to Sojourn. Follows
   tap, seeded `Casks/sojourn.rb` at v0.2.3 with the real DMG sha256, and
   removed the redundant `verified:` parameter (URL domain matched
   homepage domain — `brew audit` was rejecting it).
+- `Sojourn/Info.plist` had `CFBundleShortVersionString` and
+  `CFBundleVersion` hardcoded at `0.1.0` / `1` since the initial scaffold.
+  Releases v0.2.0 → v0.2.3 all shipped binaries that reported themselves
+  as v0.1.0 — Sparkle would never have detected an update. Replaced with
+  `$(MARKETING_VERSION)` / `$(CURRENT_PROJECT_VERSION)` Xcode build-setting
+  substitution; values now flow from `project.yml`.
 
 ### Changed
 

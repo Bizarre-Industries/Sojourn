@@ -144,25 +144,14 @@ struct PackagesPane: View {
     let mgr = managerSummaries.first { $0.id == selectedManager } ?? managerSummaries[0]
     return ScrollView {
       VStack(alignment: .leading, spacing: 18) {
-        EyebrowLabel(text: "\(mgr.name.uppercased()) · /OPT/HOMEBREW/BIN/\(mgr.id.uppercased()) · 4.4.7")
+        EyebrowLabel(text: "PACKAGES · \(mgr.name.uppercased()) · TIER \(mgr.tier)")
         Text("\(mgr.name.uppercased()) · \(mgr.pkgs) PACKAGES")
           .font(.bzrStencil(size: 30, weight: .heavy))
           .foregroundStyle(Color.txtPrimary)
-        Text("\(mgr.outdated) outdated, 5 past cooldown, 7 still aging. Tier \(mgr.tier) — \(tierWindow(mgr.tier)) default. Advisory bypass active for OSV/GHSA findings.")
+        Text("Tier \(mgr.tier) — \(tierWindow(mgr.tier)) cooldown. \(mgr.sub).")
           .font(.bzrBody(size: 13))
           .foregroundStyle(Color.txtSecondary)
-          .frame(maxWidth: 64 * 9, alignment: .leading)
-
-        // Tier badges row
-        HStack(spacing: 8) {
-          BzrBadge(text: "TIER \(mgr.tier) · \(tierWindow(mgr.tier).uppercased()) AUTO", kind: mgr.tierKind)
-          BzrBadge(text: "JSON API · 7d cache", kind: .mute)
-          BzrBadge(text: "5 ELIGIBLE NOW", kind: .mute)
-          Spacer()
-          Text("LAST OUTDATED CHECK · 2H AGO")
-            .font(.bzrMono(size: 10))
-            .foregroundStyle(Color.txtTertiary)
-        }
+          .fixedSize(horizontal: false, vertical: true)
 
         Text("Outdated · cross-manager view")
           .font(.bzrDetailH2)
@@ -207,25 +196,7 @@ struct PackagesPane: View {
   private var outdatedRows: [OutdatedRow] { [] }
 
   private var outdatedTable: some View {
-    VStack(spacing: 0) {
-      // Header
-      HStack(spacing: 0) {
-        tableHeader("Package", width: 130)
-        tableHeader("Installed", width: 80)
-        tableHeader("", width: 24)
-        tableHeader("Latest", width: 80)
-        tableHeader("Mgr", width: 60)
-        tableHeader("Tier", width: 60)
-        tableHeader("Cooldown", width: 130)
-        tableHeader("", width: 80)
-      }
-      .frame(maxWidth: .infinity, alignment: .leading)
-      .background(Color.white.opacity(0.02))
-      .overlay(
-        Rectangle().fill(Color.hairline).frame(height: 0.5),
-        alignment: .bottom
-      )
-
+    Group {
       if outdatedRows.isEmpty {
         VStack(alignment: .leading, spacing: 6) {
           Text("No outdated check yet")
@@ -234,38 +205,66 @@ struct PackagesPane: View {
           Text("`brew outdated --json` parsing lands in v0.3. Until then this pane shows the package counts from `brew bundle dump` (left rail) but cannot diff installed vs latest.")
             .font(.bzrMono(size: 11))
             .foregroundStyle(Color.txtTertiary)
-            .frame(maxWidth: 560, alignment: .leading)
+            .fixedSize(horizontal: false, vertical: true)
         }
         .padding(20)
         .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.adaptiveDeepen(0.20))
+        .clipShape(RoundedRectangle(cornerRadius: BzrRadius.bzrSharp, style: .continuous))
+        .overlay(
+          RoundedRectangle(cornerRadius: BzrRadius.bzrSharp, style: .continuous)
+            .stroke(Color.hairline, lineWidth: 0.5)
+        )
       } else {
-        ForEach(outdatedRows) { row in
-          HStack(spacing: 0) {
-            tableCell(row.pkg, width: 130, weight: .semibold)
-            tableCell(row.from, width: 80, color: .txtSecondary)
-            tableCell("→", width: 24, color: .txtTertiary)
-            tableCell(row.to, width: 80, color: .bzrLime, weight: .semibold)
-            tableCell(row.mgr, width: 60, color: .txtTertiary)
-            HStack { BzrBadge(text: row.tier, kind: row.tierKind); Spacer() }
-              .frame(width: 60).padding(.horizontal, 12).padding(.vertical, 7)
-            tableCell(row.cooldown, width: 130, color: .txtTertiary)
-            HStack { stateBadge(row.state); Spacer() }
-              .frame(width: 80).padding(.horizontal, 12).padding(.vertical, 7)
+        // Real outdated table only renders when there are rows. The
+        // 8 fixed-width columns total ~644pt; we wrap in a horizontal
+        // ScrollView so narrow windows scroll instead of clipping.
+        ScrollView(.horizontal, showsIndicators: true) {
+          VStack(spacing: 0) {
+            HStack(spacing: 0) {
+              tableHeader("Package", width: 130)
+              tableHeader("Installed", width: 80)
+              tableHeader("", width: 24)
+              tableHeader("Latest", width: 80)
+              tableHeader("Mgr", width: 60)
+              tableHeader("Tier", width: 60)
+              tableHeader("Cooldown", width: 130)
+              tableHeader("", width: 80)
+            }
+            .background(Color.adaptiveLighten(0.02))
+            .overlay(
+              Rectangle().fill(Color.hairline).frame(height: 0.5),
+              alignment: .bottom
+            )
+
+            ForEach(outdatedRows) { row in
+              HStack(spacing: 0) {
+                tableCell(row.pkg, width: 130, weight: .semibold)
+                tableCell(row.from, width: 80, color: .txtSecondary)
+                tableCell("→", width: 24, color: .txtTertiary)
+                tableCell(row.to, width: 80, color: .bzrLimeText, weight: .semibold)
+                tableCell(row.mgr, width: 60, color: .txtTertiary)
+                HStack { BzrBadge(text: row.tier, kind: row.tierKind); Spacer() }
+                  .frame(width: 60).padding(.horizontal, 12).padding(.vertical, 7)
+                tableCell(row.cooldown, width: 130, color: .txtTertiary)
+                HStack { stateBadge(row.state); Spacer() }
+                  .frame(width: 80).padding(.horizontal, 12).padding(.vertical, 7)
+              }
+              .overlay(
+                Rectangle().fill(Color.hairlineInner).frame(height: 0.5),
+                alignment: .bottom
+              )
+            }
           }
-          .frame(maxWidth: .infinity, alignment: .leading)
-          .overlay(
-            Rectangle().fill(Color.hairlineInner).frame(height: 0.5),
-            alignment: .bottom
-          )
         }
+        .background(Color.adaptiveDeepen(0.20))
+        .clipShape(RoundedRectangle(cornerRadius: BzrRadius.bzrSharp, style: .continuous))
+        .overlay(
+          RoundedRectangle(cornerRadius: BzrRadius.bzrSharp, style: .continuous)
+            .stroke(Color.hairline, lineWidth: 0.5)
+        )
       }
     }
-    .background(Color.black.opacity(0.20))
-    .clipShape(RoundedRectangle(cornerRadius: BzrRadius.bzrSharp, style: .continuous))
-    .overlay(
-      RoundedRectangle(cornerRadius: BzrRadius.bzrSharp, style: .continuous)
-        .stroke(Color.hairline, lineWidth: 0.5)
-    )
   }
 
   @ViewBuilder

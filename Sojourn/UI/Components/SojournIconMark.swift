@@ -14,6 +14,7 @@
 //   • Outer squircle uses Apple's continuous-corner approximation
 //     (~225 pt radius on the 1024 grid) drawn as cubic Béziers.
 
+import AppKit
 import SwiftUI
 
 // MARK: - 1024-grid constants
@@ -208,6 +209,43 @@ internal func sojournMenuBarMark16Path(in rect: CGRect) -> Path {
     p.addLine(to: pt(12, 5))
     p.closeSubpath()
   }
+}
+
+// MARK: - NSImage template (for MenuBarExtra label)
+//
+// SwiftUI's MenuBarExtra(label:) silently converts the label view to an
+// NSImage with isTemplate=true. SwiftUI Path-based Shape views don't
+// always survive that conversion (the rasterized output can be empty
+// or wrongly clipped). This helper draws the menu-bar mark + frame
+// directly into an NSImage we mark as template ourselves, then hand
+// to AppKit. Result: the menubar shows the actual Sojourn S in a
+// rounded square that tints to the menubar foreground (white in dark
+// menubar, near-black in light menubar).
+
+internal func sojournMenuBarTemplateImage(size: CGFloat = 18) -> NSImage {
+  let pxSize = NSSize(width: size, height: size)
+  let img = NSImage(size: pxSize, flipped: false) { rect in
+    NSColor.black.setStroke()
+    NSColor.black.setFill()
+
+    // Frame: stroke a rounded square. Width matches SwiftUI version
+    // (1.4 * size / 22).
+    let framePath = NSBezierPath(cgPath: sojournMenuBarFrame22Path(in: rect).cgPath)
+    framePath.lineWidth = 1.4 * rect.width / 22
+    framePath.stroke()
+
+    // Mark: fill the S body with two stencil cuts knocked through via
+    // even-odd winding (matching the SwiftUI .eoFill() behavior).
+    let markPath = NSBezierPath(cgPath: sojournMenuBarMark22Path(in: rect).cgPath)
+    markPath.windingRule = .evenOdd
+    markPath.fill()
+
+    return true
+  }
+  // The template flag is what makes AppKit re-tint the image to the
+  // menubar foreground color in both dark and light menubars.
+  img.isTemplate = true
+  return img
 }
 
 // MARK: - SwiftUI Shapes

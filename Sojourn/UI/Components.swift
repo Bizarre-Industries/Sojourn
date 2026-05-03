@@ -271,6 +271,12 @@ struct MenuBarRootView: View {
       }
     }
     .frame(width: 300, alignment: .leading)
+    // Force a dark backdrop so the menubar dropdown reads correctly
+    // regardless of the system menubar appearance (the `.preferredColorScheme(.dark)`
+    // modifier on the MenuBarExtra Group doesn't reliably propagate
+    // into the menubar window — SwiftUI quirk on macOS 26).
+    .background(Color.bzrVoid2)
+    .environment(\.colorScheme, .dark)
   }
 
   private var machineName: String {

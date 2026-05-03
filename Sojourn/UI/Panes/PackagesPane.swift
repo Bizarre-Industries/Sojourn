@@ -30,16 +30,24 @@ struct PackagesPane: View {
     let sub: String
   }
 
+  // Real package counts from `brew bundle dump` (BrewfileAST.counts).
+  // Outdated count is 0 for v0.2 — `brew bundle dump` is a snapshot of
+  // the spec, not a diff against installed state. Step 11 (in v0.3) will
+  // wire `brew outdated --json` parsing for the per-manager outdated #s.
   private var managerSummaries: [ManagerSummary] {
-    [
-      .init(id: "brew", glyph: "BR", name: "Homebrew", pkgs: 87, outdated: 12, tier: "B", tierKind: .tierB, sub: "formulae"),
-      .init(id: "cask", glyph: "CA", name: "Cask", pkgs: 31, outdated: 4, tier: "C", tierKind: .tierC, sub: "gui apps"),
-      .init(id: "mas", glyph: "MA", name: "Mac App Store", pkgs: 14, outdated: 1, tier: "A", tierKind: .tierA, sub: "mas-cli"),
-      .init(id: "cargo", glyph: "CA", name: "Cargo", pkgs: 22, outdated: 0, tier: "B", tierKind: .tierB, sub: "rust"),
-      .init(id: "pipx", glyph: "PI", name: "pipx", pkgs: 11, outdated: 0, tier: "D", tierKind: .tierD, sub: "python tools"),
-      .init(id: "npm", glyph: "NP", name: "npm (global)", pkgs: 9, outdated: 0, tier: "E", tierKind: .tierE, sub: "pnpm n/a"),
-      .init(id: "gem", glyph: "GE", name: "gem", pkgs: 6, outdated: 0, tier: "D", tierKind: .tierD, sub: "ruby"),
-      .init(id: "composer", glyph: "CO", name: "composer", pkgs: 4, outdated: 0, tier: "D", tierKind: .tierD, sub: "php")
+    let c = store.brewfile?.counts ?? .init()
+    return [
+      .init(id: "mas",     glyph: "MA", name: "Mac App Store", pkgs: c.mas,     outdated: 0, tier: "A", tierKind: .tierA, sub: "mas-cli"),
+      .init(id: "brew",    glyph: "BR", name: "Homebrew",      pkgs: c.brews,   outdated: 0, tier: "B", tierKind: .tierB, sub: "formulae"),
+      .init(id: "cargo",   glyph: "CA", name: "Cargo",         pkgs: c.cargo,   outdated: 0, tier: "B", tierKind: .tierB, sub: "rust"),
+      .init(id: "cask",    glyph: "CK", name: "Cask",          pkgs: c.casks,   outdated: 0, tier: "C", tierKind: .tierC, sub: "gui apps"),
+      .init(id: "uv",      glyph: "UV", name: "uv (Python)",   pkgs: c.uv,      outdated: 0, tier: "D", tierKind: .tierD, sub: "pep-723"),
+      .init(id: "npm",     glyph: "NP", name: "npm (global)",  pkgs: c.npm,     outdated: 0, tier: "E", tierKind: .tierE, sub: "lifecycle"),
+      .init(id: "go",      glyph: "GO", name: "go install",    pkgs: c.go,      outdated: 0, tier: "B", tierKind: .tierB, sub: "modules"),
+      .init(id: "vscode",  glyph: "VS", name: "VS Code",       pkgs: c.vscode,  outdated: 0, tier: "C", tierKind: .tierC, sub: "extensions"),
+      .init(id: "krew",    glyph: "KR", name: "krew (kubectl)",pkgs: c.krew,    outdated: 0, tier: "C", tierKind: .tierC, sub: "plugins"),
+      .init(id: "flatpak", glyph: "FL", name: "flatpak",       pkgs: c.flatpak, outdated: 0, tier: "D", tierKind: .tierD, sub: "linux flatpaks"),
+      .init(id: "tap",     glyph: "TP", name: "Homebrew taps", pkgs: c.taps,    outdated: 0, tier: "B", tierKind: .tierB, sub: "extra repos")
     ]
   }
 
@@ -230,20 +238,10 @@ struct PackagesPane: View {
 
   private enum OutdatedState { case eligible, cooldown, prompt, auto }
 
-  private var outdatedRows: [OutdatedRow] {
-    [
-      .init(pkg: "ripgrep", from: "14.1.1", to: "14.1.4", mgr: "brew", tier: "B", tierKind: .tierB, cooldown: "7d ✓", state: .eligible),
-      .init(pkg: "fd", from: "10.2.1", to: "10.3.0", mgr: "brew", tier: "B", tierKind: .tierB, cooldown: "8d ✓", state: .eligible),
-      .init(pkg: "eza", from: "0.18.24", to: "0.19.1", mgr: "brew", tier: "B", tierKind: .tierB, cooldown: "12d ✓", state: .eligible),
-      .init(pkg: "zoxide", from: "0.9.6", to: "0.9.8", mgr: "brew", tier: "B", tierKind: .tierB, cooldown: "3d / 7d", state: .cooldown),
-      .init(pkg: "ghostty", from: "1.0.4", to: "1.1.2", mgr: "cask", tier: "C", tierKind: .tierC, cooldown: "9d · runs script", state: .prompt),
-      .init(pkg: "Raycast", from: "1.84.5", to: "1.85.1", mgr: "cask", tier: "C", tierKind: .tierC, cooldown: "5d / 7d", state: .prompt),
-      .init(pkg: "1Password 7", from: "7.9.11", to: "7.10.0", mgr: "mas", tier: "A", tierKind: .tierA, cooldown: "0d · ready", state: .auto),
-      .init(pkg: "typescript", from: "5.4.2", to: "5.6.3", mgr: "npm", tier: "E", tierKind: .tierE, cooldown: "21d ✓ · advisory", state: .prompt),
-      .init(pkg: "mypy", from: "1.8.0", to: "1.11.2", mgr: "pipx", tier: "D", tierKind: .tierD, cooldown: "14d ✓", state: .prompt),
-      .init(pkg: "cargo-watch", from: "8.4.1", to: "8.5.3", mgr: "cargo", tier: "B", tierKind: .tierB, cooldown: "11d ✓", state: .eligible)
-    ]
-  }
+  // The outdated table is empty in v0.2 — `brew outdated --json` parsing
+  // lands in v0.3 (step 11). Until then we honestly show 0 rows + an
+  // empty-state message rather than fake demo entries.
+  private var outdatedRows: [OutdatedRow] { [] }
 
   private var outdatedTable: some View {
     VStack(spacing: 0) {
@@ -265,24 +263,38 @@ struct PackagesPane: View {
         alignment: .bottom
       )
 
-      ForEach(outdatedRows) { row in
-        HStack(spacing: 0) {
-          tableCell(row.pkg, width: 130, weight: .semibold)
-          tableCell(row.from, width: 80, color: .txtSecondary)
-          tableCell("→", width: 24, color: .txtTertiary)
-          tableCell(row.to, width: 80, color: .bzrLime, weight: .semibold)
-          tableCell(row.mgr, width: 60, color: .txtTertiary)
-          HStack { BzrBadge(text: row.tier, kind: row.tierKind); Spacer() }
-            .frame(width: 60).padding(.horizontal, 12).padding(.vertical, 7)
-          tableCell(row.cooldown, width: 130, color: .txtTertiary)
-          HStack { stateBadge(row.state); Spacer() }
-            .frame(width: 80).padding(.horizontal, 12).padding(.vertical, 7)
+      if outdatedRows.isEmpty {
+        VStack(alignment: .leading, spacing: 6) {
+          Text("No outdated check yet")
+            .font(.bzrBody(size: 13, weight: .semibold))
+            .foregroundStyle(Color.txtPrimary)
+          Text("`brew outdated --json` parsing lands in v0.3. Until then this pane shows the package counts from `brew bundle dump` (left rail) but cannot diff installed vs latest.")
+            .font(.bzrMono(size: 11))
+            .foregroundStyle(Color.txtTertiary)
+            .frame(maxWidth: 560, alignment: .leading)
         }
+        .padding(20)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .overlay(
-          Rectangle().fill(Color.hairlineInner).frame(height: 0.5),
-          alignment: .bottom
-        )
+      } else {
+        ForEach(outdatedRows) { row in
+          HStack(spacing: 0) {
+            tableCell(row.pkg, width: 130, weight: .semibold)
+            tableCell(row.from, width: 80, color: .txtSecondary)
+            tableCell("→", width: 24, color: .txtTertiary)
+            tableCell(row.to, width: 80, color: .bzrLime, weight: .semibold)
+            tableCell(row.mgr, width: 60, color: .txtTertiary)
+            HStack { BzrBadge(text: row.tier, kind: row.tierKind); Spacer() }
+              .frame(width: 60).padding(.horizontal, 12).padding(.vertical, 7)
+            tableCell(row.cooldown, width: 130, color: .txtTertiary)
+            HStack { stateBadge(row.state); Spacer() }
+              .frame(width: 80).padding(.horizontal, 12).padding(.vertical, 7)
+          }
+          .frame(maxWidth: .infinity, alignment: .leading)
+          .overlay(
+            Rectangle().fill(Color.hairlineInner).frame(height: 0.5),
+            alignment: .bottom
+          )
+        }
       }
     }
     .background(Color.black.opacity(0.20))

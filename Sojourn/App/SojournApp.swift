@@ -52,14 +52,13 @@ struct SojournApp: App {
       }
       .preferredColorScheme(.dark)
     } label: {
-      // SF Symbol "s.square" is the most reliable menubar template-
-      // image path. Custom Path-based shapes (SojournMenuBarIconView)
-      // render blank in MenuBarExtra(label:) on macOS 26 because
-      // SwiftUI converts the label view to an NSImage with
-      // isTemplate=true and doesn't always preserve fill/stroke
-      // geometry through that conversion. SF Symbols are pre-rendered
-      // as proper template images.
-      Image(systemName: "s.square")
+      // The Sojourn S-in-rounded-square mark, drawn directly as an
+      // NSImage with isTemplate=true. We bypass MenuBarExtra(label:)'s
+      // SwiftUI->NSImage conversion (which silently rasterizes Path
+      // shapes badly) and hand AppKit the template image ourselves.
+      // AppKit re-tints to the menubar foreground (white in dark
+      // menubar, near-black in light menubar).
+      Image(nsImage: sojournMenuBarTemplateImage(size: 18))
     }
     .menuBarExtraStyle(.window)
 

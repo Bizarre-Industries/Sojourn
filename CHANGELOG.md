@@ -6,9 +6,21 @@ All notable changes to Sojourn. Follows
 
 ## [Unreleased]
 
-### Planned (post-v0.2.0)
+### Planned (post-v0.3.0)
 
-(See `docs/process/plans/v0.3-plan.md`.)
+(See `docs/process/plans/v0.4-plan.md` once written by `replan-on-tag.sh`.)
+
+## [0.3.0] — unreleased
+
+In-progress release per `docs/process/plans/v0.3-plan.md`. Build
+numbers 21 → 28 walk through stages 1-8.
+
+### Added
+
+- ADR-0023 (containers panel detection priority).
+- ADR-0024 (mas Touch-ID privileged helper via `SMAppService`).
+- ADR-0025 (Sparkle delta updates).
+- ADR-0026 (multi-machine refuse-and-show-diff conflict UX).
 
 ## [0.2.0] — 2026-05-01
 

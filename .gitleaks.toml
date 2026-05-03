@@ -29,6 +29,7 @@ paths = [
 regexes = [
   '''age1[a-z0-9]{10,}''',                        # age recipient examples
   '''ghp_[A-Z]{36}''',                            # all-caps placeholder PATs
+  '''ghp_[xX]{36,}''',                            # all-x placeholder PATs (design handoff)
   '''ghp_EXAMPLE[A-Za-z0-9]{0,40}''',             # synthetic fixture PATs
   '''AKIAIOSFODNN7EXAMPLE''',                     # AWS docs canary
   '''AKIAEXAMPLE[A-Z0-9]{0,16}''',                # synthetic fixture AWS keys

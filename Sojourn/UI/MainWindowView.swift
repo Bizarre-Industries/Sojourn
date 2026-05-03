@@ -18,6 +18,7 @@ import SwiftUI
 internal enum Pane: String, Hashable, CaseIterable, Identifiable {
   case dashboard
   case packages
+  case containers
   case generations
   case macosFeatures
   case preferences
@@ -33,6 +34,7 @@ internal enum Pane: String, Hashable, CaseIterable, Identifiable {
     switch self {
     case .dashboard:     return "Dashboard"
     case .packages:      return "Packages"
+    case .containers:    return "Containers"
     case .generations:   return "Generations"
     case .macosFeatures: return "macOS Features"
     case .preferences:   return "Preferences"
@@ -48,6 +50,7 @@ internal enum Pane: String, Hashable, CaseIterable, Identifiable {
     switch self {
     case .dashboard:     return "rocket"
     case .packages:      return "shippingbox"
+    case .containers:    return "cube.box"
     case .generations:   return "clock.arrow.circlepath"
     case .macosFeatures: return "switch.2"
     case .preferences:   return "slider.horizontal.3"
@@ -109,6 +112,7 @@ internal struct MainWindowView: View {
     switch pane {
     case .dashboard:     OverviewPane()
     case .packages:      PackagesPane()
+    case .containers:    ContainersPane()
     case .generations:   GenerationsPane()
     case .macosFeatures: MacOSFeaturesPane()
     case .preferences:   PreferencesPane()

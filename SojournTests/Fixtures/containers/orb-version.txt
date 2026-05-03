@@ -1,0 +1,1 @@
+OrbStack 2.0.0 (commit 1234567, daemon 2.0.0)

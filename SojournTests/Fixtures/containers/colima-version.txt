@@ -1,0 +1,2 @@
+colima version 0.7.0
+git commit: 1234abcd

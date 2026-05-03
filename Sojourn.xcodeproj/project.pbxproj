@@ -16,6 +16,7 @@
 		0ED1AAAEAADA7250AF998BA2 /* JobRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4207776C9EC0D4B31D82E91 /* JobRunner.swift */; };
 		13CED2766FF188E9F0C1D8A9 /* GitHubDeviceAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DED6874FE4B27207A890E6E /* GitHubDeviceAuth.swift */; };
 		14AC4C6C18F2127EE503F9B6 /* Fonts in Resources */ = {isa = PBXBuildFile; fileRef = 6E6EE61BCBB43941CBEF30F4 /* Fonts */; };
+		17DFB6CB02C6706A383753FC /* ContainersService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB806B3F130A1371E112DC8 /* ContainersService.swift */; };
 		19015140F1CC02CD00D3BFF8 /* AdvisoriesPane.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B75E2CD72BA992F32BCEB9C /* AdvisoriesPane.swift */; };
 		191866534A9570E447AEA969 /* MacOSFeaturesService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF0F7E5B022F32A9CF6BF028 /* MacOSFeaturesService.swift */; };
 		19ED9BB99FD79A3F00DE09A4 /* SyncCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 197100C16F14E6EF4B75D6E3 /* SyncCoordinator.swift */; };
@@ -86,6 +87,7 @@
 		9D92A61401379AAAE305DE8D /* BrewBundleService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62253F977154A88AF1BCA3BD /* BrewBundleService.swift */; };
 		9FA218689F0D23FB8BE9C69F /* ConflictsPane.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7BBFBFD2E7DDE3A05F343A7 /* ConflictsPane.swift */; };
 		A1000D74EE7DBDEDD6CB5F79 /* ArchitectureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C2E6D67A2EE7A536B7FED0A /* ArchitectureView.swift */; };
+		A250E0AD51950D6B334A5001 /* ContainersServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A6F6540986E83E02DB01AD6 /* ContainersServiceTests.swift */; };
 		A41A6E357036CADB2C272B93 /* Brewfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CAA3F1AB2A8BAE4DFC84DC0 /* Brewfile.swift */; };
 		A73BAE6B0DA18AE332A12AF6 /* SyncMergeTargetTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2F3D8B1FA0E7E41B914FD76 /* SyncMergeTargetTests.swift */; };
 		A7B98E701D5EBDB9570D49F7 /* DiagnosticBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4852A96E28C5AE7EFD35C49 /* DiagnosticBundle.swift */; };
@@ -112,6 +114,7 @@
 		D8E561923A9C07751DB4532E /* Spacing.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF63E8F9CAA2A0B02F398EB9 /* Spacing.swift */; };
 		DE03A44AB78A511EEE4CD4F1 /* BootstrapService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14A5F035C01184E1BF26CB2F /* BootstrapService.swift */; };
 		DEC7987D1C49E0302153500B /* PersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78D3E34CEC39749CE7D6E198 /* PersistenceTests.swift */; };
+		E03EFF2897106D6F59B2E163 /* ContainersPane.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F9681D54DC8472566008C6 /* ContainersPane.swift */; };
 		E4AE7D402977E4174F6AA917 /* PackagesPane.swift in Sources */ = {isa = PBXBuildFile; fileRef = E85F38538D64D3F9E1B06485 /* PackagesPane.swift */; };
 		E50919FD33E2914DF758D069 /* JobRunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72893E315B28B7A4C2D41119 /* JobRunnerTests.swift */; };
 		E72C0687340E4387E829A79E /* MainWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82A52B4280B84BAE4A95BCBF /* MainWindowView.swift */; };
@@ -144,6 +147,7 @@
 /* Begin PBXFileReference section */
 		012D1D3CEBF6D99B901ABA36 /* ServicesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServicesTests.swift; sourceTree = "<group>"; };
 		07993C2265D99A08965BAA61 /* SecretScanService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecretScanService.swift; sourceTree = "<group>"; };
+		0A6F6540986E83E02DB01AD6 /* ContainersServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContainersServiceTests.swift; sourceTree = "<group>"; };
 		0ABC2036FA3F9FAFEEC00ED2 /* V02Stubs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V02Stubs.swift; sourceTree = "<group>"; };
 		0BADEBA10CB6637299E6E07E /* CooldownPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CooldownPolicy.swift; sourceTree = "<group>"; };
 		0DFAB02C29720FAB30864DCB /* GenerationsPane.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenerationsPane.swift; sourceTree = "<group>"; };
@@ -164,6 +168,7 @@
 		2A4824F5864A9EC3B55E6600 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		2DD4943AD10D37C3DB9CFBC9 /* LogBufferTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogBufferTests.swift; sourceTree = "<group>"; };
 		3631080B96D92DFD843F72AE /* ToolLocatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolLocatorTests.swift; sourceTree = "<group>"; };
+		37F9681D54DC8472566008C6 /* ContainersPane.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContainersPane.swift; sourceTree = "<group>"; };
 		382E9466BCD14C7A5C4CA0A7 /* OnboardPane.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardPane.swift; sourceTree = "<group>"; };
 		3A05293DDD6F76E28F023833 /* Redactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Redactor.swift; sourceTree = "<group>"; };
 		3A0B5A8BB60D9FFFA8948472 /* data */ = {isa = PBXFileReference; lastKnownFileType = folder; name = data; path = Sojourn/Resources/data; sourceTree = SOURCE_ROOT; };
@@ -220,6 +225,7 @@
 		A7BBFBFD2E7DDE3A05F343A7 /* ConflictsPane.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConflictsPane.swift; sourceTree = "<group>"; };
 		A8A0D4248D7F40715D7685E4 /* Conflict.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Conflict.swift; sourceTree = "<group>"; };
 		AA82E2DC35BD66C0CCB3D31C /* OrphanCandidate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrphanCandidate.swift; sourceTree = "<group>"; };
+		AAB806B3F130A1371E112DC8 /* ContainersService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContainersService.swift; sourceTree = "<group>"; };
 		ABEBDD56226C708B2BB5B500 /* SojournIconMark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SojournIconMark.swift; sourceTree = "<group>"; };
 		B0A7A91337334537033977DB /* Modals.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Modals.swift; sourceTree = "<group>"; };
 		B10DD40CBD9A7ADFED1E94D4 /* SojournUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SojournUITests.swift; sourceTree = "<group>"; };
@@ -412,6 +418,7 @@
 				55D844D1916BAD352E960418 /* ANSIParserTests.swift */,
 				789996000891BE42FD7BD49C /* BrewBundleServiceTests.swift */,
 				A36CD6BB083EBA6FA642F71F /* CleanupServiceTests.swift */,
+				0A6F6540986E83E02DB01AD6 /* ContainersServiceTests.swift */,
 				72893E315B28B7A4C2D41119 /* JobRunnerTests.swift */,
 				2DD4943AD10D37C3DB9CFBC9 /* LogBufferTests.swift */,
 				012D1D3CEBF6D99B901ABA36 /* ServicesTests.swift */,
@@ -494,6 +501,7 @@
 				C51F95DC3AF05E699D7B7E96 /* BrewService.swift */,
 				494B9E3CA3D4138CF9774417 /* ChezmoiService.swift */,
 				C198F65D627EB6805DC3C20A /* CleanupService.swift */,
+				AAB806B3F130A1371E112DC8 /* ContainersService.swift */,
 				887AAF2686F9A376CC67B150 /* GenerationService.swift */,
 				8DED6874FE4B27207A890E6E /* GitHubDeviceAuth.swift */,
 				51654B4F53BDA5905226D68E /* GitService.swift */,
@@ -602,6 +610,7 @@
 				7B75E2CD72BA992F32BCEB9C /* AdvisoriesPane.swift */,
 				917C3CA7A3B22318CCEC81F1 /* CleanupPane.swift */,
 				A7BBFBFD2E7DDE3A05F343A7 /* ConflictsPane.swift */,
+				37F9681D54DC8472566008C6 /* ContainersPane.swift */,
 				5F73FECB65986451C136A8A2 /* DiagnosticsPane.swift */,
 				4B4C7A81F96BAD6A1DB0EAA0 /* DotfilesPane.swift */,
 				0DFAB02C29720FAB30864DCB /* GenerationsPane.swift */,
@@ -813,6 +822,8 @@
 				8D1F43019FE87FB7E3B869B1 /* Components.swift in Sources */,
 				37441384AFE282EE64098F7F /* Conflict.swift in Sources */,
 				9FA218689F0D23FB8BE9C69F /* ConflictsPane.swift in Sources */,
+				E03EFF2897106D6F59B2E163 /* ContainersPane.swift in Sources */,
+				17DFB6CB02C6706A383753FC /* ContainersService.swift in Sources */,
 				823B02AD39D276B7611D93C9 /* CooldownGate.swift in Sources */,
 				3FE854E2818C457EBFE8E369 /* CooldownPolicy.swift in Sources */,
 				3940C3367832563077AA2786 /* CycloneDX.swift in Sources */,
@@ -891,6 +902,7 @@
 				49A81F046E48A7BBAB1382E9 /* BrewBundleServiceTests.swift in Sources */,
 				1B511F22B7852AF15BAE3CE2 /* Bundle+Fixtures.swift in Sources */,
 				70AEDCB3E9609070650F669A /* CleanupServiceTests.swift in Sources */,
+				A250E0AD51950D6B334A5001 /* ContainersServiceTests.swift in Sources */,
 				566B9302B5EF701E96BC9450 /* HistoryDBTests.swift in Sources */,
 				E50919FD33E2914DF758D069 /* JobRunnerTests.swift in Sources */,
 				739CFE8BD8A15E3E95B5B376 /* KeychainBrokerTests.swift in Sources */,
@@ -1025,7 +1037,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Sojourn/Sojourn.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 20;
+				CURRENT_PROJECT_VERSION = 21;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Sojourn/Info.plist;
@@ -1033,7 +1045,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.2.0;
+				MARKETING_VERSION = 0.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = app.bizarre.sojourn;
 				PRODUCT_NAME = Sojourn;
 				SDKROOT = macosx;
@@ -1066,7 +1078,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Sojourn/Sojourn.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 20;
+				CURRENT_PROJECT_VERSION = 21;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Sojourn/Info.plist;
@@ -1074,7 +1086,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.2.0;
+				MARKETING_VERSION = 0.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = app.bizarre.sojourn;
 				PRODUCT_NAME = Sojourn;
 				SDKROOT = macosx;

@@ -34,6 +34,7 @@ internal final class AppStore {
   internal let cooldown: CooldownGate
   internal let cleanup: CleanupService
   internal let bootstrap: BootstrapService
+  internal let containersService: ContainersService
   internal let backgroundActivity: BackgroundActivity
 
   internal let historyDB: HistoryDB?
@@ -49,6 +50,11 @@ internal final class AppStore {
   // compile against an empty dictionary. Real package counts come from
   // `brewfile` once OverviewPane is rewired in step 6.
   internal var managers: [String: ManagerSnapshot] = [:]
+
+  /// Snapshot of installed container runtimes per ADR-0023.
+  /// Populated by `refreshContainers()` (called by ContainersPane on
+  /// appear / "Rescan" gesture). Empty until first probe.
+  internal var containers: ContainersSnapshot = .empty
 
   internal init(
     paths: AppSupportPaths,
@@ -80,6 +86,7 @@ internal final class AppStore {
     self.cooldown = CooldownGate.live(settings: settingsStore)
     self.cleanup = CleanupService(deletionsDB: deletionsDB)
     self.bootstrap = BootstrapService(locator: toolLocator, brew: brew, subprocess: runner)
+    self.containersService = ContainersService(runner: runner, locator: self.toolLocator)
     self.backgroundActivity = BackgroundActivity()
     self.historyDB = historyDB
     self.bootstrapCoordinator = BootstrapCoordinator(
@@ -171,5 +178,17 @@ internal final class AppStore {
   /// Rescan orphan candidates.
   internal func rescanOrphans() async {
     self.orphans = await cleanup.scan()
+  }
+
+  /// Refresh `containers` snapshot from ContainersService. Called by
+  /// ContainersPane on appear (via cached snapshot) and on user
+  /// "Rescan" gesture (via `forceRescan: true`). Per ADR-0023 perf
+  /// invariants, no timer-based refresh — explicit gestures only.
+  internal func refreshContainers(forceRescan: Bool = false) async {
+    if forceRescan {
+      self.containers = await containersService.rescan()
+    } else {
+      self.containers = await containersService.snapshot()
+    }
   }
 }

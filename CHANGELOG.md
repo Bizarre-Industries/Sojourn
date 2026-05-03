@@ -21,6 +21,21 @@ numbers 21 → 28 walk through stages 1-8.
 - ADR-0024 (mas Touch-ID privileged helper via `SMAppService`).
 - ADR-0025 (Sparkle delta updates).
 - ADR-0026 (multi-machine refuse-and-show-diff conflict UX).
+- `Sojourn/Services/ContainersService.swift` — actor probing 5 runtimes
+  (Docker, OrbStack, Apple `container`, Lima, Colima) in fixed
+  priority order with `async let` parallelism + filesystem-presence
+  short-circuit + 5s per-probe timeout. Read-only.
+- `Sojourn/UI/Panes/ContainersPane.swift` — 11th sidebar pane;
+  read-only display; "Active runtime" badge with accessibility label;
+  empty-state CTA; manual rescan.
+- `Pane.containers` enum case + `MainWindowView.detail(for:)` arm.
+- `AppStore.containersService` + `containers` snapshot +
+  `refreshContainers(forceRescan:)`.
+- `SojournTests/Services/ContainersServiceTests.swift` — 17 tests
+  (parser fixtures for all 5 runtimes, priority order, snapshot
+  active-runtime resolution).
+- 5 fixtures under `SojournTests/Fixtures/containers/` — real-shape
+  `<tool> --version` output snapshots.
 
 ## [0.2.0] — 2026-05-01
 

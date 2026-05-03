@@ -36,6 +36,16 @@ numbers 21 → 28 walk through stages 1-8.
   active-runtime resolution).
 - 5 fixtures under `SojournTests/Fixtures/containers/` — real-shape
   `<tool> --version` output snapshots.
+- `JobKind` enum (installUpgrade / advisory / snapshot) on
+  `JobRequest` with default `.advisory`. Per-tier hard timeouts:
+  install/upgrade exempt; advisory 30s; snapshot 600s. Watchdog Task
+  fires `markTimedOut(_:after:)` on expiry; terminal-state guard on
+  every `mark*` helper prevents post-termination overwrite.
+- `SojournTests/Services/JobRunnerTimeoutPolicyTests.swift` — 12
+  tests covering the policy table, JobRequest defaults +
+  effectiveTimeout fallback, watchdog overrun, install/upgrade
+  exemption, natural-completion vs watchdog race, cancel vs
+  watchdog non-interference.
 
 ## [0.2.0] — 2026-05-01
 

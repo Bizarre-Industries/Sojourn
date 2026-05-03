@@ -46,7 +46,6 @@ struct PackagesPane: View {
       .init(id: "go",      glyph: "GO", name: "go install",    pkgs: c.go,      outdated: 0, tier: "B", tierKind: .tierB, sub: "modules"),
       .init(id: "vscode",  glyph: "VS", name: "VS Code",       pkgs: c.vscode,  outdated: 0, tier: "C", tierKind: .tierC, sub: "extensions"),
       .init(id: "krew",    glyph: "KR", name: "krew (kubectl)",pkgs: c.krew,    outdated: 0, tier: "C", tierKind: .tierC, sub: "plugins"),
-      .init(id: "flatpak", glyph: "FL", name: "flatpak",       pkgs: c.flatpak, outdated: 0, tier: "D", tierKind: .tierD, sub: "linux flatpaks"),
       .init(id: "tap",     glyph: "TP", name: "Homebrew taps", pkgs: c.taps,    outdated: 0, tier: "B", tierKind: .tierB, sub: "extra repos")
     ]
   }
@@ -63,7 +62,7 @@ struct PackagesPane: View {
         Spacer()
         Text("\(managerSummaries.count)")
           .font(.bzrMono(size: 11, weight: .medium))
-          .foregroundStyle(Color.bzrLime)
+          .foregroundStyle(Color.bzrLimeText)
       }
       .padding(.horizontal, 14)
       .padding(.vertical, 10)
@@ -171,42 +170,6 @@ struct PackagesPane: View {
           .padding(.top, 4)
 
         outdatedTable
-
-        // Per-machine gating + streaming log
-        HStack(alignment: .top, spacing: 12) {
-          BzrCard(eyebrow: "PER-MACHINE GATING / packages.toml") {
-            BzrCodeBlock(text: """
-              [brew]
-              ripgrep = "*"
-              fd = "*"
-              eza = "*"
-
-              [brew.only."work-mbp"]
-              docker = "*"
-              slack = "*"
-
-              [brew.exclude."personal-mini"]
-              postgres@16 = "*"
-              """)
-          }
-          BzrCard(eyebrow: "STREAMING JOB · brew outdated") {
-            VStack(alignment: .leading, spacing: 0) {
-              logLine("14:22:01", "$", "brew outdated --json", .secondary)
-              logLine("14:22:02", "→", "warming JSON API cache", .tertiary)
-              logLine("14:22:04", "✓", "87 formulae checked", .ok)
-              logLine("14:22:04", "→", "12 outdated", .lime)
-              logLine("14:22:05", "$", "brew bundle list --all", .secondary)
-              logLine("14:22:09", "⚠", "pip: search not implemented", .warn)
-              logLine("14:22:11", "✓", "aggregated 8 managers", .ok)
-              logLine("14:22:11", "━", "17 outdated total", .lime)
-            }
-            .padding(12)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color.black.opacity(0.55))
-            .clipShape(RoundedRectangle(cornerRadius: BzrRadius.bzrSharp, style: .continuous))
-          }
-          .frame(width: 320)
-        }
       }
       .padding(28)
       .frame(maxWidth: .infinity, alignment: .leading)

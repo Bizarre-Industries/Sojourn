@@ -78,7 +78,7 @@ internal struct MainWindowView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .navigationTitle(selection.label)
     }
-    .frame(minWidth: 1024, minHeight: 640)
+    .frame(minWidth: 1180, idealWidth: 1280, minHeight: 720, idealHeight: 800)
     .sheet(isPresented: bootstrapSheetPresented) {
       BootstrapView(
         state: store.bootstrap.state,

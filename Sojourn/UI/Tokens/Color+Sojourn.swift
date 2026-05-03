@@ -1,19 +1,35 @@
 // Sojourn — brand and Liquid Glass color tokens.
 //
-// Canonical source: docs/design/handoff/extracted/sojourn/project/styles.css
-// (the Claude Design handoff). The design is dark-only — Tahoe Liquid
-// Glass surfaces over a deep wallpaper, brand lime as the only bright
-// accent. There are no light-mode tokens. SojournApp forces every Scene
-// to .preferredColorScheme(.dark), so we don't need adaptive variants.
+// Adaptive light + dark. Same token names; bodies switch via
+// NSColor(name:dynamicProvider:) so the UI reads correctly in both
+// macOS appearances.
 //
-// Token names match the CSS custom properties verbatim
-// (--bzr-lime, --glass-window, etc.) for grep-friendly traceability
-// between the design spec and the Swift implementation.
+// Dark values match docs/design/handoff/extracted/sojourn/project/styles.css
+// verbatim (Claude Design handoff, dark-only spec).
+// Light values are designed to keep the same hierarchy: paper-warm
+// surfaces, dark labels, lime as accent only (lime-ink = #5E7A00 for
+// any "lime body text" — chat2.md design intent).
 
+import AppKit
 import SwiftUI
 
+internal func adaptiveColor(light: NSColor, dark: NSColor) -> Color {
+  Color(
+    nsColor: NSColor(name: nil) { appearance in
+      switch appearance.bestMatch(from: [.aqua, .darkAqua]) {
+      case .darkAqua: return dark
+      default:        return light
+      }
+    }
+  )
+}
+
+private func srgb(_ r: Int, _ g: Int, _ b: Int, _ a: Double = 1.0) -> NSColor {
+  NSColor(srgbRed: CGFloat(r) / 255, green: CGFloat(g) / 255, blue: CGFloat(b) / 255, alpha: CGFloat(a))
+}
+
 extension Color {
-  // MARK: - Bizarre brand
+  // MARK: - Bizarre brand (fixed across appearances — logo + accent)
   static let bzrLime      = Color(red: 198 / 255, green: 255 / 255, blue: 36 / 255)
   static let bzrLimeInk   = Color(red: 94 / 255, green: 122 / 255, blue: 0 / 255)
   static let bzrLimeGlow  = Color(red: 232 / 255, green: 255 / 255, blue: 138 / 255)
@@ -33,45 +49,89 @@ extension Color {
   static let bzrDanger    = Color(red: 240 / 255, green: 82 / 255, blue: 91 / 255)
   static let bzrInfo      = Color(red: 91 / 255, green: 159 / 255, blue: 255 / 255)
 
-  // MARK: - Liquid Glass surfaces (translucent overlays)
-  static let glassWindow   = Color(red: 28 / 255, green: 28 / 255, blue: 30 / 255).opacity(0.62)
-  static let glassSidebar  = Color(red: 20 / 255, green: 20 / 255, blue: 22 / 255).opacity(0.58)
-  static let glassToolbar  = Color(red: 38 / 255, green: 38 / 255, blue: 42 / 255).opacity(0.55)
-  static let glassContent  = Color(red: 40 / 255, green: 40 / 255, blue: 44 / 255).opacity(0.40)
-  static let glassCard     = Color(red: 58 / 255, green: 58 / 255, blue: 62 / 255).opacity(0.42)
-  static let glassCardElev = Color(red: 72 / 255, green: 72 / 255, blue: 78 / 255).opacity(0.55)
-  static let glassPopover  = Color(red: 48 / 255, green: 48 / 255, blue: 52 / 255).opacity(0.78)
+  /// Lime appearance-aware — bright lime in dark, dark lime-ink in light.
+  /// Use for "lime body text" so it's readable on both backgrounds.
+  static let bzrLimeText  = adaptiveColor(
+    light: srgb(94, 122, 0),     // bzr-lime-ink, readable on paper
+    dark:  srgb(198, 255, 36)    // bzr-lime
+  )
 
-  // MARK: - Hairlines
-  static let hairline        = Color.white.opacity(0.08)
-  static let hairlineStrong  = Color.white.opacity(0.14)
-  static let hairlineInner   = Color.white.opacity(0.06)
-  static let hairlineBottom  = Color.black.opacity(0.30)
+  // MARK: - Liquid Glass surfaces (adaptive translucent overlays)
+  static let glassWindow = adaptiveColor(
+    light: srgb(249, 248, 242, 0.62),
+    dark:  srgb(28, 28, 30, 0.62)
+  )
+  static let glassSidebar = adaptiveColor(
+    light: srgb(245, 242, 234, 0.68),
+    dark:  srgb(20, 20, 22, 0.58)
+  )
+  static let glassToolbar = adaptiveColor(
+    light: srgb(255, 255, 255, 0.55),
+    dark:  srgb(38, 38, 42, 0.55)
+  )
+  static let glassContent = adaptiveColor(
+    light: srgb(255, 255, 255, 0.50),
+    dark:  srgb(40, 40, 44, 0.40)
+  )
+  static let glassCard = adaptiveColor(
+    light: srgb(255, 255, 255, 0.65),
+    dark:  srgb(58, 58, 62, 0.42)
+  )
+  static let glassCardElev = adaptiveColor(
+    light: srgb(255, 255, 255, 0.82),
+    dark:  srgb(72, 72, 78, 0.55)
+  )
+  static let glassPopover = adaptiveColor(
+    light: srgb(255, 255, 255, 0.88),
+    dark:  srgb(48, 48, 52, 0.78)
+  )
 
-  // MARK: - Text on glass (Apple WWDC25 spec — vibrant white)
-  static let txtPrimary    = Color.white.opacity(0.96)
-  static let txtSecondary  = Color(red: 235 / 255, green: 235 / 255, blue: 245 / 255).opacity(0.62)
-  static let txtTertiary   = Color(red: 235 / 255, green: 235 / 255, blue: 245 / 255).opacity(0.40)
-  static let txtQuaternary = Color(red: 235 / 255, green: 235 / 255, blue: 245 / 255).opacity(0.24)
+  // MARK: - Hairlines (adaptive — flips contrast direction)
+  static let hairline = adaptiveColor(
+    light: NSColor.black.withAlphaComponent(0.12),
+    dark:  NSColor.white.withAlphaComponent(0.08)
+  )
+  static let hairlineStrong = adaptiveColor(
+    light: NSColor.black.withAlphaComponent(0.20),
+    dark:  NSColor.white.withAlphaComponent(0.14)
+  )
+  static let hairlineInner = adaptiveColor(
+    light: NSColor.black.withAlphaComponent(0.06),
+    dark:  NSColor.white.withAlphaComponent(0.06)
+  )
+  static let hairlineBottom = adaptiveColor(
+    light: NSColor.black.withAlphaComponent(0.10),
+    dark:  NSColor.black.withAlphaComponent(0.30)
+  )
 
-  // MARK: - Sidebar selection
-  static let sidebarSel     = Color.bzrLime.opacity(0.22)
-  static let sidebarSelBord = Color.bzrLime.opacity(0.40)
+  // MARK: - Text on glass — semantic AppKit labels auto-adapt
+  static let txtPrimary    = Color(nsColor: .labelColor)
+  static let txtSecondary  = Color(nsColor: .secondaryLabelColor)
+  static let txtTertiary   = Color(nsColor: .tertiaryLabelColor)
+  static let txtQuaternary = Color(nsColor: .quaternaryLabelColor)
 
-  // MARK: - Compatibility shims for primitives (post-adaptive-refactor)
-  //
-  // The earlier "make tokens adaptive" pass introduced Color.adaptiveLighten()
-  // and Color.adaptiveDeepen() helpers in primitives like LiquidGlass.swift,
-  // Modals.swift, and Components.swift. Those call sites stay (they're
-  // just opacity-tuned overlays). Here we map them back to the canonical
-  // dark behavior — white for "lighten", black for "deepen" — to keep the
-  // primitive code unchanged while the tokens themselves are static.
+  // MARK: - Sidebar selection (lime accent, slightly stronger in light)
+  static let sidebarSel = adaptiveColor(
+    light: NSColor(srgbRed: 198 / 255, green: 255 / 255, blue: 36 / 255, alpha: 0.32),
+    dark:  NSColor(srgbRed: 198 / 255, green: 255 / 255, blue: 36 / 255, alpha: 0.22)
+  )
+  static let sidebarSelBord = adaptiveColor(
+    light: NSColor(srgbRed: 198 / 255, green: 255 / 255, blue: 36 / 255, alpha: 0.55),
+    dark:  NSColor(srgbRed: 198 / 255, green: 255 / 255, blue: 36 / 255, alpha: 0.40)
+  )
 
+  // MARK: - Adaptive overlay helpers (used inside primitives)
   static func adaptiveLighten(_ alpha: Double) -> Color {
-    Color.white.opacity(alpha)
+    adaptiveColor(
+      light: NSColor.black.withAlphaComponent(CGFloat(alpha)),
+      dark:  NSColor.white.withAlphaComponent(CGFloat(alpha))
+    )
   }
 
   static func adaptiveDeepen(_ alpha: Double) -> Color {
-    Color.black.opacity(alpha)
+    adaptiveColor(
+      light: NSColor.black.withAlphaComponent(CGFloat(alpha * 0.4)),
+      dark:  NSColor.black.withAlphaComponent(CGFloat(alpha))
+    )
   }
 }

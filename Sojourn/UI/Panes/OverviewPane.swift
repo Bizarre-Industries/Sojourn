@@ -24,7 +24,7 @@ struct OverviewPane: View {
               .foregroundStyle(Color.txtPrimary)
             Text("PREFS.")
               .font(.bzrStencil(size: 38, weight: .heavy))
-              .foregroundStyle(Color.bzrLime)
+              .foregroundStyle(Color.bzrLimeText)
           }
           Text("A native macOS app that carries your setup across machines. brew bundle manages 11 ecosystems natively (ADR-0018). chezmoi handles dotfile templating + age. defaults round-trips plists through cfprefsd. We never link GPL-2 backends — only invoke them as subprocesses with JSON/TOML output.")
             .font(.bzrBody(size: 13))
@@ -75,14 +75,14 @@ struct OverviewPane: View {
         HStack {
           Image(systemName: "shippingbox.fill")
             .font(.system(size: 14))
-            .foregroundStyle(Color.bzrLime)
+            .foregroundStyle(Color.bzrLimeText)
           Text("PACKAGES")
             .font(.bzrStencil(size: 18, weight: .heavy))
             .foregroundStyle(Color.txtPrimary)
           Spacer()
           Text("\(total) · \(outdatedLabel) OUTDATED")
             .font(.bzrMono(size: 11, weight: .medium))
-            .foregroundStyle(Color.bzrLime)
+            .foregroundStyle(Color.bzrLimeText)
         }
         Text("brew bundle · 11 ECOSYSTEMS · `--cyclonedx` SBOM via brew vulns · single-pass install")
           .font(.bzrMono(size: 10))
@@ -110,7 +110,7 @@ struct OverviewPane: View {
               .frame(width: 90, alignment: .leading)
             Text(row.count)
               .font(.bzrMono(size: 11, weight: .medium))
-              .foregroundStyle(Color.bzrLime)
+              .foregroundStyle(Color.bzrLimeText)
               .frame(width: 30, alignment: .leading)
             Text(row.note)
               .font(.bzrBody(size: 11))
@@ -190,19 +190,15 @@ struct OverviewPane: View {
       )
 
       VStack(alignment: .leading, spacing: 6) {
-        dotfileRow(.warn, ".zshrc", "+4 −1")
-        dotfileRow(.warn, ".gitconfig", "+1 −0")
-        dotfileRow(.ok, ".config/nvim/init.lua", "+47 new")
-        dotfileRow(.ok, ".tmux.conf", "+2 −0")
-        HStack(spacing: 8) {
-          BzrBadge(text: "AGE", kind: .mute)
-          Text("private_dot_ssh/encrypted_id_ed25519.age")
-            .font(.bzrMono(size: 10))
+        if store.chezmoi == nil {
+          Text("chezmoi not detected on PATH. Install via Settings → Bootstrap, or `brew install chezmoi`.")
+            .font(.bzrBody(size: 11))
             .foregroundStyle(Color.txtSecondary)
-            .lineLimit(1)
-            .truncationMode(.middle)
+        } else {
+          Text("chezmoi available. Per-file managed list + diff render in the Sync → Onboard tab.")
+            .font(.bzrBody(size: 11))
+            .foregroundStyle(Color.txtSecondary)
         }
-        .padding(.top, 4)
       }
       .padding(.horizontal, 16)
       .padding(.vertical, 12)
@@ -263,15 +259,10 @@ struct OverviewPane: View {
         alignment: .bottom
       )
 
-      VStack(alignment: .leading, spacing: 8) {
-        prefRow(.success, "USER", "iTerm2, Dock, Finder, Raycast", "14")
-        prefRow(.mute, "APP-SUPP", "Karabiner keymaps", "3")
-        prefRow(.tierC, "FDA", "Safari, 1Password", "v2")
-        prefRow(.tierE, "SYS", "loginwindow · refused", "—")
-        Text("QUIT-AND-RELAUNCH ON IMPORT")
-          .font(.bzrMono(size: 10))
-          .foregroundStyle(Color.txtTertiary)
-          .padding(.top, 4)
+      VStack(alignment: .leading, spacing: 6) {
+        Text("Per-domain plist export/import via PrefService runs from the Preferences pane. Discovery + diff land in v0.3.")
+          .font(.bzrBody(size: 11))
+          .foregroundStyle(Color.txtSecondary)
       }
       .padding(.horizontal, 16)
       .padding(.vertical, 12)
@@ -307,19 +298,8 @@ struct OverviewPane: View {
   // MARK: Carry-motion card
 
   private var carryMotionCard: some View {
-    BzrCard(eyebrow: "THE CARRY MOTION") {
+    BzrCard(eyebrow: "SYNC") {
       VStack(alignment: .leading, spacing: 12) {
-        HStack(spacing: 8) {
-          BzrBadge(text: "WORK-MBP", kind: .lime)
-          Text("━━━ ↑ ━━━")
-            .font(.bzrMono(size: 12))
-            .foregroundStyle(Color.bzrLime)
-          BzrBadge(text: "ORIGIN/MAIN", kind: .mute)
-          Text("━━━ ↓ ━━━")
-            .font(.bzrMono(size: 12))
-            .foregroundStyle(Color.bzrLime)
-          BzrBadge(text: "PERSONAL-MINI", kind: .mute)
-        }
         Text("EXPLICIT PUSH/PULL · ONE WRITER · gitleaks BEFORE COMMIT · TARBALL SNAPSHOT BEFORE PULL · 30D RETENTION")
           .font(.bzrMono(size: 10))
           .foregroundStyle(Color.txtTertiary)
@@ -377,27 +357,10 @@ struct OverviewPane: View {
 
   private var schedulerCard: some View {
     BzrCard(eyebrow: "SCHEDULER · NSBackgroundActivityScheduler") {
-      VStack(alignment: .leading, spacing: 8) {
-        HStack(spacing: 8) {
-          StatusDot(kind: .lime)
-          Text("app.bizarre.sojourn.refresh-outdated")
-            .font(.bzrBody(size: 12, weight: .semibold))
-            .foregroundStyle(Color.txtPrimary)
-        }
-        Text("1H INTERVAL · 15M TOLERANCE · QoS .utility · APP NAP-AWARE · AC-ONLY OPT")
-          .font(.bzrMono(size: 10))
-          .foregroundStyle(Color.txtTertiary)
-        BzrProgressBar(value: 0.74)
-          .padding(.top, 2)
-        HStack {
-          Text("NEXT")
-            .font(.bzrMono(size: 10))
-            .foregroundStyle(Color.txtTertiary)
-          Spacer()
-          Text("14m")
-            .font(.bzrMono(size: 11, weight: .medium))
-            .foregroundStyle(Color.bzrLime)
-        }
+      VStack(alignment: .leading, spacing: 6) {
+        Text("Background refresh tasks (refresh-outdated 1h, refresh-advisories 6h) wire to NSBackgroundActivityScheduler in v0.3 — this card will then show next-fire timing and skip-log.")
+          .font(.bzrBody(size: 11))
+          .foregroundStyle(Color.txtSecondary)
       }
     }
     .frame(width: 300)

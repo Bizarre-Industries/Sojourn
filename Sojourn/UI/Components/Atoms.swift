@@ -15,7 +15,7 @@ internal struct EyebrowLabel: View {
     HStack(spacing: 8) {
       Text("✦")
         .font(.bzrMono(size: 11))
-        .foregroundStyle(Color.bzrLime)
+        .foregroundStyle(Color.bzrLimeText)
       Text(text)
         .font(.bzrEyebrow)
         .tracking(1.8)

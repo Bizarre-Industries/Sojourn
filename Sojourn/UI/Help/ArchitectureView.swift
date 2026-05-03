@@ -35,7 +35,7 @@ struct ArchitectureView: View {
           .font(.bzrEyebrow)
           .tracking(1.8)
           .textCase(.uppercase)
-          .foregroundStyle(Color.bzrLime)
+          .foregroundStyle(Color.bzrLimeText)
 
         HStack(alignment: .firstTextBaseline, spacing: 16) {
           Text("THE BENCH IS HONEST.")
@@ -43,7 +43,7 @@ struct ArchitectureView: View {
             .foregroundStyle(Color.txtPrimary)
           Text("NO LINKING.")
             .font(.bzrStencil(size: 48, weight: .heavy))
-            .foregroundStyle(Color.bzrLime)
+            .foregroundStyle(Color.bzrLimeText)
         }
 
         Text("Sojourn is a SwiftUI app over swift-subprocess. Every backend (chezmoi, brew, git, gitleaks, age, defaults) runs as a separate process with structured I/O. This is the licensing firewall — GPL-3-or-later code lives at arms length from GPL-2 git via subprocess only. JSON in, TOML out, exit codes everywhere.")
@@ -59,7 +59,7 @@ struct ArchitectureView: View {
           .foregroundStyle(Color.txtTertiary)
         Text("app.bizarre.sojourn · v1.0")
           .font(.bzrMono(size: 11))
-          .foregroundStyle(Color.bzrLime)
+          .foregroundStyle(Color.bzrLimeText)
       }
     }
   }
@@ -89,7 +89,7 @@ struct ArchitectureView: View {
       Text("READS APPSTORE · DISPATCHES INTENTS")
         .font(.bzrMono(size: 9, weight: .semibold))
         .tracking(1.4)
-        .foregroundStyle(Color.bzrLime)
+        .foregroundStyle(Color.bzrLimeText)
     }
   }
 
@@ -142,7 +142,7 @@ struct ArchitectureView: View {
       Text("EVERY SUBPROCESS IS A JOB")
         .font(.bzrMono(size: 10, weight: .semibold))
         .tracking(1.8)
-        .foregroundStyle(Color.bzrLime)
+        .foregroundStyle(Color.bzrLimeText)
       Text("·").foregroundStyle(Color.txtTertiary)
       Text("id · start · status · line-buffered log · cancellable · 64KB pipe backpressure handled")
         .font(.bzrMono(size: 10))
@@ -154,7 +154,7 @@ struct ArchitectureView: View {
       Spacer()
       Text("FAULT → user-visible alert")
         .font(.bzrMono(size: 10, weight: .semibold))
-        .foregroundStyle(Color.bzrLime)
+        .foregroundStyle(Color.bzrLimeText)
     }
     .padding(.horizontal, 18)
     .padding(.vertical, 14)
@@ -209,14 +209,14 @@ struct ArchitectureView: View {
         Text("SOJOURN")
           .font(.bzrStencil(size: 18, weight: .heavy))
           .tracking(1.6)
-          .foregroundStyle(Color.bzrLime)
+          .foregroundStyle(Color.bzrLimeText)
         Text("×")
           .font(.bzrStencil(size: 18, weight: .heavy))
           .foregroundStyle(Color.txtTertiary)
         Text("BIZARRE")
           .font(.bzrStencil(size: 18, weight: .heavy))
           .tracking(1.6)
-          .foregroundStyle(Color.bzrLime)
+          .foregroundStyle(Color.bzrLimeText)
       }
     }
     .padding(.top, 12)
@@ -310,7 +310,7 @@ private struct Svc: View {
           .foregroundStyle(Color.txtTertiary)
         Text(cli)
           .font(.bzrMono(size: 10))
-          .foregroundStyle(Color.bzrLime)
+          .foregroundStyle(Color.bzrLimeText)
       }
       Text(out)
         .font(.bzrMono(size: 9))
@@ -341,7 +341,7 @@ private struct Backend: View {
       }
       Text(path)
         .font(.bzrMono(size: 9))
-        .foregroundStyle(Color.bzrLime)
+        .foregroundStyle(Color.bzrLimeText)
       Text(pinned)
         .font(.bzrMono(size: 9))
         .foregroundStyle(Color.txtTertiary)
@@ -364,7 +364,7 @@ private struct BottomCard: View {
           .font(.bzrTinyEyebrow)
           .tracking(1.6)
           .textCase(.uppercase)
-          .foregroundStyle(Color.bzrLime)
+          .foregroundStyle(Color.bzrLimeText)
         Text(sub)
           .font(.bzrMono(size: 10))
           .foregroundStyle(Color.txtTertiary)
@@ -374,7 +374,7 @@ private struct BottomCard: View {
         VStack(alignment: .leading, spacing: 2) {
           Text(row.0)
             .font(.bzrMono(size: 11, weight: .semibold))
-            .foregroundStyle(Color.bzrLime)
+            .foregroundStyle(Color.bzrLimeText)
           Text(row.1)
             .font(.bzrBody(size: 11))
             .foregroundStyle(Color.txtSecondary)

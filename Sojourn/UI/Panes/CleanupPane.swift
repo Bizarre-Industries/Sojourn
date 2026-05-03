@@ -6,51 +6,20 @@ struct CleanupPane: View {
   @Environment(AppStore.self) private var store
   @State private var scanning = false
 
-  private struct OrphanRow: Identifiable {
-    let id = UUID()
-    let selected: Bool
-    let path: String
-    let size: String
-    let owner: String
-    let klass: String
-    let klassKind: BzrBadgeKind
-    let lastTouched: String
-    let action: String
-  }
-
-  // Demo rows — replaced by store.orphans projection in Phase B.
-  private var demoRows: [OrphanRow] {
-    [
-      .init(selected: true, path: "~/.rbenv/", size: "412 MB", owner: "rbenv (brew · uninstalled 2025-12-04)", klass: "SAFE", klassKind: .success, lastTouched: "142 days", action: "TRASH"),
-      .init(selected: true, path: "~/.nvm/", size: "1.1 GB", owner: "nvm (curl · uninstalled)", klass: "SAFE", klassKind: .success, lastTouched: "98 days", action: "TRASH"),
-      .init(selected: true, path: "~/.config/old-fish/", size: "8.4 MB", owner: "fish shell (not in brew · zsh active)", klass: "REVIEW", klassKind: .tierC, lastTouched: "211 days", action: "TRASH"),
-      .init(selected: true, path: "~/Library/Application Support/Atom/", size: "887 MB", owner: "com.github.atom (no bundle ID found)", klass: "REVIEW", klassKind: .tierC, lastTouched: "3 years", action: "TRASH"),
-      .init(selected: false, path: "~/.docker/", size: "3.2 MB", owner: "Docker (cask · still installed)", klass: "KEEP", klassKind: .mute, lastTouched: "2 days", action: "—"),
-      .init(selected: false, path: "~/.zsh_sessions/", size: "21 MB", owner: "zsh (system · active)", klass: "RISKY", klassKind: .tierE, lastTouched: "2 hours", action: "—"),
-      .init(selected: false, path: "~/Library/LaunchAgents/com.heroku.cli.plist", size: "2 KB", owner: "heroku (brew · uninstalled)", klass: "RISKY", klassKind: .tierE, lastTouched: "62 days", action: "prompt")
-    ]
-  }
-
   var body: some View {
     ScrollView {
       VStack(alignment: .leading, spacing: 18) {
-        EyebrowLabel(text: "HYGIENE / DOTFILE ORPHANS / RECONCILED AGAINST TOOL INVENTORY")
+        EyebrowLabel(text: "CLEANUP · CleanupService · scan · trash · 30d retention")
           .padding(.top, 8)
-        Text("12 ORPHANS · 2.4GB")
+        Text("ORPHAN CANDIDATES.")
           .font(.bzrStencil(size: 30, weight: .heavy))
           .foregroundStyle(Color.txtPrimary)
-        Text("Reconciled against brew list, pipx list, $PATH probes, and data/dotfile_owners.toml. Shell history grep, last-used xattrs, and parent-dir mtime gate the call. Never auto-delete. Always Trash.")
+        Text("Rescan the home directory against the bundled-owners registry; anything left over without an owning package is a candidate for the Trash. Each move is reversible from Finder for 30 days.")
           .font(.bzrBody(size: 13))
           .foregroundStyle(Color.txtSecondary)
           .frame(maxWidth: 64 * 9, alignment: .leading)
 
-        BzrCallout(
-          title: "APFS atime is not trustworthy",
-          kind: .danger,
-          bodyText: "Default mount is non-strict atime. Quick Look ticks it. Spotlight ticks it. We use it as a tiebreaker only. Read the docs if you care."
-        )
-
-        HStack {
+        HStack(spacing: 8) {
           Button {
             Task {
               scanning = true
@@ -59,9 +28,8 @@ struct CleanupPane: View {
             }
           } label: {
             HStack(spacing: 6) {
-              Image(systemName: scanning ? "arrow.clockwise" : "magnifyingglass")
-                .font(.system(size: 11, weight: .semibold))
-              Text(scanning ? "Scanning…" : "Scan ~/Library")
+              Image(systemName: "magnifyingglass").font(.system(size: 11, weight: .semibold))
+              Text(scanning ? "Scanning…" : "Scan home")
             }
           }
           .buttonStyle(GlassCapsuleButtonStyle())
@@ -79,26 +47,35 @@ struct CleanupPane: View {
             }
           } label: {
             HStack(spacing: 6) {
-              Image(systemName: "trash")
-                .font(.system(size: 11, weight: .semibold))
+              Image(systemName: "trash").font(.system(size: 11, weight: .semibold))
               Text("Move \(store.orphans.count) to Trash")
             }
           }
           .buttonStyle(GlassDangerButtonStyle())
           .disabled(store.orphans.isEmpty)
-          .help("Each candidate is moved to the Finder Trash via NSFileManager.trashItem. Reversible from Trash for 30 days.")
+          .help("Each candidate is moved to the Finder Trash via NSFileManager.trashItem. Reversible for 30 days.")
         }
 
-        Text("Orphan candidates")
-          .font(.bzrDetailH2)
-          .foregroundStyle(Color.txtPrimary)
-          .padding(.top, 4)
-
-        orphanTable
-
-        Text("↻ DELETIONS LOGGED TO ~/Library/Application Support/Sojourn/deletions.db · 10 MOST RECENT UNDOABLE")
-          .font(.bzrMono(size: 10))
-          .foregroundStyle(Color.txtTertiary)
+        if store.orphans.isEmpty {
+          BzrCard(eyebrow: "ORPHANS") {
+            VStack(alignment: .leading, spacing: 6) {
+              Text(scanning ? "Scanning…" : "No orphan candidates")
+                .font(.bzrBody(size: 13, weight: .semibold))
+                .foregroundStyle(Color.txtPrimary)
+              if !scanning {
+                Text("Run a scan above. The bundled-owners registry maps ~50 common home-directory paths to their owning Homebrew formulae or App Store apps; anything outside the registry without an owner is flagged here.")
+                  .font(.bzrBody(size: 12))
+                  .foregroundStyle(Color.txtSecondary)
+              }
+            }
+          }
+        } else {
+          VStack(alignment: .leading, spacing: 0) {
+            ForEach(store.orphans) { orphan in
+              orphanRow(orphan)
+            }
+          }
+        }
       }
       .padding(28)
       .frame(maxWidth: .infinity, alignment: .leading)
@@ -106,97 +83,27 @@ struct CleanupPane: View {
     .accessibilityIdentifier("pane.cleanup")
   }
 
-  private var orphanTable: some View {
-    VStack(spacing: 0) {
-      // Header
-      HStack(spacing: 0) {
-        orphanHeader("", width: 28)
-        orphanHeader("Path", width: 240)
-        orphanHeader("Size", width: 80)
-        orphanHeader("Owner (missing)", width: 240)
-        orphanHeader("Class", width: 80)
-        orphanHeader("Last touched", width: 100)
-        orphanHeader("Action", width: 80)
-      }
-      .background(Color.white.opacity(0.02))
-      .overlay(
-        Rectangle().fill(Color.hairline).frame(height: 0.5),
-        alignment: .bottom
-      )
-
-      ForEach(demoRows) { row in
-        HStack(spacing: 0) {
-          // Checkbox
-          HStack {
-            Image(systemName: row.selected ? "checkmark.square.fill" : "square")
-              .font(.system(size: 12))
-              .foregroundStyle(row.selected ? Color.bzrLime : Color.txtTertiary)
-            Spacer()
-          }
-          .frame(width: 28).padding(.horizontal, 8).padding(.vertical, 7)
-
-          orphanCell(row.path, width: 240, color: .txtPrimary, weight: .semibold)
-          orphanCell(row.size, width: 80, color: .txtTertiary)
-          orphanCell(row.owner, width: 240, color: .txtTertiary)
-          HStack { BzrBadge(text: row.klass, kind: row.klassKind); Spacer() }
-            .frame(width: 80).padding(.horizontal, 12).padding(.vertical, 7)
-          orphanCell(row.lastTouched, width: 100, color: .txtTertiary)
-          HStack {
-            if row.action == "—" {
-              Text("—").font(.bzrMono(size: 10)).foregroundStyle(Color.txtTertiary)
-            } else if row.action == "prompt" {
-              Text("prompt").font(.bzrMono(size: 10)).foregroundStyle(Color.txtTertiary)
-            } else {
-              BzrBadge(text: row.action, kind: .mute)
-            }
-            Spacer()
-          }
-          .frame(width: 80).padding(.horizontal, 12).padding(.vertical, 7)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .overlay(
-          Rectangle().fill(Color.hairlineInner).frame(height: 0.5),
-          alignment: .bottom
-        )
-      }
+  @ViewBuilder
+  private func orphanRow(_ orphan: OrphanCandidate) -> some View {
+    HStack(spacing: 10) {
+      Image(systemName: "doc")
+        .font(.system(size: 11))
+        .foregroundStyle(Color.txtTertiary)
+      Text(orphan.path.path)
+        .font(.bzrMono(size: 11))
+        .foregroundStyle(Color.txtPrimary)
+        .lineLimit(1)
+        .truncationMode(.middle)
+      Spacer()
+      Text(ByteCountFormatter.string(fromByteCount: orphan.sizeBytes, countStyle: .file))
+        .font(.bzrMono(size: 10))
+        .foregroundStyle(Color.txtTertiary)
     }
-    .background(Color.black.opacity(0.20))
-    .clipShape(RoundedRectangle(cornerRadius: BzrRadius.bzrSharp, style: .continuous))
+    .padding(.horizontal, 12)
+    .padding(.vertical, 8)
     .overlay(
-      RoundedRectangle(cornerRadius: BzrRadius.bzrSharp, style: .continuous)
-        .stroke(Color.hairline, lineWidth: 0.5)
+      Rectangle().fill(Color.hairline).frame(height: 0.5),
+      alignment: .bottom
     )
-  }
-
-  @ViewBuilder
-  private func orphanHeader(_ text: String, width: CGFloat) -> some View {
-    Text(text)
-      .font(.bzrMono(size: 9, weight: .semibold))
-      .tracking(1.6)
-      .textCase(.uppercase)
-      .foregroundStyle(Color.txtTertiary)
-      .frame(width: width, alignment: .leading)
-      .padding(.horizontal, 12)
-      .padding(.vertical, 8)
-  }
-
-  @ViewBuilder
-  private func orphanCell(_ text: String, width: CGFloat, color: Color, weight: Font.Weight = .medium) -> some View {
-    Text(text)
-      .font(.bzrMono(size: 11, weight: weight))
-      .foregroundStyle(color)
-      .frame(width: width, alignment: .leading)
-      .padding(.horizontal, 12)
-      .padding(.vertical, 7)
-      .lineLimit(1)
-      .truncationMode(.middle)
-  }
-
-  private func badgeKind(for c: OrphanCandidate.Category) -> BzrBadgeKind {
-    switch c {
-    case .safe:   return .success
-    case .review: return .warn
-    case .risky:  return .danger
-    }
   }
 }

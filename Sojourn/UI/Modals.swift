@@ -56,7 +56,7 @@ struct BootstrapView: View {
           Text("YOU")
           Text("ALREADY")
           Text("KNOW.")
-            .foregroundStyle(Color.bzrLime)
+            .foregroundStyle(Color.bzrLimeText)
         }
         .font(.bzrStencil(size: 36, weight: .heavy))
         .foregroundStyle(Color.txtPrimary)
@@ -298,7 +298,7 @@ struct PushSheet: View {
     VStack(alignment: .leading, spacing: 16) {
       HStack(spacing: 10) {
         Image(systemName: "arrow.up")
-          .foregroundStyle(Color.bzrLime)
+          .foregroundStyle(Color.bzrLimeText)
         Text("Push")
           .font(.bzrDetailH2)
           .foregroundStyle(Color.txtPrimary)
@@ -361,7 +361,7 @@ struct PullSheet: View {
     VStack(alignment: .leading, spacing: 16) {
       HStack(spacing: 10) {
         Image(systemName: "arrow.down")
-          .foregroundStyle(Color.bzrLime)
+          .foregroundStyle(Color.bzrLimeText)
         Text("Pull")
           .font(.bzrDetailH2)
           .foregroundStyle(Color.txtPrimary)

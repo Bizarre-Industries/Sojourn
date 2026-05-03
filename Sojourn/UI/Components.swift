@@ -203,7 +203,7 @@ struct MenuBarRootView: View {
           Text(machineName.uppercased())
             .font(.bzrMono(size: 10, weight: .semibold))
             .tracking(1.4)
-            .foregroundStyle(Color.bzrLime)
+            .foregroundStyle(Color.bzrLimeText)
           Text("·")
             .font(.bzrMono(size: 10))
             .foregroundStyle(Color.txtTertiary)
@@ -221,6 +221,19 @@ struct MenuBarRootView: View {
 
       // Quick actions
       VStack(spacing: 6) {
+        Button {
+          Task { await store.refreshBrewfile() }
+        } label: {
+          HStack(spacing: 6) {
+            Image(systemName: "arrow.clockwise")
+              .font(.system(size: 10, weight: .semibold))
+            Text("Update Brewfile")
+            Spacer()
+          }
+        }
+        .buttonStyle(GlassCapsuleButtonStyle())
+        .accessibilityIdentifier("menubar.update")
+
         Button {
           Task { await store.sync?.pull() }
         } label: {
@@ -245,9 +258,26 @@ struct MenuBarRootView: View {
             Spacer()
           }
         }
-        .buttonStyle(GlassPrimaryButtonStyle())
+        .buttonStyle(GlassCapsuleButtonStyle())
         .disabled(store.sync == nil)
         .accessibilityIdentifier("menubar.push")
+
+        Button {
+          Task {
+            await store.sync?.pull()
+            await store.sync?.push(message: "sojourn: menu-bar sync")
+          }
+        } label: {
+          HStack(spacing: 6) {
+            Image(systemName: "arrow.triangle.2.circlepath")
+              .font(.system(size: 10, weight: .semibold))
+            Text("Sync (Pull then Push)")
+            Spacer()
+          }
+        }
+        .buttonStyle(GlassPrimaryButtonStyle())
+        .disabled(store.sync == nil)
+        .accessibilityIdentifier("menubar.sync")
       }
       .padding(.horizontal, 14)
       .padding(.vertical, 6)
@@ -271,12 +301,6 @@ struct MenuBarRootView: View {
       }
     }
     .frame(width: 300, alignment: .leading)
-    // Force a dark backdrop so the menubar dropdown reads correctly
-    // regardless of the system menubar appearance (the `.preferredColorScheme(.dark)`
-    // modifier on the MenuBarExtra Group doesn't reliably propagate
-    // into the menubar window — SwiftUI quirk on macOS 26).
-    .background(Color.bzrVoid2)
-    .environment(\.colorScheme, .dark)
   }
 
   private var machineName: String {

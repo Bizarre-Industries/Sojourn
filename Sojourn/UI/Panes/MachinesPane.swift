@@ -131,9 +131,13 @@ struct MachinesPane: View {
             HStack(spacing: 4) { Image(systemName: "terminal").font(.system(size: 11)); Text("Open in iTerm") }
           }
           .buttonStyle(GlassCapsuleButtonStyle())
+          .disabled(true)
+          .help("SSH-out from MachinesPane needs per-machine user@host config (not in MachineMetadata yet). Lands in v0.3.")
           if m.writer {
             Button {} label: { Image(systemName: "gearshape").font(.system(size: 11)) }
               .buttonStyle(GlassGhostButtonStyle())
+              .disabled(true)
+              .help("Per-machine override editor lands in v0.3.")
           }
           Spacer()
         }

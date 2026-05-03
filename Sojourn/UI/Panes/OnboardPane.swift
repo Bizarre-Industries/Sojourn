@@ -1,5 +1,6 @@
 // Sojourn — OnboardPane
 
+import AppKit
 import SwiftUI
 
 struct OnboardPane: View {
@@ -70,6 +71,8 @@ struct OnboardPane: View {
                   HStack(spacing: 4) { Image(systemName: "arrow.triangle.branch").font(.system(size: 11)); Text("Device flow") }
                 }
                 .buttonStyle(GlassCapsuleButtonStyle())
+                .disabled(true)
+                .help("GitHub Device Flow lands in v0.3. For now, configure the remote in Settings → Sync.")
               }
               Text("CLIENT_ID ONLY · NO SECRETS EMBEDDED · KEYCHAIN-STORED TOKEN")
                 .font(.bzrMono(size: 10))
@@ -89,10 +92,15 @@ struct OnboardPane: View {
                 // share this public key with the writer
                 age1qzr...l7kq
                 """)
-              Button {} label: {
+              Button {
+                let pb = NSPasteboard.general
+                pb.clearContents()
+                pb.setString("age1qzr...l7kq", forType: .string)
+              } label: {
                 HStack(spacing: 4) { Image(systemName: "doc.on.doc").font(.system(size: 11)); Text("Copy recipient") }
               }
               .buttonStyle(GlassCapsuleButtonStyle())
+              .help("Copies the demo public key to the clipboard. Real per-machine key generation lands with chezmoi age-keygen integration in v0.3.")
               Text("WRITER WILL RE-ENCRYPT TO BOTH ON NEXT PUSH")
                 .font(.bzrMono(size: 9))
                 .foregroundStyle(Color.txtTertiary)

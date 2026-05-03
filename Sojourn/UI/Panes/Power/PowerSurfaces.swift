@@ -328,6 +328,8 @@ struct BackupsPane: View {
               Text(b.size).font(.bzrMono(size: 10)).foregroundStyle(Color.txtTertiary)
               Button {} label: { Text("Restore").font(.bzrMono(size: 11)) }
                 .buttonStyle(GlassCapsuleButtonStyle())
+                .disabled(true)
+                .help("Backup restore lands in v0.3 alongside SnapshotService.rollback().")
             }
           }
         }

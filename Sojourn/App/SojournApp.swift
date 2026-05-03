@@ -12,6 +12,12 @@ struct SojournApp: App {
   @State private var storeBox = AppStoreBox()
 
   var body: some Scene {
+    // The Sojourn design (Claude Design handoff:
+    // docs/design/handoff/extracted/sojourn/project/styles.css) is
+    // dark-only — Tahoe Liquid Glass surfaces over a deep wallpaper,
+    // brand lime as the only bright accent. There are no light-mode
+    // tokens. Force dark on every Scene so the app is legible
+    // regardless of the user's System Settings → Appearance choice.
     WindowGroup {
       Group {
         if let store = storeBox.store {
@@ -33,29 +39,44 @@ struct SojournApp: App {
             .task { await storeBox.bootstrap() }
         }
       }
+      .preferredColorScheme(.dark)
     }
 
     MenuBarExtra {
-      if let store = storeBox.store {
-        MenuBarRootView().environment(store)
-      } else {
-        Text("Sojourn not ready").padding(12)
+      Group {
+        if let store = storeBox.store {
+          MenuBarRootView().environment(store)
+        } else {
+          Text("Sojourn not ready").padding(12)
+        }
       }
+      .preferredColorScheme(.dark)
     } label: {
-      SojournMenuBarIconView(size: 18, color: .primary)
+      // SF Symbol "s.square" is the most reliable menubar template-
+      // image path. Custom Path-based shapes (SojournMenuBarIconView)
+      // render blank in MenuBarExtra(label:) on macOS 26 because
+      // SwiftUI converts the label view to an NSImage with
+      // isTemplate=true and doesn't always preserve fill/stroke
+      // geometry through that conversion. SF Symbols are pre-rendered
+      // as proper template images.
+      Image(systemName: "s.square")
     }
     .menuBarExtraStyle(.window)
 
     SwiftUI.Settings {
-      if let store = storeBox.store {
-        SettingsRoot().environment(store)
-      } else {
-        Text("Sojourn not ready").padding(20)
+      Group {
+        if let store = storeBox.store {
+          SettingsRoot().environment(store)
+        } else {
+          Text("Sojourn not ready").padding(20)
+        }
       }
+      .preferredColorScheme(.dark)
     }
 
     Window("Architecture", id: "architecture") {
       ArchitectureView()
+        .preferredColorScheme(.dark)
     }
     .windowResizability(.contentSize)
     .commands {

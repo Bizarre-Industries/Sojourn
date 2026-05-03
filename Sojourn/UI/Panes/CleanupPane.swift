@@ -70,14 +70,23 @@ struct CleanupPane: View {
 
           Spacer()
 
-          Button {} label: {
+          Button {
+            Task {
+              for orphan in store.orphans {
+                _ = try? await store.cleanup.trash(orphan)
+              }
+              await store.rescanOrphans()
+            }
+          } label: {
             HStack(spacing: 6) {
               Image(systemName: "trash")
                 .font(.system(size: 11, weight: .semibold))
-              Text("Move 4 to Trash")
+              Text("Move \(store.orphans.count) to Trash")
             }
           }
           .buttonStyle(GlassDangerButtonStyle())
+          .disabled(store.orphans.isEmpty)
+          .help("Each candidate is moved to the Finder Trash via NSFileManager.trashItem. Reversible from Trash for 30 days.")
         }
 
         Text("Orphan candidates")

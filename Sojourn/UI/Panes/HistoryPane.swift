@@ -146,6 +146,8 @@ struct HistoryPane: View {
               .font(.bzrMono(size: 10))
           }
           .buttonStyle(GlassGhostButtonStyle())
+          .disabled(true)
+          .help("Snapshot rollback (brew bundle install --cleanup --file=<snapshot>) lands in v0.3 — SnapshotService.capture() ships in v0.2 but rollback() does not.")
         }
       }
     }

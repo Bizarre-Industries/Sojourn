@@ -150,10 +150,14 @@ struct DotfilesPane: View {
             HStack(spacing: 4) { Image(systemName: "xmark").font(.system(size: 10)); Text("Discard") }
           }
           .buttonStyle(GlassGhostButtonStyle())
+          .disabled(true)
+          .help("Discard reverts a dotfile to its chezmoi source via `chezmoi forget`. Wired in v0.3 once DotfilesPane reads the live managed list.")
           Button { } label: {
             HStack(spacing: 4) { Image(systemName: "terminal").font(.system(size: 10)); Text("Open editor") }
           }
           .buttonStyle(GlassCapsuleButtonStyle())
+          .disabled(true)
+          .help("Opens the file in $EDITOR. Wired in v0.3 once DotfilesPane reads the live managed list.")
         }
 
         Text("Diff · working tree → source")

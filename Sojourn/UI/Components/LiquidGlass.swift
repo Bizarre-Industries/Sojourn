@@ -22,7 +22,7 @@ internal struct LiquidGlassBackground: ViewModifier {
           RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
             .fill(tint)
           RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-            .stroke(Color.white.opacity(0.10), lineWidth: 0.5)
+            .stroke(Color.hairlineStrong, lineWidth: 0.5)
         }
       )
   }
@@ -51,7 +51,7 @@ internal struct GlassCapsuleButtonStyle: ButtonStyle {
       .padding(.vertical, 5)
       .background(
         Capsule()
-          .fill(Color.white.opacity(configuration.isPressed ? 0.20 : 0.10))
+          .fill(Color.adaptiveLighten(configuration.isPressed ? 0.20 : 0.10))
           .overlay(Capsule().stroke(Color.hairlineStrong, lineWidth: 0.5))
       )
       .contentShape(Capsule())
@@ -99,7 +99,7 @@ internal struct GlassGhostButtonStyle: ButtonStyle {
       .padding(.vertical, 4)
       .background(
         Capsule()
-          .fill(configuration.isPressed ? Color.white.opacity(0.06) : Color.clear)
+          .fill(configuration.isPressed ? Color.adaptiveLighten(0.06) : Color.clear)
       )
       .contentShape(Capsule())
   }
@@ -125,7 +125,7 @@ internal struct GlassSegmentedControl<Selection: Hashable>: View {
             .padding(.vertical, 4)
             .background(
               RoundedRectangle(cornerRadius: 5, style: .continuous)
-                .fill(isActive ? Color.white.opacity(0.12) : Color.clear)
+                .fill(isActive ? Color.adaptiveLighten(0.12) : Color.clear)
                 .overlay(
                   RoundedRectangle(cornerRadius: 5, style: .continuous)
                     .stroke(isActive ? Color.hairlineStrong : Color.clear, lineWidth: 0.5)
@@ -138,7 +138,7 @@ internal struct GlassSegmentedControl<Selection: Hashable>: View {
     .padding(2)
     .background(
       RoundedRectangle(cornerRadius: 7, style: .continuous)
-        .fill(Color.black.opacity(0.30))
+        .fill(Color.adaptiveDeepen(0.30))
         .overlay(
           RoundedRectangle(cornerRadius: 7, style: .continuous)
             .stroke(Color.hairline, lineWidth: 0.5)
@@ -157,11 +157,11 @@ internal struct GlassSheetBackground: ViewModifier {
           RoundedRectangle(cornerRadius: 14, style: .continuous)
             .fill(.regularMaterial)
           RoundedRectangle(cornerRadius: 14, style: .continuous)
-            .fill(Color(red: 36 / 255, green: 36 / 255, blue: 40 / 255).opacity(0.40))
+            .fill(Color.glassPopover)
           RoundedRectangle(cornerRadius: 14, style: .continuous)
             .stroke(Color.hairlineStrong, lineWidth: 0.5)
         }
       )
-      .shadow(color: Color.black.opacity(0.7), radius: 30, x: 0, y: 12)
+      .shadow(color: Color.adaptiveDeepen(0.7), radius: 30, x: 0, y: 12)
   }
 }

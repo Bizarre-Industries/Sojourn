@@ -8,7 +8,7 @@ struct OverviewPane: View {
   var body: some View {
     ScrollView {
       VStack(alignment: .leading, spacing: 24) {
-        EyebrowLabel(text: "BIZARRE / SOJOURN / V1.0 / GPL-3.0-OR-LATER · GUI OVER brew bundle × chezmoi × defaults")
+        EyebrowLabel(text: "BIZARRE / SOJOURN / v0.2 / GPL-3.0-OR-LATER · GUI OVER brew bundle × chezmoi × defaults")
           .padding(.top, 8)
 
         // Hero — "PACKAGES. DOTFILES. PREFS."
@@ -62,11 +62,12 @@ struct OverviewPane: View {
   // MARK: Packages card
 
   private var packagesCard: some View {
-    let total = store.managers.values.map { $0.packages.count }.reduce(0, +)
-    let outdated = store.managers.values
-      .flatMap { $0.packages }
-      .filter { $0.installedVersion != nil && $0.installedVersion != ($0.latestVersion ?? "") && $0.latestVersion != nil }
-      .count
+    // Real package count from the parsed Brewfile AST (BrewfileService
+    // dump). `outdated` is not yet computed for v0.2 — `brew bundle dump`
+    // is a snapshot of the spec, not a diff against installed state.
+    // Showing "—" until step 11 wires `brew outdated` parsing.
+    let total = store.brewfile?.packageCount ?? 0
+    let outdatedLabel = "—"
 
     return VStack(alignment: .leading, spacing: 0) {
       // Header strip.
@@ -79,7 +80,7 @@ struct OverviewPane: View {
             .font(.bzrStencil(size: 18, weight: .heavy))
             .foregroundStyle(Color.txtPrimary)
           Spacer()
-          Text("\(total) · \(outdated) OUTDATED")
+          Text("\(total) · \(outdatedLabel) OUTDATED")
             .font(.bzrMono(size: 11, weight: .medium))
             .foregroundStyle(Color.bzrLime)
         }
@@ -148,13 +149,14 @@ struct OverviewPane: View {
   }
 
   private var packagesTierRows: [PackagesTierRow] {
-    [
-      .init(tier: "A", tierKind: .tierA, label: "mas", count: "14", note: "auto · 0d · Apple reviews"),
-      .init(tier: "B", tierKind: .tierB, label: "brew", count: "87", note: "7d · curated formulae"),
-      .init(tier: "B", tierKind: .tierB, label: "cargo", count: "22", note: "7d · crates.io"),
-      .init(tier: "C", tierKind: .tierC, label: "cask", count: "31", note: "7d · prompt · install scripts"),
-      .init(tier: "D", tierKind: .tierD, label: "pipx · pip", count: "11", note: "7d · prompt · global interpreter"),
-      .init(tier: "E", tierKind: .tierE, label: "npm global", count: "9", note: "14d · never silent · pre/postinstall")
+    let c = store.brewfile?.counts ?? .init()
+    return [
+      .init(tier: "A", tierKind: .tierA, label: "mas", count: "\(c.mas)", note: "auto · 0d · Apple reviews"),
+      .init(tier: "B", tierKind: .tierB, label: "brew", count: "\(c.brews)", note: "7d · curated formulae"),
+      .init(tier: "B", tierKind: .tierB, label: "cargo", count: "\(c.cargo)", note: "7d · crates.io"),
+      .init(tier: "C", tierKind: .tierC, label: "cask", count: "\(c.casks)", note: "7d · prompt · install scripts"),
+      .init(tier: "D", tierKind: .tierD, label: "uv · pip", count: "\(c.uv)", note: "7d · prompt · global interpreter"),
+      .init(tier: "E", tierKind: .tierE, label: "npm global", count: "\(c.npm)", note: "14d · never silent · pre/postinstall")
     ]
   }
 
@@ -171,11 +173,11 @@ struct OverviewPane: View {
             .font(.bzrStencil(size: 18, weight: .heavy))
             .foregroundStyle(Color.txtPrimary)
           Spacer()
-          Text("32 · 4 DRIFT")
+          Text(store.chezmoi == nil ? "NOT CONFIGURED" : "TRACKED")
             .font(.bzrMono(size: 11, weight: .medium))
-            .foregroundStyle(Color.bzrLime)
+            .foregroundStyle(store.chezmoi == nil ? Color.txtTertiary : Color.bzrLime)
         }
-        Text("chezmoi 2.70.2 · age · per-host templates")
+        Text("chezmoi · age · per-host templates")
           .font(.bzrMono(size: 10))
           .foregroundStyle(Color.txtTertiary)
       }
@@ -245,9 +247,9 @@ struct OverviewPane: View {
             .font(.bzrStencil(size: 18, weight: .heavy))
             .foregroundStyle(Color.txtPrimary)
           Spacer()
-          Text("18 · 2 DRIFT")
+          Text("—")
             .font(.bzrMono(size: 11, weight: .medium))
-            .foregroundStyle(Color.bzrLime)
+            .foregroundStyle(Color.txtTertiary)
         }
         Text("defaults export/import · plutil xml1 · cfprefsd")
           .font(.bzrMono(size: 10))
@@ -323,7 +325,8 @@ struct OverviewPane: View {
           .foregroundStyle(Color.txtTertiary)
         HStack(spacing: 8) {
           Button {
-            // Pull sheet trigger — wired by SyncCoordinator in Phase B.
+            guard let sync = store.sync else { return }
+            Task { await sync.pull() }
           } label: {
             HStack(spacing: 6) {
               Image(systemName: "arrow.down")
@@ -332,27 +335,43 @@ struct OverviewPane: View {
             }
           }
           .buttonStyle(GlassCapsuleButtonStyle())
+          .disabled(store.sync == nil)
 
           Button {
-            // Push sheet trigger — wired by SyncCoordinator in Phase B.
+            guard let sync = store.sync else { return }
+            Task { await sync.push(message: "sojourn: sync") }
           } label: {
             HStack(spacing: 6) {
               Image(systemName: "arrow.up")
                 .font(.system(size: 11, weight: .semibold))
-              Text("Push 3 changes")
+              Text("Push")
             }
           }
           .buttonStyle(GlassPrimaryButtonStyle())
+          .disabled(store.sync == nil)
 
           Spacer()
 
-          Text("LAST PUSH 2H · a3f9c2e · clean")
-            .font(.bzrMono(size: 10))
-            .foregroundStyle(Color.txtTertiary)
+          if let last = store.settings.lastSyncTime {
+            Text("LAST SYNC \(Self.relativeTimeFormatter.localizedString(for: last, relativeTo: Date()).uppercased())")
+              .font(.bzrMono(size: 10))
+              .foregroundStyle(Color.txtTertiary)
+          } else {
+            Text(store.sync == nil ? "SYNC NOT CONFIGURED — SEE SETTINGS" : "NO SYNCS YET")
+              .font(.bzrMono(size: 10))
+              .foregroundStyle(Color.txtTertiary)
+          }
         }
       }
     }
   }
+
+  // Formatter for the "LAST SYNC 14m ago" footer in carryMotionCard.
+  private static let relativeTimeFormatter: RelativeDateTimeFormatter = {
+    let f = RelativeDateTimeFormatter()
+    f.unitsStyle = .abbreviated
+    return f
+  }()
 
   // MARK: Scheduler card
 

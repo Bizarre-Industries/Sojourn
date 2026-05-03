@@ -82,7 +82,7 @@ struct BootstrapView: View {
       }
       .padding(28)
       .frame(width: 280, alignment: .topLeading)
-      .background(Color.black.opacity(0.30))
+      .background(Color.adaptiveDeepen(0.30))
       .overlay(
         Rectangle().fill(Color.hairline).frame(width: 0.5),
         alignment: .trailing
@@ -149,7 +149,7 @@ struct BootstrapView: View {
     switch s {
     case .done:    return .bzrLime
     case .active:  return Color.bzrLime.opacity(0.20)
-    case .pending: return Color.white.opacity(0.04)
+    case .pending: return Color.adaptiveLighten(0.04)
     }
   }
 
@@ -324,7 +324,7 @@ struct PushSheet: View {
           .padding(8)
           .background(
             RoundedRectangle(cornerRadius: 6)
-              .fill(Color.black.opacity(0.25))
+              .fill(Color.adaptiveDeepen(0.25))
               .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.hairline, lineWidth: 0.5))
           )
       }

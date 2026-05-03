@@ -1,79 +1,72 @@
-// Sojourn — v0.2 pane stubs
+// Sojourn — v0.2 pane shell
 //
-// Placeholder views for the 4 new Pane enum cases that v0.2 introduces
-// in MainWindowView (Generations, MacOSFeatures, Sync, Advisories).
-// Full implementations land in:
+// SyncPane is the consolidated multi-tab surface that hosts the four
+// pre-existing sync sub-panes (push/pull history, conflicts, onboarding,
+// machine writer-lock status). The earlier stub `StubView` is gone now
+// that all v0.2 panes are real.
 //
-//   - GenerationsPane    → step 6 (GenerationService + tarball schema)
-//   - MacOSFeaturesPane  → step 7 (Touch ID, dock, Finder, hotkeys)
-//   - AdvisoriesPane     → step 10 (brew vulns shell-out)
-//   - SyncPane           → step 6 + step 5 (machines + history + onboard
-//                          consolidation; existing MachinesPane /
-//                          HistoryPane / OnboardPane remain on disk
-//                          until step 4's Panes.swift split)
-//
-// Stubs use the same lime accent + monospace JetBrains tone as the
-// rest of the v0.1 UI so the v0.2 shell looks coherent during the
-// in-progress steps.
-//
-// Refs: docs/process/plans/v0.2-plan.md.
+// Refs: docs/process/plans/v0.2-plan.md;
+//       ADR-0012 (cooperative writer lock — pull resolves any conflict
+//                 before push is allowed).
 
 import SwiftUI
 
 internal struct SyncPane: View {
-  var body: some View {
-    StubView(
-      paneID: "pane.sync",
-      title: "Sync",
-      subtitle: "Push / pull / history / conflicts (v0.2 step 5+6)",
-      icon: "arrow.triangle.2.circlepath",
-      detail: """
-      Consolidates the v0.1 History, Conflicts, and Onboard panes into
-      one master surface. Top half: push/pull controls + history
-      timeline. Bottom half: conflicts list (when present) + machine
-      writer-lock status.
+  private enum Tab: String, Hashable, CaseIterable, Identifiable {
+    case history
+    case conflicts
+    case onboard
+    case machines
 
-      Cooperative writer lock per ADR-0012 — pull resolves any conflict
-      before push is allowed.
-      """
-    )
+    var id: String { rawValue }
+
+    var label: String {
+      switch self {
+      case .history:   return "History"
+      case .conflicts: return "Conflicts"
+      case .onboard:   return "Onboard"
+      case .machines:  return "Machines"
+      }
+    }
+
+    var icon: String {
+      switch self {
+      case .history:   return "clock"
+      case .conflicts: return "exclamationmark.triangle"
+      case .onboard:   return "play.circle"
+      case .machines:  return "laptopcomputer.and.iphone"
+      }
+    }
   }
-}
 
-private struct StubView: View {
-  let paneID: String
-  let title: String
-  let subtitle: String
-  let icon: String
-  let detail: String
+  @State private var tab: Tab = .history
 
   var body: some View {
-    VStack(alignment: .leading, spacing: 16) {
-      HStack(spacing: 12) {
-        Image(systemName: icon)
-          .font(.system(size: 28, weight: .medium))
-          .foregroundStyle(.tint)
-        VStack(alignment: .leading, spacing: 2) {
-          Text(title)
-            .font(.system(size: 22, weight: .bold))
-          Text(subtitle)
-            .font(.system(size: 13, weight: .regular))
-            .foregroundStyle(.secondary)
+    VStack(spacing: 0) {
+      Picker("", selection: $tab) {
+        ForEach(Tab.allCases) { t in
+          Label(t.label, systemImage: t.icon).tag(t)
         }
       }
+      .pickerStyle(.segmented)
+      .labelsHidden()
+      .padding(.horizontal, 24)
+      .padding(.top, 16)
+      .padding(.bottom, 8)
 
-      Text(detail)
-        .font(.system(size: 12, weight: .regular, design: .monospaced))
-        .foregroundStyle(.secondary)
-        .textSelection(.enabled)
-        .frame(maxWidth: 720, alignment: .leading)
-        .padding(12)
-        .background(.quaternary, in: RoundedRectangle(cornerRadius: 8))
+      Divider()
 
-      Spacer(minLength: 0)
+      Group {
+        switch tab {
+        case .history:   HistoryPane()
+        case .conflicts: ConflictsPane()
+        case .onboard:   OnboardPane()
+        case .machines:  MachinesPane()
+        }
+      }
+      .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
-    .padding(24)
     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-    .accessibilityIdentifier(paneID)
+    .accessibilityIdentifier("pane.sync")
   }
 }

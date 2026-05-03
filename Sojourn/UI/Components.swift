@@ -111,7 +111,7 @@ struct SojournToolbar: View {
       .frame(width: 240)
       .background(
         Capsule()
-          .fill(Color.white.opacity(0.05))
+          .fill(Color.adaptiveLighten(0.05))
           .overlay(Capsule().stroke(Color.hairline, lineWidth: 0.5))
       )
       .padding(.leading, 8)

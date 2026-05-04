@@ -44,6 +44,13 @@ struct PrefServiceTests {
     let ok = await pref.canAccess(domain: "com.example.does.not.exist")
     #expect(ok == false)
   }
+
+  @Test func loadDomainCorpusReadsBundledResource() {
+    let pref = PrefService.mock { _, _ in Data() }
+    let entries = pref.loadDomainCorpus()
+    #expect(!entries.isEmpty)
+    #expect(entries.allSatisfy { !$0.bundleID.isEmpty && !$0.displayName.isEmpty })
+  }
 }
 
 struct SecretScanServiceTests {

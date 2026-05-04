@@ -62,15 +62,18 @@ jobs:
 
       - name: Import Developer ID certificate
         run: |
-          echo "$DEVELOPER_ID_P12_BASE64" | base64 --decode -o /tmp/dev-id.p12
+          P12_FILE="$(mktemp -t sojourn-dev-id.XXXXXX)"
+          chmod 600 "$P12_FILE"
+          trap 'rm -P -f "$P12_FILE"' EXIT
+          printf '%s' "$DEVELOPER_ID_P12_BASE64" | base64 --decode -o "$P12_FILE"
           security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
           security set-keychain-settings -lut 43200 build.keychain
           security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
-          security import /tmp/dev-id.p12 -P "$DEVELOPER_ID_P12_PASSWORD" -A -t cert -f pkcs12 -k build.keychain
+          security import "$P12_FILE" -P "$DEVELOPER_ID_P12_PASSWORD" -A -t cert -f pkcs12 -k build.keychain
           # shellcheck disable=SC2046  # intentional word split
           security list-keychains -d user -s build.keychain $(security list-keychains -d user | sed 's/\"//g')
           security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PASSWORD" build.keychain
-          rm /tmp/dev-id.p12
+          rm -P -f "$P12_FILE"
 
       - name: Inject Local.xcconfig
         run: |
@@ -156,47 +159,51 @@ jobs:
           restore-keys: |
             sparkle-prior-dmgs-
 
-      - name: Download Sparkle release tarball (generate_appcast tools)
+      - name: Load Sparkle EdDSA key
+        id: load_sparkle_key
         if: "!contains(github.ref, '-')"
+        uses: 1password/load-secrets-action@92467eb28f72e8255933372f1e0707c567ce2259 # v4.0.0
+        with:
+          export-env: false
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release download 2.9.1 \
-            --repo sparkle-project/Sparkle \
-            --pattern 'Sparkle-2.9.1.tar.xz' \
-            --output sparkle.tar.xz
-          mkdir -p sparkle-tools
-          tar -xJf sparkle.tar.xz -C sparkle-tools
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          SPARKLE_EDDSA_PRIVATE_KEY: op://Bizarre-Industries/sojourn-sparkle-eddsa/private
 
       - name: Generate appcast (full + delta entries)
         if: "!contains(github.ref, '-')"
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+          RELEASE_REPOSITORY: ${{ github.repository }}
+          SPARKLE_EDDSA_PRIVATE_KEY: ${{ steps.load_sparkle_key.outputs.SPARKLE_EDDSA_PRIVATE_KEY }}
         run: |
           set -euo pipefail
-          mkdir -p prior-dmgs
-          cp Sojourn.dmg "prior-dmgs/Sojourn-${{ github.ref_name }}.dmg"
-          # sign_update reads the EdDSA private key from stdin (per
-          # ADR-0020 §"Key handling protocol"). generate_appcast
-          # invokes sign_update internally via --ed-key-file=- pattern.
-          # We provide the key via a 600-mode tempfile and remove it
-          # immediately after generate_appcast exits (RAII pattern).
-          KEY_FILE="$(mktemp)"
-          chmod 600 "$KEY_FILE"
-          printf '%s' "$SPARKLE_EDDSA_PRIVATE_KEY" > "$KEY_FILE"
-          # rm -P shreds (multi-pass overwrite) per ADR-0016 ephemeral
-          # key handling; APFS may CoW so this is best-effort defense.
-          trap 'rm -P -f "$KEY_FILE"' EXIT
-          # Verify the secret loaded; an empty op:// load would silently
-          # produce signatures with an empty key (council security cond).
-          if [ ! -s "$KEY_FILE" ]; then
+          if [[ ! "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "FATAL: release tag must be vMAJOR.MINOR.PATCH; got ${RELEASE_TAG}" >&2
+            exit 1
+          fi
+          if [[ ! "$RELEASE_REPOSITORY" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]]; then
+            echo "FATAL: unexpected repository slug: ${RELEASE_REPOSITORY}" >&2
+            exit 1
+          fi
+          if [ -z "${SPARKLE_EDDSA_PRIVATE_KEY:-}" ]; then
             echo "FATAL: SPARKLE_EDDSA_PRIVATE_KEY loaded empty from 1Password." >&2
             exit 1
           fi
-          ./sparkle-tools/Sparkle-2.9.1/bin/generate_appcast \
-            --ed-key-file "$KEY_FILE" \
+          echo "::add-mask::${SPARKLE_EDDSA_PRIVATE_KEY}"
+          GENERATE_APPCAST="$(find build/SourcePackages/artifacts -path '*/Sparkle/bin/generate_appcast' -type f | head -n 1)"
+          if [ -z "$GENERATE_APPCAST" ] || [ ! -x "$GENERATE_APPCAST" ]; then
+            echo "FATAL: Sparkle generate_appcast tool not found in Xcode-resolved package artifacts." >&2
+            exit 1
+          fi
+          mkdir -p prior-dmgs
+          cp Sojourn.dmg "prior-dmgs/Sojourn-${RELEASE_TAG}.dmg"
+          printf '%s' "$SPARKLE_EDDSA_PRIVATE_KEY" | "$GENERATE_APPCAST" \
+            --ed-key-file - \
             --maximum-versions 10 \
             --link "https://sojourn.bizarre.app/" \
-            --download-url-prefix "https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/" \
+            --download-url-prefix "https://github.com/${RELEASE_REPOSITORY}/releases/download/${RELEASE_TAG}/" \
             prior-dmgs
+          unset SPARKLE_EDDSA_PRIVATE_KEY
           # generate_appcast writes appcast.xml in the prior-dmgs dir;
           # copy it back to repo root for the upload step.
           cp prior-dmgs/appcast.xml appcast.xml
@@ -220,9 +227,13 @@ jobs:
           files: Sojourn.dmg
           generate_release_notes: true
 
-      - name: Setup Homebrew
+      - name: Verify Homebrew
         if: "!contains(github.ref, '-')"
-        uses: Homebrew/actions/setup-homebrew@main
+        timeout-minutes: 5
+        run: |
+          set -euo pipefail
+          brew --version
+          brew update --quiet
 
       - name: Style-check cask
         # `brew audit [path ...]` was disabled in Homebrew 5.x — only
@@ -231,6 +242,8 @@ jobs:
         # local-file linting layer; `brew bump-cask-pr` runs full audit
         # against the bumped tap-side cask before opening the PR.
         if: "!contains(github.ref, '-')"
+        env:
+          HOMEBREW_NO_AUTO_UPDATE: "1"
         run: brew style ./Casks/sojourn.rb
 
       - name: Install coreutils (gtimeout)
@@ -238,6 +251,8 @@ jobs:
         # audit + git push in gtimeout to fail fast. Install once here so
         # the publish step doesn't have to.
         if: "!contains(github.ref, '-')"
+        env:
+          HOMEBREW_NO_AUTO_UPDATE: "1"
         run: brew install --quiet coreutils
 
       - name: Publish Homebrew cask update
@@ -247,8 +262,9 @@ jobs:
         # script so we can replay it locally (e.g. `act` for CI testing,
         # or for backfilling missed cask publishes). See script header
         # for the full safeguard list and the council deliberation at
-        # .claude/council-logs/2026-05-01-notarize-publish-direct-push.md.
+        # .Codex/council-logs/2026-05-01-notarize-publish-direct-push.md.
         if: "!contains(github.ref, '-')"
         env:
           TAP_TOKEN: ${{ env.HOMEBREW_TAP_TOKEN }}
+          HOMEBREW_NO_AUTO_UPDATE: "1"
         run: bash scripts/publish-homebrew-cask.sh Sojourn.dmg

@@ -16,7 +16,9 @@ Release authority: the Sojourn maintainer only. See
 4. Create `Bizarre-Industries/homebrew-sojourn` tap repo.
 5. Create a fine-grained PAT with `contents:write` on the tap repo —
    paste as `HOMEBREW_TAP_TOKEN` in the release environment secrets.
-6. Add GitHub repository secrets for the release environment:
+6. Add GitHub repository secrets for the release environment, or map
+   them from the 1Password `Load 1Password secrets` step in
+   `notarize.yml`:
    - `DEVELOPER_ID_P12_BASE64` (base64 of the .p12)
    - `DEVELOPER_ID_P12_PASSWORD`
    - `DEVELOPER_ID_IDENTITY` (full cert common name)
@@ -24,6 +26,7 @@ Release authority: the Sojourn maintainer only. See
    - `KEYCHAIN_PASSWORD` (arbitrary; gates the temp build keychain)
    - `APPLE_ID` (Apple ID email)
    - `APPLE_APP_SPECIFIC_PASSWORD`
+   - `SPARKLE_EDDSA_PRIVATE_KEY`
    - `HOMEBREW_TAP_TOKEN`
 7. Set `DEVELOPMENT_TEAM` in a local `Sojourn/Config/Local.xcconfig`
    (gitignored) for Xcode signing.
@@ -48,7 +51,7 @@ because it doesn't `needs:` build (failures are caught in the concurrent
 ## Local verification (run BEFORE every commit)
 
 ```sh
-make ci-local       # mirrors ci.yml: actionlint + gitleaks + swiftlint + swift-format
+make ci-local       # release gate: actionlint, gitleaks, pins, zizmor, expiry, advisory Swift lint/format
 make test           # swift test
 make xcodebuild     # full Xcode test (mirrors build.yml's xcodebuild job)
 make act-ci         # run ci.yml's ubuntu jobs in Docker via nektos/act
@@ -64,6 +67,13 @@ are the local equivalents of the macOS jobs in `build.yml`.
 2. Regenerate Xcode project: `make generate` (runs
    `scripts/regenerate-project.sh`).
 3. Local pre-flight: `make ci-local && make test && make xcodebuild`.
+   `make xcodebuild` includes `SojournUITests`, so it requires a real
+   `DEVELOPMENT_TEAM` in `Sojourn/Config/Local.xcconfig` or passed as
+   `DEVELOPMENT_TEAM=<Team ID>`, plus an explicit
+   `CODE_SIGN_IDENTITY="Apple Development"`. An unsigned or ad-hoc
+   local UI-test loader failure is not release evidence; use the
+   `-only-testing:SojournTests` command only as a unit-test fallback
+   while configuring signing.
 4. Tag: `git tag -s vX.Y.Z -m "release vX.Y.Z"`.
 5. Push tag: `git push origin vX.Y.Z`.
 6. Watch GitHub Actions → `notarize.yml` workflow:
@@ -76,7 +86,7 @@ are the local equivalents of the macOS jobs in `build.yml`.
    - runs `spctl --assess` on `.app` AND `.dmg` **before** upload
    - uploads `Sojourn.dmg` to GitHub Release
    - invokes `scripts/publish-homebrew-cask.sh` to bump the tap
-7. Download the DMG on a clean Sequoia/Tahoe VM and verify Gatekeeper
+7. Download the DMG on a clean Tahoe VM and verify Gatekeeper
    accepts it: `spctl --assess --verbose=4 Sojourn.dmg`.
 
 ## Post-release
@@ -88,21 +98,17 @@ are the local equivalents of the macOS jobs in `build.yml`.
 
 ### Replan-on-ship hook
 
-Opening a Claude Code session in this repo after a `v*` tag is pushed
-fires `.claude/hooks/replan-on-ship.sh` (wired via `.claude/settings.json`
-on `SessionStart` + `Stop`). The hook compares `git tag -l 'v*'` against
-the per-clone marker `.claude/.last-shipped-tag` (gitignored). If a new
-tag is found it injects a system-context message instructing Claude to
-reanalyze the repo, docs, and `docs/process/implementation-plan.md` and
-write a new plan at `~/.claude/plans/sojourn-post-<tag>.md` toward the
-next version per the phase ladder.
+Opening an agent session in this repo after a `v*` tag is pushed fires
+`.Codex/hooks/replan-on-tag.sh`. The hook compares `git tag -l 'v*'`
+against the per-clone marker `.Codex/.last-shipped-tag` (gitignored). If
+a new tag is found, the next session writes the next active plan at
+`docs/process/plans/v0.X-plan.md`.
 
-After the new plan is written and approved, Claude advances the marker
-with `bash .claude/hooks/mark-replanned.sh <tag>` so subsequent sessions
-start clean. The marker is **per-clone, never committed** — each
-maintainer workstation re-prompts independently.
+After the new plan is written and approved, advance the marker with
+`bash .Codex/hooks/mark-replanned.sh <tag>` so subsequent sessions start
+clean. The marker is **per-clone, never committed**.
 
-Manual override: edit `.claude/.last-shipped-tag` directly (or `rm` it to
+Manual override: edit `.Codex/.last-shipped-tag` directly (or `rm` it to
 re-trigger), or write a tag string the hook should treat as "already
 replanned."
 

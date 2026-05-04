@@ -29,9 +29,10 @@ notarization and DMG creation. The step:
 1. Uses `actions/cache` keyed on the prior release tag to fetch the
    previous Sojourn.dmg into a local archive directory.
 2. Reads the EdDSA signing key from
-   `op://Bizarre-Industries/sojourn-sparkle-eddsa` via `op` CLI,
-   piping the key on stdin to `sign_update` (no tempfile, no
-   `--key-file`; matches ADR-0020 §"Key handling protocol").
+   `op://Bizarre-Industries/sojourn-sparkle-eddsa/private` via the
+   1Password release environment, then pipes it on stdin to Sparkle's
+   `generate_appcast --ed-key-file -` (no tempfile, no raw key
+   command-line argument; matches ADR-0020 §"Key handling protocol").
 3. Runs `generate_appcast --maximum-versions=10` against the archive
    directory. Output is `appcast.xml` with full-DMG and delta
    entries; signatures embedded per Sparkle spec.
@@ -54,9 +55,11 @@ test must intentionally corrupt one byte of a delta archive on a
 clean Tahoe VM and confirm the explicit fallback re-fetches the full
 DMG before tagging v0.3.0.
 
-`Package.swift` adds Sparkle SPM dep
-`https://github.com/sparkle-project/Sparkle` `from: "2.6.0"`.
-`project.yml` adds Sparkle to Sojourn target deps.
+`project.yml` adds Sparkle to the Xcode-built Sojourn app target. The
+SwiftPM library manifest intentionally does not depend on Sparkle:
+`SparkleService` compiles a no-op same-API service only when
+`SWIFT_PACKAGE` is set, while Xcode/app builds import Sparkle
+unconditionally and fail if the package dependency regresses.
 
 ## Consequences
 
@@ -66,15 +69,16 @@ DMG before tagging v0.3.0.
   (4-8 MB vs 30-80 MB).
 - Lower CDN cost (single GitHub Releases asset still serves both
   full and delta on demand).
-- Sparkle 2 delta-apply failure fallback is handled by the framework
-  itself, reducing custom code.
+- Sparkle 2 handles delta archive generation and signing; Sojourn owns
+  the one-shot full-DMG retry when the delegate reports a delta apply
+  failure.
 - Delta generation is a CI-side step; nothing in the running app
   changes day-to-day beyond initialization.
 
 ### Negative
 
-- New SPM dependency adds maintenance surface (Sparkle releases must
-  be reviewed before bump).
+- New Xcode package dependency adds maintenance surface (Sparkle
+  releases must be reviewed before bump).
 - `notarize.yml` workflow grows (one more step + cache + 1Password
   secret read). Retention math (10 versions) is a magic number that
   may need tuning if release cadence increases.
@@ -121,12 +125,12 @@ re-invoking the updater with the full-DMG enclosure.
 
 ### Sparkle launch sequencing
 
-`SPUStandardUpdaterController` initialization runs in
-`Task.detached` from `SojournApp` — does not block menubar
-appearance (200ms launch budget per v0.2 perf baseline). Appcast
-fetch timeout set to 30s explicitly via `SPUUpdater.userDriver`
-configuration (Foundation `URLSession` default 60s is too lenient).
+`AppStore` owns `SparkleService`; `SojournApp` starts Sparkle from a
+background `Task.detached` so appcast prefetch does not block menubar
+appearance (200ms launch budget per v0.2 perf baseline). Appcast fetch
+timeout is set to 30s explicitly via the updater delegate's
+`URLSession` configuration (Foundation default 60s is too lenient).
 
 ### Council log
 
-`/Users/binghzal/Developer/Sojourn/.claude/council-logs/2026-05-03-v0.3-adr-batch.md`.
+`/Users/binghzal/Developer/Sojourn/.Codex/council-logs/2026-05-03-v0.3-adr-batch.md`.

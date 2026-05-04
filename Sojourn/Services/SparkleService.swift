@@ -13,24 +13,26 @@
 //     framework-automatic. SparkleService.updater(_:didAbortWithError:)
 //     inspects `(error as NSError).code` for
 //     `SUDeltaUpdateError = 4002`. On that code, the updater is
-//     re-invoked with the full DMG enclosure and the user-facing
-//     string "Update download restarting (delta unavailable)" is set.
+//     re-invoked with the full DMG enclosure and diagnostic status
+//     "Update download restarting (delta unavailable)" is set.
 //   - Council 2026-05-04 stage6 architect condition: fallback-loop
 //     guard prevents recursing if the fallback also fails.
 //
 // CORRUPT-DELTA SMOKE TEST DEFERRED: ADR-0025 hard-requires a clean
 // Tahoe VM smoke before tagging v0.3.0. Council 2026-05-04 stage6
 // approved deferral to tag pre-flight per maintainer decision. Logged
-// in `.claude/council-logs/2026-05-04-stage6-sparkle-delta.md`.
+// in `.Codex/council-logs/2026-05-04-stage6-sparkle-delta.md`.
 
 import Foundation
+#if !SWIFT_PACKAGE
 import Sparkle
+#endif
 
 /// Public-facing surface used by the SwiftUI menubar item.
+#if !SWIFT_PACKAGE
 @MainActor
 internal final class SparkleService: NSObject, SPUUpdaterDelegate {
-  /// User-visible status string updated by the delegate. Drives the
-  /// menubar progress label when delta apply falls back to full DMG.
+  /// Diagnostic status string updated by the delegate.
   internal private(set) var statusMessage: String = ""
 
   /// True after a delta-failure fallback has been triggered in this
@@ -150,3 +152,24 @@ internal final class SparkleService: NSObject, SPUUpdaterDelegate {
     }
   }
 }
+#else
+@MainActor
+internal final class SparkleService {
+  /// Sparkle is Xcode-app only. The SwiftPM library target still needs
+  /// AppStore to compile for unit tests, so it gets a no-op service with
+  /// the same API.
+  internal private(set) var statusMessage: String = ""
+
+  internal init() {}
+
+  internal func start() {
+    statusMessage = String(localized: "Updates unavailable in this build.")
+  }
+
+  internal func checkForUpdates() {
+    statusMessage = String(localized: "Updates unavailable in this build.")
+  }
+
+  internal var canCheckForUpdates: Bool { false }
+}
+#endif

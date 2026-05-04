@@ -32,7 +32,7 @@ Ship both, with clear ownership:
 
 - **In-app Sparkle** is the primary updater. It runs on app launch,
   hits an appcast at
-  `https://bizarre-industries.github.io/homebrew-sojourn/appcast.xml`,
+  `https://github.com/Bizarre-Industries/Sojourn/releases/latest/download/appcast.xml`,
   and prompts the user to download the new DMG. EdDSA signature is
   verified before relaunch.
 - **Cask `livecheck`** points at the GitHub Releases page and lets
@@ -52,15 +52,18 @@ baked into `Info.plist` at build time as `SUPublicEDKey`.
 
 **Key handling protocol** (security council condition):
 
-- The service-account token is scoped read-only to the single
-  `op://Bizarre-Industries/sojourn-sparkle-eddsa` item. Token cannot enumerate other
-  vaults or items.
+- The release workflow's service-account token is read-only to the
+  minimum 1Password release items used by `notarize.yml`; it must not
+  have write access. The Sparkle private key is loaded in a dedicated
+  `export-env: false` step so it is passed only to appcast generation.
 - The private key is **never written to disk**. The notarize workflow
-  pipes `op read --no-newline op://Bizarre-Industries/sojourn-sparkle-eddsa/private`
-  directly into `sign_update -f -` (stdin pipe). No tempfile, no
-  `--key-file` flag.
-- After signing, `unset OP_SERVICE_ACCOUNT_TOKEN` runs in the same
-  step. Subsequent steps cannot re-read the vault.
+  pipes the masked
+  `op://Bizarre-Industries/sojourn-sparkle-eddsa/private` release
+  secret directly into Sparkle's appcast tooling with
+  `generate_appcast --ed-key-file -` (stdin pipe). No tempfile, no
+  raw key command-line argument.
+- After appcast generation, the shell unsets `SPARKLE_EDDSA_PRIVATE_KEY`.
+  The key is not exported to the job-wide environment.
 - CI runner logs are scrubbed via GitHub Actions'
   `add-mask` directive applied to both the token and the key bytes
   before any echo can leak them.
@@ -84,11 +87,11 @@ relayout cache paths). Replace with **persisted install source**:
 - The Updates pref pane offers a "Override install source"
   toggle for users who change paths post-install.
 
-The appcast XML is hosted via GitHub Pages out of the
-`Bizarre-Industries/homebrew-sojourn` tap repo (already public,
-already serving the cask). Each release appends one
-`<item>` element via the notarize workflow's
-`sparkle-tools` step.
+The appcast XML is uploaded to the GitHub Release alongside
+`Sojourn.dmg` and addressed through the `latest/download/appcast.xml`
+URL. Each release regenerates the appcast and delta archive entries via
+Sparkle's `generate_appcast` tool from the Xcode-resolved package
+artifact.
 
 ## Consequences
 

@@ -54,13 +54,10 @@ let package = Package(
         // an app bundle context that SPM does not provide.
         "App",
         "UI",
-        // Sparkle SPM target ships a binaryTarget XCFramework that needs
-        // an AppKit app bundle to load. Excluded from the SPM build;
-        // Xcode build pulls it in via project.yml dependencies.
-        "Services/SparkleService.swift"
       ],
       resources: [
-        .process("Resources/data")
+        .copy("Resources/data"),
+        .process("Resources/preference-domains.json")
       ],
       swiftSettings: [
         .enableExperimentalFeature("StrictConcurrency"),

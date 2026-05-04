@@ -1,8 +1,10 @@
 # Sojourn — dev DX
 # See docs/IMPLEMENTATION_PLAN.md for the build/test contract.
 
+SWIFT_FORMAT ?= $(shell command -v swift-format 2>/dev/null || xcrun --find swift-format 2>/dev/null)
+
 .PHONY: help bootstrap build test lint leaks generate xcodebuild clean format \
-        ci-local act-ci act-build actionlint
+        ci-local act-ci act-build actionlint pin-actions verify-pins zizmor
 
 help:
 	@echo 'Sojourn — make targets:'
@@ -14,7 +16,7 @@ help:
 	@echo '  leaks      gitleaks dir --config=.gitleaks.toml'
 	@echo '  lint       swiftlint (advisory)'
 	@echo '  format     swift-format in place'
-	@echo '  ci-local   run quality+security checks locally (mirrors ci.yml)'
+	@echo '  ci-local   local release gate: workflows, leaks, pins, zizmor, expiry, advisory Swift lint'
 	@echo '  act-ci     run ci.yml ubuntu jobs locally via act (Docker required)'
 	@echo '  act-build  run build.yml jobs locally — macOS jobs unsupported by act, use xcodebuild'
 	@echo '  actionlint lint .github/workflows/*.yml'
@@ -37,8 +39,33 @@ test:
 generate:
 	bash scripts/regenerate-project.sh
 
-xcodebuild: generate
-	xcodebuild -scheme Sojourn -destination 'platform=macOS' test
+xcodebuild:
+	@set -e; \
+	team="$${DEVELOPMENT_TEAM:-}"; \
+	if [ -z "$$team" ]; then \
+		team="$$(awk -F= '/^[[:space:]]*DEVELOPMENT_TEAM[[:space:]]*=/{gsub(/[[:space:]]/, "", $$2); print $$2; exit}' Sojourn/Config/Local.xcconfig 2>/dev/null || true)"; \
+	fi; \
+	if ! printf '%s\n' "$$team" | grep -Eq '^[A-Z0-9]{10}$$'; then \
+		echo 'make xcodebuild runs SojournUITests and requires real Apple Development signing.'; \
+		echo 'Set Sojourn/Config/Local.xcconfig with DEVELOPMENT_TEAM = <10-char Team ID>'; \
+		echo 'or pass DEVELOPMENT_TEAM=<10-char Team ID> to make.'; \
+		echo 'Unsigned/ad-hoc UI-test loader failures are not release evidence.'; \
+		echo 'For unsigned unit-only validation use:'; \
+		echo "  xcodebuild test -project Sojourn.xcodeproj -scheme Sojourn -destination 'platform=macOS' -only-testing:SojournTests"; \
+		exit 2; \
+	fi; \
+	if [ -z "$${CODE_SIGN_IDENTITY:-}" ]; then \
+		echo 'make xcodebuild runs SojournUITests and must not use Sign to Run Locally.'; \
+		echo 'Pass CODE_SIGN_IDENTITY="Apple Development" after local certificates are installed.'; \
+		echo 'Unsigned/ad-hoc UI-test loader failures are not release evidence.'; \
+		echo 'For unsigned unit-only validation use:'; \
+		echo "  xcodebuild test -project Sojourn.xcodeproj -scheme Sojourn -destination 'platform=macOS' -only-testing:SojournTests"; \
+		exit 2; \
+	fi; \
+	$(MAKE) generate; \
+	xcodebuild -scheme Sojourn -destination 'platform=macOS' test \
+		DEVELOPMENT_TEAM="$$team" \
+		CODE_SIGN_IDENTITY="$${CODE_SIGN_IDENTITY}"
 
 leaks:
 	gitleaks dir --config=.gitleaks.toml -v
@@ -47,19 +74,11 @@ lint:
 	-swiftlint
 
 format:
-	swift-format format -i -r Sojourn SojournTests SojournUITests
+	$(SWIFT_FORMAT) format -i -r Sojourn SojournTests SojournUITests
 
 clean:
 	swift package clean
 	rm -rf .build build DerivedData
-
-# Mirror what ci.yml runs on every push/PR: gitleaks scan + lint +
-# format-check. Run before every commit. Catches anything the
-# pre-commit gate misses.
-ci-local: actionlint leaks
-	-swiftlint lint --strict --reporter emoji
-	-swift-format lint --recursive Sojourn SojournTests SojournUITests \
-		--parallel --configuration .swift-format
 
 # Lint workflow YAML before push. ci.yml job-level `if: hashFiles(...)`
 # silently failed pre-runner with 0s duration — actionlint catches that.
@@ -84,13 +103,12 @@ act-build:
 	@echo '      Use `make test` (swift test) and `make xcodebuild` instead.'
 	@echo '      To still attempt: act push --job swift-test --workflows .github/workflows/build.yml -P macos-15=-self-hosted'
 
+# Release gate: required checks first, advisory lint/format last.
 ci-local: actionlint leaks verify-pins zizmor
 	-swiftlint lint --strict --reporter emoji
-	-swift-format lint --recursive Sojourn SojournTests SojournUITests \
+	-$(SWIFT_FORMAT) lint --recursive Sojourn SojournTests SojournUITests \
 		--parallel --configuration .swift-format
 	@command -v python3 >/dev/null && python3 .github/scripts/check-expiry.py --validate
-
-.PHONY: pin-actions verify-pins zizmor
 
 # Pin every action in .github/ to a commit SHA + # vX.Y.Z comment
 pin-actions:

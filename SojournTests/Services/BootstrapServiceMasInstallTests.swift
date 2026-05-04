@@ -9,8 +9,9 @@
 // list shape so a future maintainer cannot silently drop "mas" from
 // probeTools without breaking a test.
 
-import Testing
+import Foundation
 @testable import Sojourn
+import Testing
 
 struct BootstrapServiceMasInstallTests {
   @Test
@@ -45,11 +46,7 @@ struct BootstrapServiceMasInstallTests {
     // OnboardPane.copyTemplate(into:) loads via subdirectory: "data".
     // Pinning the lookup contract here so a future bundle reorg cannot
     // silently break the "Copy repro-drift template" button.
-    let url = Bundle.main.url(
-      forResource: "repro-drift",
-      withExtension: "md",
-      subdirectory: "data"
-    )
+    let url = BundledResourceLocator.reproDriftTemplateURL()
     #expect(url != nil, "repro-drift.md must ship under Resources/data")
   }
 }

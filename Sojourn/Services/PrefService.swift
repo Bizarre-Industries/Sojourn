@@ -186,7 +186,7 @@ internal actor PrefService {
   internal nonisolated func loadDomainCorpus(
     bundle: Bundle = .main
   ) -> [PreferenceDomainEntry] {
-    guard let url = bundle.url(forResource: "preference-domains", withExtension: "json"),
+    guard let url = BundledResourceLocator.preferenceDomainsURL(bundle: bundle),
           let data = try? Data(contentsOf: url),
           let decoded = try? JSONDecoder().decode([PreferenceDomainEntry].self, from: data)
     else {

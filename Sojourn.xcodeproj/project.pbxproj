@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		00A969D442931F5B06432881 /* BackgroundActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5540A13628D2CEAF0961029 /* BackgroundActivity.swift */; };
 		029D5D5DF9A3AADFEE4746E1 /* MenuBarExtraAccess in Frameworks */ = {isa = PBXBuildFile; productRef = B7BF6B03C13860CCD1E85526 /* MenuBarExtraAccess */; };
+		02A2099413A379DC3F048016 /* BundledResourceLocator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6F0178D0AC4C6DD068C321E /* BundledResourceLocator.swift */; };
 		0525C3C48DB06953B174E5E1 /* Font+Sojourn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6534B3DB0424AE8E3E280F03 /* Font+Sojourn.swift */; };
 		09E0C0FA877B857BB17F524D /* ToolLocator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5531EFE3E6A6B9815FE6AA3D /* ToolLocator.swift */; };
 		0D148516CCF22EFBD2934A6C /* Sidebar.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC1E1DC7914BD10A9F64131C /* Sidebar.swift */; };
@@ -27,6 +28,7 @@
 		238667233329CC95B7AA7686 /* SettingsScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6759066E988970C0FDB44D7E /* SettingsScene.swift */; };
 		247920E87C1C4DE550730A4A /* BrewService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51F95DC3AF05E699D7B7E96 /* BrewService.swift */; };
 		249227C9D716AEFAE9F37265 /* ConflictResolverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCD94D5F35C89F85DA2CEC8B /* ConflictResolverTests.swift */; };
+		25EB7D923435FBC4FFE63FC7 /* BootstrapServiceMasInstallTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8850C6C49AE8C25A8188705F /* BootstrapServiceMasInstallTests.swift */; };
 		261BEFF3AAF79386E014FBD9 /* SojournFileCodec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 481F54F2BDF64F5380438AA6 /* SojournFileCodec.swift */; };
 		262B5F3716E1AC7A9612369A /* DeletionsDB.swift in Sources */ = {isa = PBXBuildFile; fileRef = 519573B2007EA85FF61BF8F5 /* DeletionsDB.swift */; };
 		2A8DAE1EF876120D899253E7 /* LiquidGlass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9379A483ED7A08C15144F74B /* LiquidGlass.swift */; };
@@ -232,6 +234,7 @@
 		81F879A8DCA19A0D5AA7B0AB /* SojournIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SojournIcon.swift; sourceTree = "<group>"; };
 		82A52B4280B84BAE4A95BCBF /* MainWindowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainWindowView.swift; sourceTree = "<group>"; };
 		85CA5EF14259B836AD6AED4E /* DotfileOwner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DotfileOwner.swift; sourceTree = "<group>"; };
+		8850C6C49AE8C25A8188705F /* BootstrapServiceMasInstallTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BootstrapServiceMasInstallTests.swift; sourceTree = "<group>"; };
 		885D1B68EB7366BB93BB0DFA /* MasHelperService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MasHelperService.swift; sourceTree = "<group>"; };
 		887AAF2686F9A376CC67B150 /* GenerationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenerationService.swift; sourceTree = "<group>"; };
 		8884B2AE7CA5668066930F1F /* AdvisoryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvisoryService.swift; sourceTree = "<group>"; };
@@ -293,6 +296,7 @@
 		DC453885D2E108F361A7299D /* PreferencesPane.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesPane.swift; sourceTree = "<group>"; };
 		E4852A96E28C5AE7EFD35C49 /* DiagnosticBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticBundle.swift; sourceTree = "<group>"; };
 		E4FDE1104A51EA62C619BA04 /* TierClassifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierClassifier.swift; sourceTree = "<group>"; };
+		E6F0178D0AC4C6DD068C321E /* BundledResourceLocator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BundledResourceLocator.swift; sourceTree = "<group>"; };
 		E85F38538D64D3F9E1B06485 /* PackagesPane.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackagesPane.swift; sourceTree = "<group>"; };
 		E9E64BDF45BE87A78922A385 /* HistoryEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryEntry.swift; sourceTree = "<group>"; };
 		EB4FE8184AADB56514189B5D /* MasHelperProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MasHelperProtocol.swift; sourceTree = "<group>"; };
@@ -453,6 +457,7 @@
 			isa = PBXGroup;
 			children = (
 				55D844D1916BAD352E960418 /* ANSIParserTests.swift */,
+				8850C6C49AE8C25A8188705F /* BootstrapServiceMasInstallTests.swift */,
 				789996000891BE42FD7BD49C /* BrewBundleServiceTests.swift */,
 				A36CD6BB083EBA6FA642F71F /* CleanupServiceTests.swift */,
 				0A6F6540986E83E02DB01AD6 /* ContainersServiceTests.swift */,
@@ -541,6 +546,7 @@
 				14A5F035C01184E1BF26CB2F /* BootstrapService.swift */,
 				62253F977154A88AF1BCA3BD /* BrewBundleService.swift */,
 				C51F95DC3AF05E699D7B7E96 /* BrewService.swift */,
+				E6F0178D0AC4C6DD068C321E /* BundledResourceLocator.swift */,
 				494B9E3CA3D4138CF9774417 /* ChezmoiService.swift */,
 				C198F65D627EB6805DC3C20A /* CleanupService.swift */,
 				AAB806B3F130A1371E112DC8 /* ContainersService.swift */,
@@ -930,6 +936,7 @@
 				9D92A61401379AAAE305DE8D /* BrewBundleService.swift in Sources */,
 				247920E87C1C4DE550730A4A /* BrewService.swift in Sources */,
 				A41A6E357036CADB2C272B93 /* Brewfile.swift in Sources */,
+				02A2099413A379DC3F048016 /* BundledResourceLocator.swift in Sources */,
 				8FA89585B9D478180E588471 /* ChezmoiService.swift in Sources */,
 				51FFB7477224BF2F58CFB77E /* CleanupPane.swift in Sources */,
 				88B110F47D49F67CC718D40D /* CleanupService.swift in Sources */,
@@ -1020,6 +1027,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				AF41D0A179C38D3AFA59E55A /* ANSIParserTests.swift in Sources */,
+				25EB7D923435FBC4FFE63FC7 /* BootstrapServiceMasInstallTests.swift in Sources */,
 				49A81F046E48A7BBAB1382E9 /* BrewBundleServiceTests.swift in Sources */,
 				1B511F22B7852AF15BAE3CE2 /* Bundle+Fixtures.swift in Sources */,
 				70AEDCB3E9609070650F669A /* CleanupServiceTests.swift in Sources */,
@@ -1167,7 +1175,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Sojourn/Sojourn.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 27;
+				CURRENT_PROJECT_VERSION = 28;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Sojourn/Info.plist;
@@ -1208,7 +1216,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Sojourn/Sojourn.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 27;
+				CURRENT_PROJECT_VERSION = 28;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Sojourn/Info.plist;
@@ -1231,7 +1239,7 @@
 				CODE_SIGN_ENTITLEMENTS = MasHelper/MasHelper.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
 				CREATE_INFOPLIST_SECTION_IN_BINARY = YES;
-				CURRENT_PROJECT_VERSION = 27;
+				CURRENT_PROJECT_VERSION = 28;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = MasHelper/Info.plist;
@@ -1292,7 +1300,7 @@
 				CODE_SIGN_ENTITLEMENTS = MasHelper/MasHelper.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
 				CREATE_INFOPLIST_SECTION_IN_BINARY = YES;
-				CURRENT_PROJECT_VERSION = 27;
+				CURRENT_PROJECT_VERSION = 28;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = MasHelper/Info.plist;

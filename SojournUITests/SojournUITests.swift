@@ -16,31 +16,27 @@ final class SojournUITests: XCTestCase {
   }
 
   /// Click each sidebar entry. Assert the corresponding pane's
-  /// accessibilityIdentifier becomes hittable. Identifiers are wired in
-  /// Sojourn/UI/Panes.swift + Sojourn/UI/Panes/Power/PowerSurfaces.swift.
+  /// accessibilityIdentifier becomes hittable.
   func testSidebarNavigation() throws {
     let app = XCUIApplication()
     app.launch()
     XCTAssertTrue(app.wait(for: .runningForeground, timeout: 10))
 
-    // v0.2 sidebar: 10 typed Pane enum cases per
-    // docs/process/plans/v0.2-plan.md step 3. Pane IDs match the
+    // v0.3 sidebar: 11 typed Pane enum cases. Pane IDs match the
     // accessibilityIdentifier wired in MainWindowView (sidebar.<rawValue>)
-    // and the existing pane-side identifier convention. The .dashboard
-    // case maps to OverviewPane (rawValue "dashboard"), which still
-    // exposes its v0.1 "pane.overview" identifier until the v0.2
-    // step 4 Panes.swift split rewires it.
+    // and the pane-side identifier convention.
     let entries: [(String, String)] = [
-      ("sidebar.dashboard",     "pane.overview"),
-      ("sidebar.packages",      "pane.packages"),
-      ("sidebar.generations",   "pane.generations"),
-      ("sidebar.macosFeatures", "pane.macosFeatures"),
-      ("sidebar.preferences",   "pane.preferences"),
-      ("sidebar.sync",          "pane.sync"),
-      ("sidebar.machines",      "pane.machines"),
-      ("sidebar.advisories",    "pane.advisories"),
-      ("sidebar.jobs",          "pane.jobs"),
-      ("sidebar.settings",      "pane.settings")
+      ("sidebar.dashboard", "pane.overview"),
+      ("sidebar.packages", "pane.packages"),
+      ("sidebar.containers", "pane.containers"),
+      ("sidebar.generations", "pane.generations"),
+      ("sidebar.macosFeatures", "pane.macos-features"),
+      ("sidebar.preferences", "pane.preferences"),
+      ("sidebar.sync", "pane.sync"),
+      ("sidebar.machines", "pane.machines"),
+      ("sidebar.advisories", "pane.advisories"),
+      ("sidebar.jobs", "pane.jobs"),
+      ("sidebar.settings", "pane.settings")
     ]
 
     for (sidebarID, paneID) in entries {
@@ -52,8 +48,18 @@ final class SojournUITests: XCTestCase {
       row.click()
       let pane = app.scrollViews[paneID]
       let other = app.otherElements[paneID]
-      let visible = pane.waitForExistence(timeout: 4) || other.waitForExistence(timeout: 1)
-      XCTAssertTrue(visible, "Pane \(paneID) did not surface after clicking \(sidebarID)")
+      let visiblePane: XCUIElement?
+      if pane.waitForExistence(timeout: 4) {
+        visiblePane = pane
+      } else if other.waitForExistence(timeout: 1) {
+        visiblePane = other
+      } else {
+        visiblePane = nil
+      }
+      XCTAssertTrue(
+        visiblePane?.isHittable == true,
+        "Pane \(paneID) did not become hittable after clicking \(sidebarID)"
+      )
     }
   }
 }

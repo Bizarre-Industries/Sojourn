@@ -55,7 +55,7 @@ internal final class BootstrapService {
     self.subprocess = subprocess
   }
 
-  internal static let probeTools = ["brew", "git", "chezmoi", "age", "gitleaks", "mas"]
+  internal nonisolated static let probeTools = ["brew", "git", "chezmoi", "age", "gitleaks", "mas"]
 
   internal func probe() async {
     let signpost = SojournSignpost.bootstrap

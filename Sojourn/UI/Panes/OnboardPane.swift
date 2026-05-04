@@ -96,11 +96,7 @@ struct OnboardPane: View {
     }
     // `Resources/data` ships as a folder reference per project.yml;
     // bundle resources land under `data/` inside the .app, not at root.
-    guard let src = Bundle.main.url(
-      forResource: "repro-drift",
-      withExtension: "md",
-      subdirectory: "data"
-    ) else {
+    guard let src = BundledResourceLocator.reproDriftTemplateURL() else {
       lastResult = "Bundled template missing — rebuild Sojourn."
       return
     }
@@ -113,11 +109,16 @@ struct OnboardPane: View {
         at: templateDir,
         withIntermediateDirectories: true
       )
-      if FileManager.default.fileExists(atPath: dst.path) {
-        try FileManager.default.removeItem(at: dst)
+      let replacedExisting = FileManager.default.fileExists(atPath: dst.path)
+      if replacedExisting {
+        try FileManager.default.trashItem(at: dst, resultingItemURL: nil)
       }
       try FileManager.default.copyItem(at: src, to: dst)
-      lastResult = "Template copied. Commit it in your dotfiles repo to enable the issue template on GitHub."
+      if replacedExisting {
+        lastResult = "Template copied. Existing repro-drift.md moved to Trash. Commit the new template in your dotfiles repo."
+      } else {
+        lastResult = "Template copied. Commit it in your dotfiles repo to enable the issue template on GitHub."
+      }
     } catch {
       lastResult = "Copy failed: \(error.localizedDescription)"
     }

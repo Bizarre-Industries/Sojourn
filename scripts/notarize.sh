@@ -7,12 +7,17 @@ DMG="${1:?usage: notarize.sh <path/to/Sojourn.dmg>}"
 : "${APPSTORE_API_ISSUER_ID:?required}"
 : "${APPSTORE_API_KEY_P8:?required}"
 
-KEY_FILE="$(mktemp -t sojourn-notary.XXXX).p8"
-trap 'rm -f "$KEY_FILE"' EXIT
+KEY_FILE="$(mktemp -t sojourn-notary.XXXXXX)"
+chmod 600 "$KEY_FILE"
 printf '%s' "$APPSTORE_API_KEY_P8" > "$KEY_FILE"
 
-SUBMIT_OUTPUT="$(mktemp -t sojourn-notarize.XXXX.json)"
-trap 'rm -f "$KEY_FILE" "$SUBMIT_OUTPUT"' EXIT
+SUBMIT_OUTPUT="$(mktemp -t sojourn-notarize.XXXXXX)"
+chmod 600 "$SUBMIT_OUTPUT"
+cleanup() {
+  rm -P -f "$KEY_FILE"
+  rm -f "$SUBMIT_OUTPUT"
+}
+trap cleanup EXIT
 
 # `--output-format json` so we can extract the submission ID and inspect
 # Apple's per-issue log if notarization comes back Invalid. Without

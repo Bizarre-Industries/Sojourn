@@ -86,8 +86,8 @@ numbers 21 → 28 walk through stages 1-8.
 - `.gitleaks.toml` allowlists `.agents/` (gitignored plugin dir
   triggers false-positive Apple-app-specific-password matches on
   swiftui-expert-skill heading anchors).
-- Sparkle SPM dependency `sparkle-project/Sparkle 2.9.x` for in-app
-  delta updates (ADR-0025).
+- Sparkle Xcode package dependency `sparkle-project/Sparkle 2.9.x`
+  for in-app delta updates (ADR-0025).
 - `Sojourn/Services/SparkleService.swift` — `@MainActor` wrap of
   `SPUStandardUpdaterController` + `SPUUpdaterDelegate`. AppStore-
   owned (no singleton); eagerly constructed via `Task.detached` from
@@ -109,13 +109,13 @@ numbers 21 → 28 walk through stages 1-8.
   populates per release.
 - `.github/workflows/notarize.yml` — pre-sign placeholder fail
   (`grep -q PLACEHOLDER`), 1Password Sparkle private-key load,
-  empty-key fail-loud (`[ -s "$KEY_FILE" ]`), `rm -P` shred trap,
-  download Sparkle 2.9.1 release tarball for `generate_appcast` tools,
-  run `generate_appcast --maximum-versions=10`, upload `appcast.xml`
-  + delta archives to GitHub Release.
-- `Package.swift` excludes `Services/SparkleService.swift` from the
-  SPM library build (Sparkle binaryTarget needs an AppKit bundle;
-  Xcode-only via project.yml dependencies).
+  empty-key fail-loud, stdin-only `generate_appcast --ed-key-file -`
+  signing from the Xcode-resolved Sparkle package artifact, upload
+  `appcast.xml` + delta archives to GitHub Release.
+- `Package.swift` includes `Services/SparkleService.swift` in the SPM
+  library build; the file compiles a no-op same-API updater only when
+  `SWIFT_PACKAGE` is set. Xcode app builds import Sparkle
+  unconditionally via `project.yml`.
 - `BootstrapState.installingMas` — additive enum case for the
   `brew install mas` step in `BootstrapService.proceed()`.
   `probeTools` now includes `mas` so the bootstrap rail surfaces
@@ -173,6 +173,24 @@ numbers 21 → 28 walk through stages 1-8.
   `MasInvocationResult` accessors, error descriptions + equality,
   client UInt64 input validation (rejects zero ID + zero in upgrade
   list).
+
+### Fixed
+
+- SwiftPM builds now include `SparkleService` behind a `SWIFT_PACKAGE`
+  gate, falling back to a no-op updater service for `swift build` /
+  `swift test` while app/Xcode builds require Sparkle.
+- SwiftPM resources now include `Resources/preference-domains.json`, and
+  the bundled repro-drift template resolves through a package-aware
+  resource locator.
+- `notarize.yml` avoids direct GitHub expression interpolation inside
+  shell scripts and verifies Homebrew with shell commands instead of the
+  unpinned `Homebrew/actions/setup-homebrew@main` action.
+- `make ci-local` has one release-gate target for workflow lint,
+  gitleaks, pinned-action checks, zizmor, expiry validation, and
+  advisory Swift lint/format checks.
+- Build metadata is aligned to v0.3 stage 8 build `28`, and UI smoke
+  tests cover the current 11-pane sidebar including Containers and the
+  `pane.macos-features` identifier.
 
 ## [0.2.0] — 2026-05-01
 

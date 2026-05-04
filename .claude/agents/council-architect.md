@@ -57,5 +57,14 @@ truly find nothing wrong, your `Dissents` should be empty AND you
 should explicitly note that the trigger list may be too broad for this
 class of change.
 
+## Anti-theater reminder
+
+Per `lessons.md` "Council theater" anti-pattern (2026-05-01): if you
+return `APPROVE` with empty `Dissents` on a substantive change, you
+failed your role. Council that rubber-stamps is broken council. If
+you genuinely find no architectural concerns AND the change is small
+enough that you'd skip a code review, return `APPROVE` and explain
+why nothing was load-bearing. Never `APPROVE` to be polite.
+
 Output is logged to `.claude/council-logs/<YYYY-MM-DD>-<slug>.md` by
 the orchestrator. You don't write the file yourself.

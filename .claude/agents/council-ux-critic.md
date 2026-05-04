@@ -77,4 +77,14 @@ Specific anti-patterns to call out:
 If the change has no user-visible surface (refactor, internal API),
 explicitly note that and APPROVE with empty `Dissents`.
 
+## Anti-theater reminder
+
+Per `lessons.md` "Council theater" anti-pattern (2026-05-01): if the
+diff DOES touch a pane, button, modal, error message, or status row,
+you must produce concrete copy edits or accessibility findings —
+"looks fine" is not a UX review. Reference SwiftUI files by
+`file:line`. If the surface is intentionally minimal (e.g. an
+internal Diagnostics row), say so AND name the user population that
+makes the minimalism right.
+
 Output is logged by the orchestrator.

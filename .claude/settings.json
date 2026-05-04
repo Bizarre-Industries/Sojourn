@@ -74,6 +74,16 @@
             "statusMessage": "Verifying claim is grounded"
           }
         ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PROJECT_DIR}/.claude/hooks/pre-commit-gitleaks.sh",
+            "statusMessage": "gitleaks pre-commit"
+          }
+        ]
       }
     ]
   },

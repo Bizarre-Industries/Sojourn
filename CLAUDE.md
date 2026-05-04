@@ -206,6 +206,56 @@ commit. Cheaper, catches obvious mistakes, doesn't need formal logging.
   - `.claude/council-logs/` — deliberation transcripts.
   - `.claude/.last-shipped-tag` — replan-on-tag marker (ignored from git).
 
+## Skills (`.claude/skills/`)
+
+Project-local skills are loaded automatically. Invoke them via the
+Skill tool when a task matches the trigger; do not paraphrase what
+they teach. Roster:
+
+- **`swift-concurrency`** — actor isolation, Sendable, @MainActor,
+  data race fixes, async/await migration. Trigger: any change inside
+  `Sojourn/Services/` or `Sojourn/Store/`, any concurrency-related
+  warning, any new actor type.
+- **`swift-testing-expert`** — `#expect` / `#require` macros, traits,
+  parameterized tests, async waiting. Trigger: any new test in
+  `SojournTests/`, any flaky test investigation, any XCTest →
+  Swift Testing migration.
+- **`swiftui-expert-skill`** — view composition, state management,
+  macOS 26 Liquid Glass, performance traces. Trigger: any change
+  inside `Sojourn/UI/`, any pane file edit, any Instruments `.trace`
+  reference.
+- **`xcode-build-orchestrator`** — end-to-end build optimization
+  (compilation, project settings, packages). Trigger: build > 30s
+  locally, any `xcodegen` regeneration that surfaces new warnings,
+  any "make Xcode faster" ask.
+- **`core-data-expert`** — only relevant if Sojourn ever moves
+  persistence off TOML/SQLite to Core Data. v0.3 doesn't use it.
+- **`auto-skill` / `skill-discovery`** — observe + suggest community
+  skills matching repeated patterns. Reactive, not load-bearing.
+- **`sojourn-stage-workflow`** — codifies the v0.X 8-stage release
+  loop (bump build → ADRs → council → service → pane → tests →
+  gitleaks → commit → next stage). Invoke at the start of every
+  stage to skip re-deriving the loop from CLAUDE.md.
+
+When a skill applies, invoke it via the Skill tool BEFORE writing
+code. Skipping the skill and re-deriving its content burns tokens
+and produces inconsistent output across sessions.
+
+## Slash commands (`.claude/commands/`)
+
+Project-local commands are user-invokable shortcuts:
+
+- **`/council`** — fire the 5-member council on the current diff.
+  Equivalent to dispatching all 5 council-* subagents in parallel,
+  collecting verdicts, writing a deliberation log to
+  `.claude/council-logs/<date>-<slug>.md`.
+- **`/stage-commit`** — pre-flight a stage commit: gitleaks, swift
+  build, xcodebuild test, self-critique on diff. Bumps
+  `CURRENT_PROJECT_VERSION`. Drafts the commit message.
+- **`/regen`** — regenerate `Sojourn.xcodeproj` from `project.yml`
+  via xcodegen. Run after adding/removing source files or modifying
+  target settings.
+
 ## When in doubt
 
 - **Architectural change** → write a new ADR under `docs/decisions/`

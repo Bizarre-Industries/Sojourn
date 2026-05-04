@@ -60,10 +60,18 @@ notarize-*.json
 !.claude/hooks/
 !.claude/agents/
 !.claude/council-logs/
+!.claude/commands/
+!.claude/skills/
 .claude/.last-shipped-tag
 .claude/settings.local.json
 .claude-cache/
 .claude-plans/
+
+# Plugin-managed skill caches and lockfiles. The canonical project
+# skills live under .claude/skills/; .agents/ is a plugin-driven
+# duplicate that drifts and should never be committed.
+.agents/
+skills-lock.json
 .remember/
 .task/
 LESSONS.md

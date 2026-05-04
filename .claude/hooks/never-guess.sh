@@ -30,50 +30,86 @@ if [ -z "$command_str" ]; then
   exit 0
 fi
 
-# External tools whose CLI surface has historically drifted between
-# Sojourn's relevant cycles. If a Bash invokes one of these, inject a
-# verification reminder. Pattern is greedy on purpose — false positives
-# cost a few extra tokens, false negatives cost a buggy commit.
-declare -a watch_tools=(
-  "brew"
-  "mas"
-  "chezmoi"
-  "defaults"
-  "PlistBuddy"
-  "/usr/libexec/PlistBuddy"
-  "softwareupdate"
-  "spctl"
-  "notarytool"
-  "stapler"
-  "codesign"
+# Risky tool+flag combos. Trimmed 2026-05-04: previous version fired on
+# every benign `brew --version`, `codesign -d`, `docker --version` call
+# — pure noise during stage 4 helper work. Now only fires on operations
+# that mutate state on disk, notary servers, GitHub, 1Password, or
+# signing config. Read-only probes (--version, --help, list, -d) skip
+# the reminder entirely.
+declare -a watch_combos=(
+  # Mutates Apple notary state
+  "notarytool submit"
+  "notarytool history"
+  "stapler staple"
+  "stapler validate"
+  # Mutates code-signing state
+  "codesign --remove-signature"
+  "codesign --force"
+  "codesign -f "
   "sign_update"
-  "gh"
-  "container"
-  "orbctl"
-  "docker"
-  "op"
+  # Mutates Apple software baseline
+  "softwareupdate --install"
+  "softwareupdate -i "
+  # Mutates GitHub remote state
+  "gh release delete"
+  "gh release create"
+  "gh repo delete"
+  "gh pr merge"
+  "gh pr close"
+  "gh issue delete"
+  # Mutates 1Password vault
+  "op item delete"
+  "op item create"
+  "op item edit"
+  "op signout"
+  # Modifies macOS prefs (defaults read is fine)
+  "defaults delete"
+  "defaults import"
+  "defaults write"
+  # PlistBuddy mutation
+  "PlistBuddy.*-c .*Set"
+  "PlistBuddy.*-c .*Add"
+  "PlistBuddy.*-c .*Delete"
+  # Privileged-helper management
+  "SMAppService"
+  "launchctl bootstrap"
+  "launchctl bootout"
+  "launchctl unload"
+  # mas state mutation (the broken signin path)
+  "mas signin"
+  "mas account"
+  # Apple `container` runtime mutation
+  "container run"
+  "container start"
+  "container stop"
+  "container delete"
 )
 
-# Risky shell patterns regardless of tool.
+# Risky shell patterns regardless of tool — destructive or
+# irreversible operations.
 declare -a watch_patterns=(
   "curl.*\|.*sh"
   "wget.*\|.*sh"
-  "--force"
-  "-f .* origin"
+  "--no-verify"
   "rm -rf"
   "git push.*--force"
+  "git push.*-f([^a-zA-Z]|$)"
   "git reset --hard"
   "git tag -d"
   "git branch -D"
-  "diskutil"
+  "git rebase --abort"
+  "diskutil eraseDisk"
+  "diskutil eraseVolume"
   "sudo "
+  "chmod 777"
+  "chmod -R 777"
 )
 
 reminder=""
 
-for t in "${watch_tools[@]}"; do
-  if echo "$command_str" | grep -qE "(^|[^[:alnum:]_/-])${t}([^[:alnum:]_-]|$)"; then
-    reminder="External tool '${t}' invoked. Its CLI surface may have drifted since the training cutoff. Before relying on output shape or flag behavior, verify against upstream: \`man ${t}\`, \`${t} --help\`, or the tool's GitHub repo at HEAD. If the behavior is critical (parsing output, depending on a flag, mutating state), run a smoke check first. Compilation/exit-0 is not correctness."
+for c in "${watch_combos[@]}"; do
+  if echo "$command_str" | grep -qE "$c"; then
+    reminder="State-mutating operation detected: '${c}'. Before relying on this call, confirm: (1) the flag/subcommand is still spelled correctly in the current upstream version (\`<tool> --help\` or man page), (2) the operation is reversible OR a snapshot was taken first, (3) any required env vars / secrets are loaded from 1Password and not committed. If you can't verify, ask before running."
     break
   fi
 done

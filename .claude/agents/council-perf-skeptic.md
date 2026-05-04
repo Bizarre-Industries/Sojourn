@@ -80,4 +80,14 @@ Use `Bash` if you need to actually measure something — run the binary
 with `/usr/bin/time -lp` or check `du -sh` on a representative path.
 Don't speculate when you can measure.
 
+## Anti-theater reminder
+
+Per `lessons.md` "Council theater" anti-pattern (2026-05-01):
+perf concerns must cite a measurement OR a documented invariant
+violation. "Could be slow" without a number is theater. If the diff
+genuinely has no perf impact, return `APPROVE` with one sentence
+explaining the boundary you checked (e.g. "no new subprocess
+spawns; no new persisted-disk writes; no new SwiftUI body
+recomputations").
+
 Output is logged by the orchestrator.

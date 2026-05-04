@@ -86,6 +86,36 @@ numbers 21 → 28 walk through stages 1-8.
 - `.gitleaks.toml` allowlists `.agents/` (gitignored plugin dir
   triggers false-positive Apple-app-specific-password matches on
   swiftui-expert-skill heading anchors).
+- Sparkle SPM dependency `sparkle-project/Sparkle 2.9.x` for in-app
+  delta updates (ADR-0025).
+- `Sojourn/Services/SparkleService.swift` — `@MainActor` wrap of
+  `SPUStandardUpdaterController` + `SPUUpdaterDelegate`. AppStore-
+  owned (no singleton); eagerly constructed via `Task.detached` from
+  `SojournApp .task` so the menubar 200ms launch budget is preserved.
+  `feedURLSession(for:)` pins appcast fetch to 30s. `didAbortWithError`
+  inspects `SUDeltaUpdateError = 4002` (domain `SUSparkleErrorDomain`)
+  and falls back to full DMG with status string "Update download
+  restarting (delta unavailable)". Fallback-loop guard
+  (`hasFallenBackThisSession`) prevents recursion.
+- `Sojourn/App/SojournApp.swift` — menubar `Check for Updates…`
+  command in `CommandGroup(after: .appInfo)`, gated on
+  `sparkleService.canCheckForUpdates`.
+- `Sojourn/Info.plist` — `SUFeedURL` →
+  `https://github.com/Bizarre-Industries/Sojourn/releases/latest/download/appcast.xml`,
+  `SUPublicEDKey` placeholder (notarize.yml fails the build if not
+  replaced before tag), `SUEnableAutomaticChecks`,
+  `SUScheduledCheckInterval = 86400`.
+- `appcast.xml` — empty channel scaffold; `generate_appcast`
+  populates per release.
+- `.github/workflows/notarize.yml` — pre-sign placeholder fail
+  (`grep -q PLACEHOLDER`), 1Password Sparkle private-key load,
+  empty-key fail-loud (`[ -s "$KEY_FILE" ]`), `rm -P` shred trap,
+  download Sparkle 2.9.1 release tarball for `generate_appcast` tools,
+  run `generate_appcast --maximum-versions=10`, upload `appcast.xml`
+  + delta archives to GitHub Release.
+- `Package.swift` excludes `Services/SparkleService.swift` from the
+  SPM library build (Sparkle binaryTarget needs an AppKit bundle;
+  Xcode-only via project.yml dependencies).
 - `MasHelper` Xcode target (Swift command-line tool) — privileged
   daemon binary `industries.bizarre.Sojourn.helper` embedded at
   `Sojourn.app/Contents/MacOS/`. Listens on

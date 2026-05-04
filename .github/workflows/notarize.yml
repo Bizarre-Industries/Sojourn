@@ -90,6 +90,17 @@ jobs:
       - name: Re-sign bundled binaries
         run: bash scripts/sign.sh
 
+      - name: Fail if SUPublicEDKey placeholder still present
+        # Council 2026-05-04 stage6 security condition: a forgotten
+        # placeholder ships an unverifiable updater. Block the build
+        # before we even start signing.
+        run: |
+          if grep -q PLACEHOLDER Sojourn/Info.plist; then
+            echo "FATAL: Sojourn/Info.plist::SUPublicEDKey is still the placeholder."
+            echo "Replace with the real EdDSA public key before tagging." >&2
+            exit 1
+          fi
+
       - name: Build Sojourn.app
         run: |
           xcodebuild -project Sojourn.xcodeproj \
@@ -127,6 +138,77 @@ jobs:
         run: |
           spctl --assess --type execute --verbose=4 build/Build/Products/Release/Sojourn.app
           spctl --assess --type install --verbose=4 Sojourn.dmg
+
+      # ─── Sparkle delta updates (ADR-0025) ───────────────────────────
+      # Steps below build appcast.xml + delta archives against the
+      # prior 10 releases. Cache key uses the prior release tag so a
+      # cache miss (first delta run after a long quiet period) falls
+      # back to full-DMG-only — acceptable degradation.
+      - name: Restore prior DMGs for delta generation
+        if: "!contains(github.ref, '-')"
+        id: prior-dmgs-cache
+        # zizmor: ignore[cache-poisoning]
+        # notarize.yml runs only on tag push; no PR vector.
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: prior-dmgs
+          key: sparkle-prior-dmgs-${{ github.ref_name }}
+          restore-keys: |
+            sparkle-prior-dmgs-
+
+      - name: Download Sparkle release tarball (generate_appcast tools)
+        if: "!contains(github.ref, '-')"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release download 2.9.1 \
+            --repo sparkle-project/Sparkle \
+            --pattern 'Sparkle-2.9.1.tar.xz' \
+            --output sparkle.tar.xz
+          mkdir -p sparkle-tools
+          tar -xJf sparkle.tar.xz -C sparkle-tools
+
+      - name: Generate appcast (full + delta entries)
+        if: "!contains(github.ref, '-')"
+        run: |
+          set -euo pipefail
+          mkdir -p prior-dmgs
+          cp Sojourn.dmg "prior-dmgs/Sojourn-${{ github.ref_name }}.dmg"
+          # sign_update reads the EdDSA private key from stdin (per
+          # ADR-0020 §"Key handling protocol"). generate_appcast
+          # invokes sign_update internally via --ed-key-file=- pattern.
+          # We provide the key via a 600-mode tempfile and remove it
+          # immediately after generate_appcast exits (RAII pattern).
+          KEY_FILE="$(mktemp)"
+          chmod 600 "$KEY_FILE"
+          printf '%s' "$SPARKLE_EDDSA_PRIVATE_KEY" > "$KEY_FILE"
+          # rm -P shreds (multi-pass overwrite) per ADR-0016 ephemeral
+          # key handling; APFS may CoW so this is best-effort defense.
+          trap 'rm -P -f "$KEY_FILE"' EXIT
+          # Verify the secret loaded; an empty op:// load would silently
+          # produce signatures with an empty key (council security cond).
+          if [ ! -s "$KEY_FILE" ]; then
+            echo "FATAL: SPARKLE_EDDSA_PRIVATE_KEY loaded empty from 1Password." >&2
+            exit 1
+          fi
+          ./sparkle-tools/Sparkle-2.9.1/bin/generate_appcast \
+            --ed-key-file "$KEY_FILE" \
+            --maximum-versions 10 \
+            --link "https://sojourn.bizarre.app/" \
+            --download-url-prefix "https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/" \
+            prior-dmgs
+          # generate_appcast writes appcast.xml in the prior-dmgs dir;
+          # copy it back to repo root for the upload step.
+          cp prior-dmgs/appcast.xml appcast.xml
+
+      - name: Upload appcast.xml + delta archives to release
+        if: "!contains(github.ref, '-')"
+        # zizmor: ignore[superfluous-actions]
+        uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda # v3.0.0
+        with:
+          files: |
+            appcast.xml
+            prior-dmgs/*.delta
 
       - name: Upload release artifact
         # zizmor: ignore[superfluous-actions]

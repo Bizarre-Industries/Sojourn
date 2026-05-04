@@ -36,6 +36,7 @@ internal final class AppStore {
   internal let bootstrap: BootstrapService
   internal let containersService: ContainersService
   internal let masService: MasService
+  internal let sparkleService: SparkleService
   internal let backgroundActivity: BackgroundActivity
 
   internal let historyDB: HistoryDB?
@@ -98,6 +99,7 @@ internal final class AppStore {
     self.bootstrap = BootstrapService(locator: toolLocator, brew: brew, subprocess: runner)
     self.containersService = ContainersService(runner: runner, locator: self.toolLocator)
     self.masService = MasService()
+    self.sparkleService = SparkleService()
     self.backgroundActivity = BackgroundActivity()
     self.historyDB = historyDB
     self.bootstrapCoordinator = BootstrapCoordinator(

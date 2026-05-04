@@ -53,7 +53,11 @@ let package = Package(
         // SPM library cannot link @main cleanly, and AppKit/SwiftUI requires
         // an app bundle context that SPM does not provide.
         "App",
-        "UI"
+        "UI",
+        // Sparkle SPM target ships a binaryTarget XCFramework that needs
+        // an AppKit app bundle to load. Excluded from the SPM build;
+        // Xcode build pulls it in via project.yml dependencies.
+        "Services/SparkleService.swift"
       ],
       resources: [
         .process("Resources/data")

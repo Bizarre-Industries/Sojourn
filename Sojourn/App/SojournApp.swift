@@ -24,6 +24,13 @@ struct SojournApp: App {
               await store.reloadFromDisk()
               await store.bootstrap.probe()
               await store.refreshManagers()
+              // ADR-0025: kick Sparkle on a detached task so the
+              // appcast prefetch does not block the 200ms launch
+              // budget. SparkleService is @MainActor-owned by AppStore;
+              // the detached task hops back to MainActor for `start()`.
+              Task.detached(priority: .background) { [store] in
+                await store.sparkleService.start()
+              }
             }
         } else if storeBox.initError != nil {
           ContentUnavailableView(
@@ -67,6 +74,18 @@ struct SojournApp: App {
     .commands {
       CommandGroup(after: .help) {
         ArchitectureMenuItem()
+      }
+      CommandGroup(after: .appInfo) {
+        // ADR-0025: in-app update via Sparkle. Reads through the
+        // AppStore-owned SparkleService so command-builder evaluation
+        // does not synchronously construct an updater (council
+        // 2026-05-04 stage6 perf condition).
+        if let store = storeBox.store {
+          Button("Check for Updates…") {
+            store.sparkleService.checkForUpdates()
+          }
+          .disabled(!store.sparkleService.canCheckForUpdates)
+        }
       }
     }
   }

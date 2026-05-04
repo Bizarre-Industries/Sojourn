@@ -52,6 +52,7 @@
 		51FFB7477224BF2F58CFB77E /* CleanupPane.swift in Sources */ = {isa = PBXBuildFile; fileRef = 917C3CA7A3B22318CCEC81F1 /* CleanupPane.swift */; };
 		527CE4A5051F3BDD51B486E4 /* DotfilesPane.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4C7A81F96BAD6A1DB0EAA0 /* DotfilesPane.swift */; };
 		52EDC71EEB3F6B1019200816 /* LogBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75102F527B8749FB644C0444 /* LogBuffer.swift */; };
+		54BFA029AD66E7C96A082952 /* SparkleService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42E2ABBD80A9964361A8688C /* SparkleService.swift */; };
 		5637BD907CE29C5CEA91B8EB /* OnboardPane.swift in Sources */ = {isa = PBXBuildFile; fileRef = 382E9466BCD14C7A5C4CA0A7 /* OnboardPane.swift */; };
 		566B9302B5EF701E96BC9450 /* HistoryDBTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22514EEE2D61221B194F8C5F /* HistoryDBTests.swift */; };
 		592812DD4D79A19E29AE9854 /* HistoryDB.swift in Sources */ = {isa = PBXBuildFile; fileRef = 277FC75194E246A84AB1A2A9 /* HistoryDB.swift */; };
@@ -72,6 +73,7 @@
 		7BD820423453D94C76D6AC14 /* PreferenceDomain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92FBF1A32893C79F8C24CC6D /* PreferenceDomain.swift */; };
 		7D12230599E03128063CB41D /* SecretBroker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5217EB2276E28CBD960CFE45 /* SecretBroker.swift */; };
 		7DC5BAB597CF4ECE62CDE01C /* ToolProbe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A07B987FC38D4FE488E8704 /* ToolProbe.swift */; };
+		7EB4436F77BF9F391CF0C28D /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 6D20408C069D9385AE80FE87 /* Sparkle */; };
 		7F35922412987A6980939F44 /* StateDB.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F811FB480E52C17173F18BE /* StateDB.swift */; };
 		7F4A4A10C94FD64082D138E3 /* AdvisoryReference.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB1FBD91A2515C0261DD4EFF /* AdvisoryReference.swift */; };
 		80AA65AC31C8757820AAFDE3 /* Fixtures in Resources */ = {isa = PBXBuildFile; fileRef = F6B2E4CDB667C8A900D0EC01 /* Fixtures */; };
@@ -195,6 +197,7 @@
 		3BF1AACCC465682DC48834DF /* MasHelper */ = {isa = PBXFileReference; includeInIndex = 0; path = MasHelper; sourceTree = BUILT_PRODUCTS_DIR; };
 		3D1CE3F585241A7C3832E1FC /* ManagerSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagerSnapshot.swift; sourceTree = "<group>"; };
 		3E2C81F1F7CEDB139F93278C /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
+		42E2ABBD80A9964361A8688C /* SparkleService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SparkleService.swift; sourceTree = "<group>"; };
 		46A3581F13A50DB09A6F343F /* CycloneDX.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CycloneDX.swift; sourceTree = "<group>"; };
 		481F54F2BDF64F5380438AA6 /* SojournFileCodec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SojournFileCodec.swift; sourceTree = "<group>"; };
 		494B9E3CA3D4138CF9774417 /* ChezmoiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChezmoiService.swift; sourceTree = "<group>"; };
@@ -309,6 +312,7 @@
 			files = (
 				FEC5097A5FFAE8DAAA7D7B3A /* Subprocess in Frameworks */,
 				029D5D5DF9A3AADFEE4746E1 /* MenuBarExtraAccess in Frameworks */,
+				7EB4436F77BF9F391CF0C28D /* Sparkle in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -552,6 +556,7 @@
 				8CF3E7F8591B56E1E9859A73 /* PrefService.swift */,
 				07993C2265D99A08965BAA61 /* SecretScanService.swift */,
 				D6059260CDDBEFAD1D8B25EE /* SojournLog.swift */,
+				42E2ABBD80A9964361A8688C /* SparkleService.swift */,
 				22DFD3E375E49A6409AE3812 /* SubprocessRunner.swift */,
 				5531EFE3E6A6B9815FE6AA3D /* ToolLocator.swift */,
 			);
@@ -765,6 +770,7 @@
 			packageProductDependencies = (
 				39BF93AAF2A4FCFC7EBAD55E /* Subprocess */,
 				B7BF6B03C13860CCD1E85526 /* MenuBarExtraAccess */,
+				6D20408C069D9385AE80FE87 /* Sparkle */,
 			);
 			productName = Sojourn;
 			productReference = C40858EDF69CF14EA473AF3F /* Sojourn.app */;
@@ -809,6 +815,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				6604167E2ABE1EBEEF5A47E4 /* XCRemoteSwiftPackageReference "MenuBarExtraAccess" */,
+				D5D4224684365BBEC79F19EA /* XCRemoteSwiftPackageReference "Sparkle" */,
 				1059625C2ECBD3457AD1FA4C /* XCRemoteSwiftPackageReference "swift-subprocess" */,
 			);
 			preferredProjectObjectVersion = 77;
@@ -994,6 +1001,7 @@
 				E8CF049FDC844E6B057A072A /* SojournIconMark.swift in Sources */,
 				2AAEE78D2F3B8A48BFA7B6AA /* SojournLog.swift in Sources */,
 				D8E561923A9C07751DB4532E /* Spacing.swift in Sources */,
+				54BFA029AD66E7C96A082952 /* SparkleService.swift in Sources */,
 				7F35922412987A6980939F44 /* StateDB.swift in Sources */,
 				84ED767DF156511C5A5411CD /* SubprocessError.swift in Sources */,
 				96F5B9D644CDA14A4F97D25B /* SubprocessRunner.swift in Sources */,
@@ -1159,7 +1167,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Sojourn/Sojourn.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 25;
+				CURRENT_PROJECT_VERSION = 26;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Sojourn/Info.plist;
@@ -1200,7 +1208,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Sojourn/Sojourn.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 25;
+				CURRENT_PROJECT_VERSION = 26;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Sojourn/Info.plist;
@@ -1223,7 +1231,7 @@
 				CODE_SIGN_ENTITLEMENTS = MasHelper/MasHelper.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
 				CREATE_INFOPLIST_SECTION_IN_BINARY = YES;
-				CURRENT_PROJECT_VERSION = 25;
+				CURRENT_PROJECT_VERSION = 26;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = MasHelper/Info.plist;
@@ -1284,7 +1292,7 @@
 				CODE_SIGN_ENTITLEMENTS = MasHelper/MasHelper.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
 				CREATE_INFOPLIST_SECTION_IN_BINARY = YES;
-				CURRENT_PROJECT_VERSION = 25;
+				CURRENT_PROJECT_VERSION = 26;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = MasHelper/Info.plist;
@@ -1434,6 +1442,14 @@
 				minimumVersion = 1.3.0;
 			};
 		};
+		D5D4224684365BBEC79F19EA /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle.git";
+			requirement = {
+				kind = upToNextMinorVersion;
+				minimumVersion = 2.9.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1441,6 +1457,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 1059625C2ECBD3457AD1FA4C /* XCRemoteSwiftPackageReference "swift-subprocess" */;
 			productName = Subprocess;
+		};
+		6D20408C069D9385AE80FE87 /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D5D4224684365BBEC79F19EA /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
 		};
 		B7BF6B03C13860CCD1E85526 /* MenuBarExtraAccess */ = {
 			isa = XCSwiftPackageProductDependency;

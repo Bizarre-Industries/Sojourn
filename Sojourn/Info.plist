@@ -34,5 +34,22 @@
   <false/>
   <key>NSSupportsSuddenTermination</key>
   <false/>
+  <!-- Sparkle 2 — appcast URL + public EdDSA key. Per ADR-0025. -->
+  <!-- SUFeedURL targets the GitHub Releases "latest" alias which
+       transparently redirects to the most-recent release's
+       appcast.xml asset uploaded by .github/workflows/notarize.yml.
+       No external CDN dependency. -->
+  <key>SUFeedURL</key>
+  <string>https://github.com/Bizarre-Industries/Sojourn/releases/latest/download/appcast.xml</string>
+  <!-- SUPublicEDKey is the public half of the keypair stored at
+       op://Bizarre-Industries/sojourn-sparkle-eddsa. Safe to ship.
+       notarize.yml fails the build if this string still equals the
+       placeholder at sign time (sojourn-stage-workflow guard). -->
+  <key>SUPublicEDKey</key>
+  <string>SPARKLE_EDDSA_PUBLIC_KEY_PLACEHOLDER_REPLACE_BEFORE_TAG</string>
+  <key>SUEnableAutomaticChecks</key>
+  <true/>
+  <key>SUScheduledCheckInterval</key>
+  <integer>86400</integer>
 </dict>
 </plist>

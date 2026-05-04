@@ -6,6 +6,13 @@ All notable changes to Sojourn. Follows
 
 ## [Unreleased]
 
+### Added
+
+- v0.4 stage 1 native UI reset: grouped split-view sidebar,
+  compact toolbar actions, native pane surfaces, AppStore-backed
+  pane snapshots, bounded job history, and staged-content secret
+  scanning before sync push.
+
 ### Planned (post-v0.3.0)
 
 (See `docs/process/plans/v0.4-plan.md` for the active native UI reset plan.)

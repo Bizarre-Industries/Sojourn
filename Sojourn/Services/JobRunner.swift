@@ -80,33 +80,43 @@ internal struct JobHandle: Sendable {
   internal let bufferID: LogBufferID
 }
 
+internal enum JobRunnerError: Error, Sendable, Equatable, CustomStringConvertible {
+  case timedOut(seconds: TimeInterval)
+
+  internal var description: String {
+    switch self {
+    case .timedOut(let seconds):
+      return "timed out after \(Self.format(seconds))"
+    }
+  }
+
+  private static func format(_ seconds: TimeInterval) -> String {
+    if seconds.rounded(.down) == seconds {
+      return "\(Int(seconds))s"
+    }
+    return String(format: "%.1fs", seconds)
+  }
+}
+
 @Observable
 @MainActor
 internal final class JobRunner {
   internal private(set) var jobs: [Job] = []
   internal private(set) var buffers: [LogBufferID: LogBuffer] = [:]
 
+  private let terminalRetentionLimit: Int
   private let runner: SubprocessRunner
   private var tasks: [JobID: Task<Void, Never>] = [:]
+  private var trackedCancellers: [JobID: @Sendable () -> Void] = [:]
 
-  internal init(runner: SubprocessRunner) {
+  internal init(runner: SubprocessRunner, terminalRetentionLimit: Int = 200) {
     self.runner = runner
+    self.terminalRetentionLimit = max(0, terminalRetentionLimit)
   }
 
   @discardableResult
   internal func submit(_ request: JobRequest) -> JobHandle {
-    let buffer = LogBuffer()
-    let bufferID = buffer.id
-    let job = Job(
-      label: request.label,
-      tool: request.tool,
-      args: request.args,
-      state: .pending,
-      logBufferID: bufferID
-    )
-    jobs.append(job)
-    buffers[bufferID] = buffer
-    let jobID = job.id
+    let (jobID, buffer, handle) = appendJob(request)
 
     let task = Task.detached { [weak self, runner] in
       await self?.markRunning(jobID)
@@ -144,15 +154,73 @@ internal final class JobRunner {
       }
     }
 
-    return JobHandle(id: jobID, bufferID: bufferID)
+    return handle
+  }
+
+  @discardableResult
+  internal func track<T: Sendable>(
+    _ request: JobRequest,
+    operation: @escaping @Sendable () async throws -> T
+  ) async throws -> T {
+    let (jobID, buffer, _) = appendJob(request)
+    markRunning(jobID)
+    let task = Task<T, any Error> {
+      try await operation()
+    }
+    trackedCancellers[jobID] = { task.cancel() }
+    do {
+      let value = try await awaitTrackedValue(task, timeout: request.effectiveTimeout)
+      await buffer.feed(StreamChunk(
+        stream: .stdout,
+        data: Data("Completed \(request.label)\n".utf8)
+      ))
+      await buffer.close()
+      markSucceeded(jobID, exitCode: 0)
+      return value
+    } catch let SubprocessError.nonZeroExit(code, stdout, stderr) {
+      await feedIfPresent(stdout, stream: .stdout, to: buffer)
+      await feedIfPresent(stderr, stream: .stderr, to: buffer)
+      await buffer.close()
+      markSucceeded(jobID, exitCode: code, asFailure: true)
+      throw SubprocessError.nonZeroExit(code: code, stdout: stdout, stderr: stderr)
+    } catch is CancellationError {
+      task.cancel()
+      await buffer.close()
+      markCancelled(jobID)
+      throw CancellationError()
+    } catch let error as JobRunnerError {
+      task.cancel()
+      await buffer.feed(StreamChunk(
+        stream: .stderr,
+        data: Data(error.description.utf8)
+      ))
+      await buffer.close()
+      markFailed(jobID, reason: error.description)
+      throw error
+    } catch {
+      task.cancel()
+      await buffer.feed(StreamChunk(
+        stream: .stderr,
+        data: Data(String(describing: error).utf8)
+      ))
+      await buffer.close()
+      markFailed(jobID, reason: "\(error)")
+      throw error
+    }
   }
 
   internal func cancel(_ jobID: JobID) {
     tasks[jobID]?.cancel()
+    trackedCancellers[jobID]?()
+  }
+
+  internal func canCancel(_ jobID: JobID) -> Bool {
+    tasks[jobID] != nil || trackedCancellers[jobID] != nil
   }
 
   internal func cancelAll() {
     for task in tasks.values { task.cancel() }
+    for cancel in trackedCancellers.values { cancel() }
   }
 
   internal func job(_ jobID: JobID) -> Job? {
@@ -165,11 +233,32 @@ internal final class JobRunner {
 
   internal func purgeTerminal() {
     let terminalIDs = Set(jobs.filter { $0.state.isTerminal }.map(\.id))
+    let bufferIDs = jobs
+      .filter { terminalIDs.contains($0.id) }
+      .map(\.logBufferID)
     jobs.removeAll { terminalIDs.contains($0.id) }
     for id in terminalIDs { tasks.removeValue(forKey: id) }
+    for id in terminalIDs { trackedCancellers.removeValue(forKey: id) }
+    for id in bufferIDs { buffers.removeValue(forKey: id) }
   }
 
   // MARK: - State transitions
+
+  private func appendJob(_ request: JobRequest) -> (JobID, LogBuffer, JobHandle) {
+    let buffer = LogBuffer()
+    let bufferID = buffer.id
+    let job = Job(
+      label: request.label,
+      tool: request.tool,
+      args: request.args,
+      state: .pending,
+      logBufferID: bufferID
+    )
+    jobs.append(job)
+    buffers[bufferID] = buffer
+    trimRetainedJobs()
+    return (job.id, buffer, JobHandle(id: job.id, bufferID: bufferID))
+  }
 
   /// Locate a non-terminal job by id. Terminal-state jobs cannot
   /// transition again (timeout watchdog races against natural
@@ -191,18 +280,27 @@ internal final class JobRunner {
       ? .failed(reason: "non-zero exit \(exitCode)")
       : .succeeded(exitCode: exitCode)
     jobs[idx].finishedAt = Date()
+    tasks.removeValue(forKey: id)
+    trackedCancellers.removeValue(forKey: id)
+    trimRetainedJobs()
   }
 
   private func markFailed(_ id: JobID, reason: String) {
     guard let idx = nonTerminalIndex(of: id) else { return }
     jobs[idx].state = .failed(reason: reason)
     jobs[idx].finishedAt = Date()
+    tasks.removeValue(forKey: id)
+    trackedCancellers.removeValue(forKey: id)
+    trimRetainedJobs()
   }
 
   private func markCancelled(_ id: JobID) {
     guard let idx = nonTerminalIndex(of: id) else { return }
     jobs[idx].state = .cancelled
     jobs[idx].finishedAt = Date()
+    tasks.removeValue(forKey: id)
+    trackedCancellers.removeValue(forKey: id)
+    trimRetainedJobs()
   }
 
   /// Watchdog finalizer — called when the per-kind hard timeout
@@ -211,8 +309,77 @@ internal final class JobRunner {
   /// naturally (terminal-state guard).
   private func markTimedOut(_ id: JobID, after seconds: TimeInterval) {
     guard let idx = nonTerminalIndex(of: id) else { return }
+    let task = tasks.removeValue(forKey: id)
     jobs[idx].state = .failed(reason: "timed out after \(Int(seconds))s")
     jobs[idx].finishedAt = Date()
-    tasks[id]?.cancel()
+    task?.cancel()
+    trackedCancellers.removeValue(forKey: id)?()
+    trimRetainedJobs()
   }
+
+  private func trimRetainedJobs() {
+    let terminalJobs = jobs.filter { $0.state.isTerminal }
+    let overflow = terminalJobs.count - terminalRetentionLimit
+    guard overflow > 0 else { return }
+
+    let evictedIDs = Set(terminalJobs.prefix(overflow).map(\.id))
+    let evictedBufferIDs = jobs
+      .filter { evictedIDs.contains($0.id) }
+      .map(\.logBufferID)
+    jobs.removeAll { evictedIDs.contains($0.id) }
+    for id in evictedIDs {
+      tasks.removeValue(forKey: id)
+      trackedCancellers.removeValue(forKey: id)
+    }
+    for id in evictedBufferIDs {
+      buffers.removeValue(forKey: id)
+    }
+  }
+
+  private func feedIfPresent(
+    _ data: Data,
+    stream: StreamTag,
+    to buffer: LogBuffer
+  ) async {
+    guard !data.isEmpty else { return }
+    await buffer.feed(StreamChunk(stream: stream, data: data))
+  }
+
+  private nonisolated func awaitTrackedValue<T: Sendable>(
+    _ task: Task<T, any Error>,
+    timeout: TimeInterval?
+  ) async throws -> T {
+    guard let timeout else {
+      return try await task.value
+    }
+
+    return try await withThrowingTaskGroup(of: TrackedOutcome<T>.self) { group in
+      group.addTask {
+        let value = try await task.value
+        return .value(value)
+      }
+      group.addTask {
+        try await Task.sleep(for: .seconds(timeout))
+        return .timedOut
+      }
+
+      guard let outcome = try await group.next() else {
+        throw CancellationError()
+      }
+      group.cancelAll()
+
+      switch outcome {
+      case .value(let value):
+        return value
+      case .timedOut:
+        task.cancel()
+        throw JobRunnerError.timedOut(seconds: timeout)
+      }
+    }
+  }
+}
+
+private enum TrackedOutcome<T: Sendable>: Sendable {
+  case value(T)
+  case timedOut
 }

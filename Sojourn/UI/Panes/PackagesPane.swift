@@ -4,71 +4,171 @@ import SwiftUI
 
 struct PackagesPane: View {
   @Environment(AppStore.self) private var store
-  @State private var selectedManager: String = "brew"
-  @State private var filter: String = "All"
+  @State private var selectedManager: String? = "brew"
+  @State private var masHelperError: MasHelperActionError?
+  @State private var confirmingMasHelperRevoke = false
 
   var body: some View {
-    VStack(spacing: 0) {
-      if selectedManager == "mas" {
-        masHelperStatusRow
-        Rectangle().fill(Color.hairline).frame(height: 0.5)
+    HStack(spacing: 0) {
+      List(managerSummaries, selection: $selectedManager) { manager in
+        Label {
+          VStack(alignment: .leading, spacing: 2) {
+            Text(manager.name)
+            Text("\(manager.count) packages · tier \(manager.tierLabel)")
+              .font(.caption)
+              .foregroundStyle(.secondary)
+          }
+        } icon: {
+          Image(systemName: manager.symbol)
+            .foregroundStyle(.secondary)
+            .accessibilityHidden(true)
+        }
+        .tag(manager.id)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(manager.name). \(manager.count) packages. Tier \(manager.tierLabel).")
       }
-      HStack(spacing: 0) {
-        managerMidlist
-        Rectangle().fill(Color.hairline).frame(width: 0.5)
-        packageDetail
-      }
+      .listStyle(.inset)
+      .scrollContentBackground(.hidden)
+      .background(Color(nsColor: .windowBackgroundColor))
+      .frame(width: 280)
+
+      Divider()
+
+      packageDetail
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
-    .frame(maxWidth: .infinity, maxHeight: .infinity)
+    .background(Color(nsColor: .windowBackgroundColor))
     .accessibilityIdentifier("pane.packages")
     .task {
       await store.refreshMasHelperStatus()
     }
+    .alert(masHelperError?.title ?? "Helper action failed", isPresented: masHelperErrorPresented) {
+      Button("OK", role: .cancel) {
+        masHelperError = nil
+      }
+    } message: {
+      Text(masHelperError?.message ?? "")
+    }
+    .confirmationDialog(
+      "Remove helper?",
+      isPresented: $confirmingMasHelperRevoke,
+      titleVisibility: .visible
+    ) {
+      Button("Remove Helper", role: .destructive) {
+        Task {
+          do {
+            try await store.unregisterMasHelper()
+          } catch {
+            masHelperError = .revoke(error)
+          }
+        }
+      }
+      Button("Cancel", role: .cancel) {}
+    } message: {
+      Text("App Store installs will stop using Touch ID until you register it again.")
+    }
   }
 
-  // MARK: MasHelper status row (ADR-0024)
+  private var packageDetail: some View {
+    let manager = selectedSummary
+    return ScrollView {
+      VStack(alignment: .leading, spacing: 18) {
+        VStack(alignment: .leading, spacing: 4) {
+          Text(manager.name)
+            .font(.title2.weight(.semibold))
+          Text(manager.description)
+            .foregroundStyle(.secondary)
+        }
 
-  /// Per ADR-0024 amendment "Helper authorization status surface": a
-  /// row showing whether the privileged Touch-ID install helper is
-  /// active, plus a Register / Revoke control. Visible only when the
-  /// "mas" manager is selected so it sits in context.
+        if manager.id == "mas" {
+          masHelperStatusRow
+        }
+
+        GroupBox("Summary") {
+          Grid(alignment: .leading, horizontalSpacing: 16, verticalSpacing: 8) {
+            GridRow {
+              Text("Packages").foregroundStyle(.secondary)
+              Text("\(manager.count)").monospacedDigit()
+            }
+            GridRow {
+              Text("Cooldown tier").foregroundStyle(.secondary)
+              Text("Tier \(manager.tierLabel) · \(manager.cooldownWindow)")
+            }
+            GridRow {
+              Text("Prompt").foregroundStyle(.secondary)
+              Text(manager.promptLabel)
+            }
+            GridRow {
+              Text("Install source").foregroundStyle(.secondary)
+              Text(manager.source)
+            }
+          }
+          .frame(maxWidth: .infinity, alignment: .leading)
+        }
+
+        GroupBox("Outdated") {
+          ContentUnavailableView(
+            "Outdated scan unavailable",
+            systemImage: "arrow.triangle.2.circlepath",
+            description: Text("Package counts are available. Installed-versus-latest rows are not part of the current inventory snapshot.")
+          )
+          .frame(maxWidth: .infinity, minHeight: 140)
+        }
+      }
+      .padding(24)
+      .frame(maxWidth: 760, alignment: .leading)
+    }
+  }
+
+  // MARK: - MasHelper status row
+
   @ViewBuilder
   private var masHelperStatusRow: some View {
     HStack(spacing: 12) {
-      StatusDot(kind: masDotKind)
+      Image(systemName: masStatusSymbol)
+        .foregroundStyle(masStatusColor)
+        .frame(width: 20)
+        .accessibilityHidden(true)
       VStack(alignment: .leading, spacing: 2) {
         Text(masStatusTitle)
-          .font(.bzrBody(size: 13, weight: .semibold))
-          .foregroundStyle(Color.txtPrimary)
+          .font(.callout.weight(.semibold))
         Text(masStatusSubtitle)
-          .font(.bzrMono(size: 10))
-          .foregroundStyle(Color.txtTertiary)
-          .lineLimit(1)
+          .font(.caption)
+          .foregroundStyle(.secondary)
+          .lineLimit(2)
       }
       Spacer()
       masStatusButton
     }
-    .padding(.horizontal, 20)
-    .padding(.vertical, 12)
-    .background(Color.white.opacity(0.04))
+    .padding()
+    .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 8))
     .accessibilityIdentifier("packages.mas-helper-status")
     .accessibilityLabel(masStatusAccessibilityLabel)
   }
 
-  private var masDotKind: StatusDotKind {
+  private var masStatusSymbol: String {
     switch store.masHelperStatus {
-    case .registered:        return .lime
-    case .requiresApproval:  return .warn
-    case .notRegistered:     return .ok
-    case .missing, .unknown: return .danger
+    case .registered:       return "checkmark.circle"
+    case .requiresApproval: return "exclamationmark.circle"
+    case .notRegistered:    return "circle"
+    case .missing, .unknown:return "xmark.octagon"
+    }
+  }
+
+  private var masStatusColor: Color {
+    switch store.masHelperStatus {
+    case .registered:       return .green
+    case .requiresApproval: return .orange
+    case .notRegistered:    return .secondary
+    case .missing, .unknown:return .red
     }
   }
 
   private var masStatusTitle: String {
     switch store.masHelperStatus {
-    case .registered:       return "Touch-ID install helper active"
-    case .requiresApproval: return "Helper needs your approval"
-    case .notRegistered:    return "Touch-ID install helper not yet installed"
+    case .registered:       return "Touch ID install helper active"
+    case .requiresApproval: return "Helper needs approval"
+    case .notRegistered:    return "Touch ID install helper not installed"
     case .missing:          return "Helper missing from app bundle"
     case .unknown:          return "Helper status unknown"
     }
@@ -77,15 +177,15 @@ struct PackagesPane: View {
   private var masStatusSubtitle: String {
     switch store.masHelperStatus {
     case .registered:
-      return "App Store installs run silently after first authorization"
+      return "App Store installs run through the privileged helper after authorization."
     case .requiresApproval:
-      return "Open System Settings → General → Login Items"
+      return "Approve the helper in System Settings > General > Login Items."
     case .notRegistered:
-      return "Click Register to install (one-time admin prompt)"
+      return "Registering installs the helper with a one-time system prompt."
     case .missing:
-      return "Reinstall Sojourn or rebuild from source"
+      return "Reinstall Sojourn or rebuild from source."
     case .unknown:
-      return "Could not read SMAppService status"
+      return "Sojourn could not read SMAppService status."
     }
   }
 
@@ -98,336 +198,162 @@ struct PackagesPane: View {
     switch store.masHelperStatus {
     case .registered:
       Button("Revoke") {
-        Task {
-          try? await store.unregisterMasHelper()
-        }
+        confirmingMasHelperRevoke = true
       }
-      .buttonStyle(.bordered)
-      .controlSize(.small)
       .accessibilityIdentifier("packages.mas-helper-revoke")
+      .accessibilityHint("Removes the helper after confirmation.")
     case .notRegistered, .requiresApproval:
       Button("Register") {
         Task {
-          try? await store.registerMasHelper()
+          do {
+            try await store.registerMasHelper()
+          } catch {
+            masHelperError = .register(error)
+          }
         }
       }
       .buttonStyle(.borderedProminent)
-      .controlSize(.small)
       .accessibilityIdentifier("packages.mas-helper-register")
+      .accessibilityHint("Registers a privileged helper for App Store installs and may show a macOS approval prompt.")
     case .missing, .unknown:
       EmptyView()
     }
   }
 
-  // MARK: Midlist
+  // MARK: - Manager data
 
-  private struct ManagerSummary: Identifiable {
-    let id: String
-    let glyph: String
-    let name: String
-    let pkgs: Int
-    let outdated: Int
-    let tier: String
-    let tierKind: BzrBadgeKind
-    let sub: String
+  private var selectedSummary: PackageManagerSummary {
+    managerSummaries.first { $0.id == selectedManager } ?? managerSummaries[0]
   }
 
-  // Real package counts from `brew bundle dump` (BrewfileAST.counts).
-  // Outdated count is 0 for v0.2 — `brew bundle dump` is a snapshot of
-  // the spec, not a diff against installed state. Step 11 (in v0.3) will
-  // wire `brew outdated --json` parsing for the per-manager outdated #s.
-  private var managerSummaries: [ManagerSummary] {
-    let c = store.brewfile?.counts ?? .init()
+  private var managerSummaries: [PackageManagerSummary] {
+    let counts = store.brewfile?.counts ?? .init()
     return [
-      .init(id: "mas",     glyph: "MA", name: "Mac App Store", pkgs: c.mas,     outdated: 0, tier: "A", tierKind: .tierA, sub: "mas-cli"),
-      .init(id: "brew",    glyph: "BR", name: "Homebrew",      pkgs: c.brews,   outdated: 0, tier: "B", tierKind: .tierB, sub: "formulae"),
-      .init(id: "cargo",   glyph: "CA", name: "Cargo",         pkgs: c.cargo,   outdated: 0, tier: "B", tierKind: .tierB, sub: "rust"),
-      .init(id: "cask",    glyph: "CK", name: "Cask",          pkgs: c.casks,   outdated: 0, tier: "C", tierKind: .tierC, sub: "gui apps"),
-      .init(id: "uv",      glyph: "UV", name: "uv (Python)",   pkgs: c.uv,      outdated: 0, tier: "D", tierKind: .tierD, sub: "pep-723"),
-      .init(id: "npm",     glyph: "NP", name: "npm (global)",  pkgs: c.npm,     outdated: 0, tier: "E", tierKind: .tierE, sub: "lifecycle"),
-      .init(id: "go",      glyph: "GO", name: "go install",    pkgs: c.go,      outdated: 0, tier: "B", tierKind: .tierB, sub: "modules"),
-      .init(id: "vscode",  glyph: "VS", name: "VS Code",       pkgs: c.vscode,  outdated: 0, tier: "C", tierKind: .tierC, sub: "extensions"),
-      .init(id: "krew",    glyph: "KR", name: "krew (kubectl)",pkgs: c.krew,    outdated: 0, tier: "C", tierKind: .tierC, sub: "plugins"),
-      .init(id: "tap",     glyph: "TP", name: "Homebrew taps", pkgs: c.taps,    outdated: 0, tier: "B", tierKind: .tierB, sub: "extra repos")
+      .init(
+        id: "mas",
+        name: "Mac App Store",
+        symbol: "apple.logo",
+        count: counts.mas,
+        tier: .a,
+        promptLabel: "Not required",
+        source: "mas",
+        description: "Reviewed App Store applications installed through mas."
+      ),
+      .init(
+        id: "brew",
+        name: "Homebrew",
+        symbol: "terminal",
+        count: counts.brews,
+        tierLabel: "B-C",
+        cooldownWindow: "7-14 days",
+        promptLabel: "Depends on tap",
+        source: "brew",
+        description: "Homebrew formulae from the Brewfile. Third-party taps use the stricter tier."
+      ),
+      .init(
+        id: "cargo",
+        name: "Cargo",
+        symbol: "shippingbox",
+        count: counts.cargo,
+        tier: .e,
+        promptLabel: "Required before apply",
+        source: "cargo",
+        description: "Rust packages installed by cargo."
+      ),
+      .init(
+        id: "cask",
+        name: "Casks",
+        symbol: "app.dashed",
+        count: counts.casks,
+        tierLabel: "C-D",
+        cooldownWindow: "14-21 days",
+        promptLabel: "Depends on tap",
+        source: "brew cask",
+        description: "GUI apps and packaged installers."
+      ),
+      .init(
+        id: "uv",
+        name: "uv / Python",
+        symbol: "chevron.left.forwardslash.chevron.right",
+        count: counts.uv,
+        tier: .e,
+        promptLabel: "Required before apply",
+        source: "uv",
+        description: "Python tools managed through uv."
+      ),
+      .init(
+        id: "npm",
+        name: "npm global",
+        symbol: "curlybraces",
+        count: counts.npm,
+        tier: .e,
+        promptLabel: "Required before apply",
+        source: "npm",
+        description: "Global npm packages with lifecycle-script risk."
+      ),
+      .init(
+        id: "go",
+        name: "Go install",
+        symbol: "g.circle",
+        count: counts.go,
+        tier: .e,
+        promptLabel: "Required before apply",
+        source: "go",
+        description: "Go module binaries."
+      ),
+      .init(
+        id: "vscode",
+        name: "VS Code",
+        symbol: "curlybraces.square",
+        count: counts.vscode,
+        tier: .d,
+        promptLabel: "Required before apply",
+        source: "code",
+        description: "VS Code extensions."
+      ),
+      .init(
+        id: "krew",
+        name: "krew",
+        symbol: "k.square",
+        count: counts.krew,
+        tier: .e,
+        promptLabel: "Required before apply",
+        source: "kubectl krew",
+        description: "kubectl plugin manager entries."
+      ),
+      .init(
+        id: "flatpak",
+        name: "Flatpak",
+        symbol: "shippingbox.circle",
+        count: counts.flatpak,
+        tier: .e,
+        promptLabel: "Required before apply",
+        source: "flatpak",
+        description: "Flatpak application entries from the Brewfile."
+      ),
+      .init(
+        id: "tap",
+        name: "Homebrew taps",
+        symbol: "point.3.connected.trianglepath.dotted",
+        count: counts.taps,
+        tierLabel: "Reference",
+        cooldownWindow: "No package cooldown",
+        promptLabel: "Not applicable",
+        source: "brew tap",
+        description: "Additional Homebrew repositories."
+      )
     ]
   }
 
-  private var managerMidlist: some View {
-    VStack(alignment: .leading, spacing: 0) {
-      // Header
-      HStack {
-        Text("MANAGERS")
-          .font(.bzrEyebrow)
-          .tracking(1.6)
-          .textCase(.uppercase)
-          .foregroundStyle(Color.txtTertiary)
-        Spacer()
-        Text("\(managerSummaries.count)")
-          .font(.bzrMono(size: 11, weight: .medium))
-          .foregroundStyle(Color.bzrLimeText)
-      }
-      .padding(.horizontal, 14)
-      .padding(.vertical, 10)
-
-      ScrollView {
-        LazyVStack(alignment: .leading, spacing: 0) {
-          ForEach(managerSummaries) { mgr in
-            managerRow(mgr)
-          }
+  private var masHelperErrorPresented: Binding<Bool> {
+    Binding(
+      get: { masHelperError != nil },
+      set: { isPresented in
+        if !isPresented {
+          masHelperError = nil
         }
       }
-    }
-    .frame(width: 280)
-    .background(Color.black.opacity(0.18))
+    )
   }
 
-  @ViewBuilder
-  private func managerRow(_ mgr: ManagerSummary) -> some View {
-    let selected = selectedManager == mgr.id
-    Button { selectedManager = mgr.id } label: {
-      HStack(spacing: 10) {
-        // 2-letter glyph chip
-        Text(mgr.glyph)
-          .font(.bzrStencil(size: 12, weight: .bold))
-          .tracking(0.5)
-          .foregroundStyle(selected ? Color.bzrVoid : Color.txtPrimary)
-          .frame(width: 28, height: 28)
-          .background(
-            RoundedRectangle(cornerRadius: 6, style: .continuous)
-              .fill(selected ? Color.bzrLime : Color.white.opacity(0.06))
-          )
-
-        VStack(alignment: .leading, spacing: 2) {
-          HStack(spacing: 6) {
-            Text(mgr.name)
-              .font(.bzrBody(size: 13, weight: .semibold))
-              .foregroundStyle(Color.txtPrimary)
-            if mgr.outdated > 0 {
-              StatusDot(kind: .warn)
-            }
-          }
-          HStack(spacing: 4) {
-            Text("\(mgr.pkgs) pkg")
-              .font(.bzrMono(size: 10))
-              .foregroundStyle(Color.txtTertiary)
-            Text("·")
-              .font(.bzrMono(size: 10))
-              .foregroundStyle(Color.txtQuaternary)
-            Text(mgr.outdated > 0 ? "\(mgr.outdated) outdated" : "up to date")
-              .font(.bzrMono(size: 10))
-              .foregroundStyle(Color.txtTertiary)
-            Text("·")
-              .font(.bzrMono(size: 10))
-              .foregroundStyle(Color.txtQuaternary)
-            Text("tier \(mgr.tier)")
-              .font(.bzrMono(size: 10))
-              .foregroundStyle(Color.txtTertiary)
-          }
-        }
-        Spacer()
-      }
-      .padding(.horizontal, 14)
-      .padding(.vertical, 8)
-      .frame(maxWidth: .infinity, alignment: .leading)
-      .background(selected ? Color.bzrLime.opacity(0.10) : Color.clear)
-      .overlay(
-        Rectangle()
-          .fill(selected ? Color.bzrLime : Color.clear)
-          .frame(width: 2),
-        alignment: .leading
-      )
-    }
-    .buttonStyle(.plain)
-  }
-
-  // MARK: Detail
-
-  private var packageDetail: some View {
-    let mgr = managerSummaries.first { $0.id == selectedManager } ?? managerSummaries[0]
-    return ScrollView {
-      VStack(alignment: .leading, spacing: 18) {
-        EyebrowLabel(text: "PACKAGES · \(mgr.name.uppercased()) · TIER \(mgr.tier)")
-        Text("\(mgr.name.uppercased()) · \(mgr.pkgs) PACKAGES")
-          .font(.bzrStencil(size: 30, weight: .heavy))
-          .foregroundStyle(Color.txtPrimary)
-        Text("Tier \(mgr.tier) — \(tierWindow(mgr.tier)) cooldown. \(mgr.sub).")
-          .font(.bzrBody(size: 13))
-          .foregroundStyle(Color.txtSecondary)
-          .fixedSize(horizontal: false, vertical: true)
-
-        Text("Outdated · cross-manager view")
-          .font(.bzrDetailH2)
-          .foregroundStyle(Color.txtPrimary)
-          .padding(.top, 4)
-
-        outdatedTable
-      }
-      .padding(28)
-      .frame(maxWidth: .infinity, alignment: .leading)
-    }
-  }
-
-  private func tierWindow(_ tier: String) -> String {
-    switch tier {
-    case "A": return "0d"
-    case "B", "C", "D": return "7d"
-    case "E": return "14d"
-    default: return "—"
-    }
-  }
-
-  // MARK: Outdated table
-
-  private struct OutdatedRow: Identifiable {
-    let id = UUID()
-    let pkg: String
-    let from: String
-    let to: String
-    let mgr: String
-    let tier: String
-    let tierKind: BzrBadgeKind
-    let cooldown: String
-    let state: OutdatedState
-  }
-
-  private enum OutdatedState { case eligible, cooldown, prompt, auto }
-
-  // The outdated table is empty in v0.2 — `brew outdated --json` parsing
-  // lands in v0.3 (step 11). Until then we honestly show 0 rows + an
-  // empty-state message rather than fake demo entries.
-  private var outdatedRows: [OutdatedRow] { [] }
-
-  private var outdatedTable: some View {
-    Group {
-      if outdatedRows.isEmpty {
-        VStack(alignment: .leading, spacing: 6) {
-          Text("No outdated check yet")
-            .font(.bzrBody(size: 13, weight: .semibold))
-            .foregroundStyle(Color.txtPrimary)
-          Text("`brew outdated --json` parsing lands in v0.3. Until then this pane shows the package counts from `brew bundle dump` (left rail) but cannot diff installed vs latest.")
-            .font(.bzrMono(size: 11))
-            .foregroundStyle(Color.txtTertiary)
-            .fixedSize(horizontal: false, vertical: true)
-        }
-        .padding(20)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color.adaptiveDeepen(0.20))
-        .clipShape(RoundedRectangle(cornerRadius: BzrRadius.bzrSharp, style: .continuous))
-        .overlay(
-          RoundedRectangle(cornerRadius: BzrRadius.bzrSharp, style: .continuous)
-            .stroke(Color.hairline, lineWidth: 0.5)
-        )
-      } else {
-        // Real outdated table only renders when there are rows. The
-        // 8 fixed-width columns total ~644pt; we wrap in a horizontal
-        // ScrollView so narrow windows scroll instead of clipping.
-        ScrollView(.horizontal, showsIndicators: true) {
-          VStack(spacing: 0) {
-            HStack(spacing: 0) {
-              tableHeader("Package", width: 130)
-              tableHeader("Installed", width: 80)
-              tableHeader("", width: 24)
-              tableHeader("Latest", width: 80)
-              tableHeader("Mgr", width: 60)
-              tableHeader("Tier", width: 60)
-              tableHeader("Cooldown", width: 130)
-              tableHeader("", width: 80)
-            }
-            .background(Color.adaptiveLighten(0.02))
-            .overlay(
-              Rectangle().fill(Color.hairline).frame(height: 0.5),
-              alignment: .bottom
-            )
-
-            ForEach(outdatedRows) { row in
-              HStack(spacing: 0) {
-                tableCell(row.pkg, width: 130, weight: .semibold)
-                tableCell(row.from, width: 80, color: .txtSecondary)
-                tableCell("→", width: 24, color: .txtTertiary)
-                tableCell(row.to, width: 80, color: .bzrLimeText, weight: .semibold)
-                tableCell(row.mgr, width: 60, color: .txtTertiary)
-                HStack { BzrBadge(text: row.tier, kind: row.tierKind); Spacer() }
-                  .frame(width: 60).padding(.horizontal, 12).padding(.vertical, 7)
-                tableCell(row.cooldown, width: 130, color: .txtTertiary)
-                HStack { stateBadge(row.state); Spacer() }
-                  .frame(width: 80).padding(.horizontal, 12).padding(.vertical, 7)
-              }
-              .overlay(
-                Rectangle().fill(Color.hairlineInner).frame(height: 0.5),
-                alignment: .bottom
-              )
-            }
-          }
-        }
-        .background(Color.adaptiveDeepen(0.20))
-        .clipShape(RoundedRectangle(cornerRadius: BzrRadius.bzrSharp, style: .continuous))
-        .overlay(
-          RoundedRectangle(cornerRadius: BzrRadius.bzrSharp, style: .continuous)
-            .stroke(Color.hairline, lineWidth: 0.5)
-        )
-      }
-    }
-  }
-
-  @ViewBuilder
-  private func tableHeader(_ text: String, width: CGFloat) -> some View {
-    Text(text)
-      .font(.bzrMono(size: 9, weight: .semibold))
-      .tracking(1.6)
-      .textCase(.uppercase)
-      .foregroundStyle(Color.txtTertiary)
-      .frame(width: width, alignment: .leading)
-      .padding(.horizontal, 12)
-      .padding(.vertical, 8)
-  }
-
-  @ViewBuilder
-  private func tableCell(_ text: String, width: CGFloat, color: Color = .txtPrimary, weight: Font.Weight = .medium) -> some View {
-    Text(text)
-      .font(.bzrMono(size: 11, weight: weight))
-      .foregroundStyle(color)
-      .frame(width: width, alignment: .leading)
-      .padding(.horizontal, 12)
-      .padding(.vertical, 7)
-  }
-
-  @ViewBuilder
-  private func stateBadge(_ state: OutdatedState) -> some View {
-    switch state {
-    case .eligible: BzrBadge(text: "READY", kind: .success)
-    case .cooldown: BzrBadge(text: "AGING", kind: .mute)
-    case .prompt:   BzrBadge(text: "PROMPT", kind: .tierC)
-    case .auto:     BzrBadge(text: "AUTO", kind: .lime)
-    }
-  }
-
-  // MARK: Log line atom
-
-  private enum LogTone { case secondary, tertiary, ok, warn, lime }
-
-  @ViewBuilder
-  private func logLine(_ ts: String, _ glyph: String, _ msg: String, _ tone: LogTone) -> some View {
-    HStack(alignment: .firstTextBaseline, spacing: 6) {
-      Text(ts)
-        .font(.bzrMono(size: 11))
-        .foregroundStyle(Color.txtTertiary)
-      Text(glyph)
-        .font(.bzrMono(size: 11, weight: .bold))
-        .foregroundStyle(toneColor(tone))
-      Text(msg)
-        .font(.bzrMono(size: 11))
-        .foregroundStyle(Color(red: 220 / 255, green: 225 / 255, blue: 210 / 255).opacity(0.85))
-    }
-    .padding(.vertical, 2)
-  }
-
-  private func toneColor(_ t: LogTone) -> Color {
-    switch t {
-    case .secondary: return .txtSecondary
-    case .tertiary:  return .txtTertiary
-    case .ok:        return .bzrSuccess
-    case .warn:      return .bzrWarn
-    case .lime:      return .bzrLime
-    }
-  }
 }

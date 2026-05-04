@@ -52,4 +52,19 @@ struct LogBufferTests {
     #expect(snap.count <= 100)
     #expect(snap.last?.text == "line149")
   }
+
+  @Test func latestLineAndLiveSubscriptionAvoidReplay() async {
+    let buffer = LogBuffer()
+    await buffer.append(LogLine(stream: .stdout, text: "old"))
+
+    let latest = await buffer.latestLine()
+    #expect(latest?.text == "old")
+
+    let stream = await buffer.subscribeLive()
+    await buffer.append(LogLine(stream: .stdout, text: "new"))
+
+    var iterator = stream.makeAsyncIterator()
+    let first = await iterator.next()
+    #expect(first?.text == "new")
+  }
 }

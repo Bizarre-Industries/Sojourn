@@ -91,12 +91,28 @@ internal actor LogBuffer {
   /// Snapshot of all currently buffered lines.
   internal func snapshot() -> [LogLine] { lines }
 
+  /// Last currently buffered line without replaying the whole ring.
+  internal func latestLine() -> LogLine? { lines.last }
+
   /// Subscribe to live line events. Replays the current buffer first, then
   /// streams future lines. The stream finishes when `close()` is called.
   internal func subscribe() -> AsyncStream<LogLine> {
     let subID = UUID()
     return AsyncStream { continuation in
       for line in lines { continuation.yield(line) }
+      continuations[subID] = continuation
+      continuation.onTermination = { [weak self] _ in
+        Task { await self?.removeSubscriber(subID) }
+      }
+      if finished { continuation.finish() }
+    }
+  }
+
+  /// Subscribe only to future line events. Used by compact status labels that
+  /// need the latest line without replaying the full buffer on view creation.
+  internal func subscribeLive() -> AsyncStream<LogLine> {
+    let subID = UUID()
+    return AsyncStream(bufferingPolicy: .bufferingNewest(1)) { continuation in
       continuations[subID] = continuation
       continuation.onTermination = { [weak self] _ in
         Task { await self?.removeSubscriber(subID) }

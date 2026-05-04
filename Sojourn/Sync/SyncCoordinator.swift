@@ -29,6 +29,15 @@ internal enum SyncPhase: Sendable, Equatable {
 internal final class SyncCoordinator {
   internal private(set) var phase: SyncPhase = .idle
 
+  internal var isOperationActive: Bool {
+    switch phase {
+    case .pulling, .resolvingConflicts, .scanningSecrets, .pushing:
+      return true
+    case .idle, .awaitingPullDecision, .done, .failed:
+      return false
+    }
+  }
+
   private let repoURL: URL
   private let git: GitService
   private let chezmoi: ChezmoiService?
@@ -64,6 +73,11 @@ internal final class SyncCoordinator {
   // MARK: - Pull
 
   internal func pull(branch: String = "main") async {
+    guard !isOperationActive else {
+      SojournLog.sync.error("pull ignored: sync operation already in progress")
+      return
+    }
+
     let signpost = SojournSignpost.sync
     let state = signpost.beginInterval("pull", id: signpost.makeSignpostID())
     SojournLog.sync.info("pull start branch=\(branch, privacy: .public)")
@@ -144,6 +158,11 @@ internal final class SyncCoordinator {
   // MARK: - Push
 
   internal func push(branch: String = "main", message: String) async {
+    guard !isOperationActive else {
+      SojournLog.sync.error("push ignored: sync operation already in progress")
+      return
+    }
+
     let signpost = SojournSignpost.sync
     let state = signpost.beginInterval("push", id: signpost.makeSignpostID())
     defer { signpost.endInterval("push", state) }
@@ -159,31 +178,8 @@ internal final class SyncCoordinator {
       return
     }
 
-    phase = .scanningSecrets
-    if let secrets {
-      do {
-        let findings = try await secrets.scanStaged(cwd: repoURL)
-        let highConfidence = findings.filter(\.isHighConfidence)
-        if !highConfidence.isEmpty {
-          SojournLog.secrets.error(
-            "blocked push: \(highConfidence.count) high-confidence finding(s)"
-          )
-          phase = .failed(
-            "\(highConfidence.count) high-confidence secret(s) — resolve via SecretFindingsModal"
-          )
-          return
-        }
-      } catch {
-        SojournLog.secrets.error("gitleaks failed: \(String(describing: error), privacy: .public)")
-        phase = .failed("gitleaks failed: \(error)")
-        return
-      }
-    }
-
     phase = .pushing
     do {
-      _ = try await snapshots.capture(operation: .syncPush, sources: [repoURL])
-
       let host = Self.hostname()
       let syncFiles = [
         "Brewfile.common",
@@ -198,13 +194,93 @@ internal final class SyncCoordinator {
         .map { $0.lastPathComponent }
       if !stageable.isEmpty {
         try await git.add(paths: stageable, cwd: repoURL)
-        _ = try await git.commit(message: message, signoff: true, cwd: repoURL)
+        let stagedPaths = try await git.stagedPaths(cwd: repoURL)
+        let unexpected = stagedPaths.filter { !Self.isSyncPath($0, under: stageable) }
+        if !unexpected.isEmpty {
+          await failAfterUnstage(
+            paths: stageable,
+            blockedMessage: Self.unexpectedStagedPathsMessage(unexpected)
+          )
+          return
+        }
+        phase = .scanningSecrets
+        guard let secrets else {
+          await failAfterUnstage(
+            paths: stageable,
+            blockedMessage: String(localized: "Push blocked because secret scanning is unavailable. Re-run bootstrap so Sojourn can locate gitleaks, then push again.")
+          )
+          return
+        }
+        do {
+          let findings = try await secrets.scanStaged(cwd: repoURL)
+          let highConfidence = findings.filter(\.isHighConfidence)
+          if !highConfidence.isEmpty {
+            SojournLog.secrets.error(
+              "blocked push: \(highConfidence.count) high-confidence finding(s)"
+            )
+            await failAfterUnstage(
+              paths: stageable,
+              blockedMessage: Self.secretScanBlockedMessage(for: highConfidence)
+            )
+            return
+          }
+        } catch {
+          SojournLog.secrets.error("gitleaks failed: \(String(describing: error), privacy: .public)")
+          await failAfterUnstage(
+            paths: stageable,
+            blockedMessage: String(localized: "Push blocked because gitleaks could not scan the staged sync files. Resolve the scan error, then push again. Cause: \(String(describing: error))")
+          )
+          return
+        }
+        _ = try await snapshots.capture(operation: .syncPush, sources: [repoURL])
+        phase = .pushing
+        _ = try await git.commit(message: message, signoff: true, paths: stageable, cwd: repoURL)
+      } else {
+        _ = try await snapshots.capture(operation: .syncPush, sources: [repoURL])
       }
       try await git.push(remote: "origin", branch: branch, cwd: repoURL)
       phase = .done(.syncPush)
     } catch {
       phase = .failed("push failed: \(error)")
     }
+  }
+
+  private func failAfterUnstage(paths: [String], blockedMessage: String) async {
+    do {
+      try await git.unstage(paths: paths, cwd: repoURL)
+      phase = .failed(blockedMessage)
+    } catch {
+      SojournLog.secrets.error(
+        "failed to unstage blocked push paths: \(String(describing: error), privacy: .public)"
+      )
+      phase = .failed(
+        blockedMessage + " " + String(localized: "Cleanup also failed; staged sync files may still contain blocked content. Run git reset -- Brewfile.common Brewfile.<host> dotfiles prefs .sojourn in the data repo before retrying. Cause: \(String(describing: error))")
+      )
+    }
+  }
+
+  private nonisolated static func secretScanBlockedMessage(
+    for findings: [SecretFinding]
+  ) -> String {
+    let listed = findings.prefix(3).map {
+      "\($0.file):\($0.startLine) (\($0.ruleID))"
+    }.joined(separator: ", ")
+    let remaining = findings.count - min(findings.count, 3)
+    let suffix = remaining > 0 ? ", and \(remaining) more" : ""
+    return String(localized: "Push blocked by secret scan. \(findings.count) high-confidence finding(s) in staged sync files: \(listed)\(suffix). Remove the secret or add a repo allowlist entry, then push again.")
+  }
+
+  private nonisolated static func isSyncPath(_ path: String, under roots: [String]) -> Bool {
+    roots.contains { root in
+      path == root || path.hasPrefix(root + "/")
+    }
+  }
+
+  private nonisolated static func unexpectedStagedPathsMessage(_ paths: [String]) -> String {
+    let listed = paths.prefix(3).joined(separator: ", ")
+    let remaining = paths.count - min(paths.count, 3)
+    let suffix = remaining > 0 ? ", and \(remaining) more" : ""
+    return String(localized: "Push blocked because the data repo already has staged files outside Sojourn sync paths: \(listed)\(suffix). Unstage those files, then push again.")
   }
 
   internal func reset() {

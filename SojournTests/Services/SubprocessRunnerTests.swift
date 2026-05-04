@@ -136,6 +136,51 @@ struct SubprocessRunnerTests {
     }
   }
 
+  @Test func streamCapsNonZeroExitOutputSnapshots() async throws {
+    let runner = SubprocessRunner()
+    let stream = runner.stream(
+      tool: URL(fileURLWithPath: "/bin/sh"),
+      args: ["-c", "dd if=/dev/zero bs=1048576 count=2 2>/dev/null; exit 7"]
+    )
+
+    var streamedStdoutBytes = 0
+    do {
+      for try await chunk in stream {
+        if chunk.stream == .stdout {
+          streamedStdoutBytes += chunk.data.count
+        }
+      }
+      Issue.record("expected non-zero stream failure")
+    } catch let error as SubprocessError {
+      guard case .nonZeroExit(let code, let stdout, _) = error else {
+        Issue.record("expected .nonZeroExit, got \(error)")
+        return
+      }
+      #expect(code == 7)
+      #expect(streamedStdoutBytes >= SubprocessRunner.streamOutputSnapshotLimit)
+      #expect(stdout.count == SubprocessRunner.streamOutputSnapshotLimit)
+    }
+  }
+
+  @Test func streamEmitsTruncationMarkerWhenBufferDropsChunks() async throws {
+    let runner = SubprocessRunner()
+    let stream = runner.stream(
+      tool: URL(fileURLWithPath: "/bin/sh"),
+      args: ["-c", "for i in 1 2 3 4 5; do printf 'line-%s\\n' \"$i\"; sleep 0.02; done"],
+      bufferLimit: 1
+    )
+
+    try await Task.sleep(nanoseconds: 200_000_000)
+
+    var stdoutBytes = Data()
+    for try await chunk in stream where chunk.stream == .stdout {
+      stdoutBytes.append(chunk.data)
+    }
+
+    let stdout = String(decoding: stdoutBytes, as: UTF8.self)
+    #expect(stdout.contains("[sojourn] stream output truncated before log buffer"))
+  }
+
   @Test func timeoutCausesTimedOutError() async throws {
     let runner = SubprocessRunner()
     let start = Date()

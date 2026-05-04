@@ -37,6 +37,9 @@ internal struct StreamChunk: Sendable {
 }
 
 internal actor SubprocessRunner {
+  internal static let streamOutputSnapshotLimit = 1_048_576
+  internal static let streamBufferLimit = 1_024
+
   internal init() {}
 
   // MARK: - Run-to-completion
@@ -134,9 +137,13 @@ internal actor SubprocessRunner {
     tool: URL,
     args: [String] = [],
     env: [String: String]? = nil,
-    cwd: URL? = nil
+    cwd: URL? = nil,
+    bufferLimit: Int = SubprocessRunner.streamBufferLimit
   ) -> AsyncThrowingStream<StreamChunk, any Error> {
-    AsyncThrowingStream(StreamChunk.self, bufferingPolicy: .unbounded) { continuation in
+    AsyncThrowingStream(
+      StreamChunk.self,
+      bufferingPolicy: .bufferingNewest(bufferLimit)
+    ) { continuation in
       let process = Process()
       process.executableURL = tool
       process.arguments = args
@@ -151,58 +158,61 @@ internal actor SubprocessRunner {
       let outCollector = ChunkCollector()
       let errCollector = ChunkCollector()
 
-      stdoutPipe.fileHandleForReading.readabilityHandler = { handle in
-        let data = handle.availableData
-        if data.isEmpty {
-          handle.readabilityHandler = nil
-          return
-        }
-        outCollector.append(data)
-        continuation.yield(StreamChunk(stream: .stdout, data: data))
+      let stdoutTask = Task.detached {
+        Self.drainStream(
+          stdoutPipe.fileHandleForReading,
+          stream: .stdout,
+          collector: outCollector,
+          continuation: continuation
+        )
       }
-      stderrPipe.fileHandleForReading.readabilityHandler = { handle in
-        let data = handle.availableData
-        if data.isEmpty {
-          handle.readabilityHandler = nil
-          return
-        }
-        errCollector.append(data)
-        continuation.yield(StreamChunk(stream: .stderr, data: data))
+      let stderrTask = Task.detached {
+        Self.drainStream(
+          stderrPipe.fileHandleForReading,
+          stream: .stderr,
+          collector: errCollector,
+          continuation: continuation
+        )
       }
 
       process.terminationHandler = { proc in
-        stdoutPipe.fileHandleForReading.readabilityHandler = nil
-        stderrPipe.fileHandleForReading.readabilityHandler = nil
-        // Drain tail bytes that landed between the last readabilityHandler
-        // invocation and terminationHandler.
-        if let tailOut = try? stdoutPipe.fileHandleForReading.readToEnd(),
-           !tailOut.isEmpty {
-          outCollector.append(tailOut)
-          continuation.yield(StreamChunk(stream: .stdout, data: tailOut))
-        }
-        if let tailErr = try? stderrPipe.fileHandleForReading.readToEnd(),
-           !tailErr.isEmpty {
-          errCollector.append(tailErr)
-          continuation.yield(StreamChunk(stream: .stderr, data: tailErr))
-        }
-
-        let code = proc.terminationStatus
-        if code != 0 {
-          continuation.finish(throwing: SubprocessError.nonZeroExit(
-            code: code, stdout: outCollector.snapshot, stderr: errCollector.snapshot
-          ))
-        } else {
-          continuation.finish()
+        Task {
+          _ = await stdoutTask.value
+          _ = await stderrTask.value
+          Self.emitDropMarkerIfNeeded(
+            stream: .stdout,
+            collector: outCollector,
+            continuation: continuation
+          )
+          Self.emitDropMarkerIfNeeded(
+            stream: .stderr,
+            collector: errCollector,
+            continuation: continuation
+          )
+          let code = proc.terminationStatus
+          if code != 0 {
+            continuation.finish(throwing: SubprocessError.nonZeroExit(
+              code: code, stdout: outCollector.snapshot, stderr: errCollector.snapshot
+            ))
+          } else {
+            continuation.finish()
+          }
         }
       }
 
       continuation.onTermination = { _ in
         if process.isRunning { process.terminate() }
+        stdoutTask.cancel()
+        stderrTask.cancel()
       }
 
       do {
         try process.run()
       } catch {
+        stdoutTask.cancel()
+        stderrTask.cancel()
+        try? stdoutPipe.fileHandleForReading.close()
+        try? stderrPipe.fileHandleForReading.close()
         continuation.finish(throwing: SubprocessError.spawnFailed(error.localizedDescription))
       }
     }
@@ -218,6 +228,38 @@ internal actor SubprocessRunner {
       acc.append(chunk)
     }
     return acc
+  }
+
+  private nonisolated static func drainStream(
+    _ handle: FileHandle,
+    stream: StreamTag,
+    collector: ChunkCollector,
+    continuation: AsyncThrowingStream<StreamChunk, any Error>.Continuation
+  ) {
+    while !Task.isCancelled {
+      let data = handle.availableData
+      if data.isEmpty { break }
+      collector.append(data)
+      switch continuation.yield(StreamChunk(stream: stream, data: data)) {
+      case .dropped:
+        collector.recordDroppedChunk()
+      case .enqueued, .terminated:
+        break
+      @unknown default:
+        break
+      }
+    }
+  }
+
+  private nonisolated static func emitDropMarkerIfNeeded(
+    stream: StreamTag,
+    collector: ChunkCollector,
+    continuation: AsyncThrowingStream<StreamChunk, any Error>.Continuation
+  ) {
+    let dropped = collector.droppedChunks
+    guard dropped > 0 else { return }
+    let marker = "\n[sojourn] stream output truncated before log buffer; \(dropped) chunk(s) dropped\n"
+    _ = continuation.yield(StreamChunk(stream: stream, data: Data(marker.utf8)))
   }
 
   /// Returns true if the timeout fired (meaning we SIGTERM'd the child).
@@ -262,16 +304,34 @@ private enum TimeoutOutcome: Sendable {
 /// Thread-safe byte accumulator for the stream path.
 private final class ChunkCollector: @unchecked Sendable {
   private var buffer = Data()
+  private var dropped = 0
   private let lock = NSLock()
+  private let limit: Int
+
+  init(limit: Int = SubprocessRunner.streamOutputSnapshotLimit) {
+    self.limit = max(0, limit)
+  }
 
   func append(_ data: Data) {
     lock.lock(); defer { lock.unlock() }
-    buffer.append(data)
+    guard buffer.count < limit else { return }
+    let remaining = limit - buffer.count
+    buffer.append(data.prefix(remaining))
+  }
+
+  func recordDroppedChunk() {
+    lock.lock(); defer { lock.unlock() }
+    dropped += 1
   }
 
   var snapshot: Data {
     lock.lock(); defer { lock.unlock() }
     return buffer
+  }
+
+  var droppedChunks: Int {
+    lock.lock(); defer { lock.unlock() }
+    return dropped
   }
 }
 

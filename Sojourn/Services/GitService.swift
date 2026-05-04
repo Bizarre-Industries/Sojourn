@@ -88,6 +88,13 @@ internal actor GitService {
     return Self.parseStatusPorcelain(r.stdoutString)
   }
 
+  internal func stagedPaths(cwd: URL) async throws -> [String] {
+    let r = try await runCommand(["diff", "--cached", "--name-only", "-z"], cwd)
+    return r.stdoutString
+      .split(separator: "\0", omittingEmptySubsequences: true)
+      .map(String.init)
+  }
+
   internal func aheadBehind(
     upstream: String = "@{upstream}",
     cwd: URL
@@ -115,13 +122,21 @@ internal actor GitService {
     _ = try await runCommand(["add", "--"] + paths, cwd)
   }
 
+  internal func unstage(paths: [String], cwd: URL) async throws {
+    _ = try await runCommand(["reset", "--"] + paths, cwd)
+  }
+
   internal func commit(
     message: String,
     signoff: Bool = true,
+    paths: [String] = [],
     cwd: URL
   ) async throws -> String {
     var args = ["commit", "-m", message]
     if signoff { args.append("-s") }
+    if !paths.isEmpty {
+      args += ["--"] + paths
+    }
     let r = try await runCommand(args, cwd)
     return r.stdoutString
   }

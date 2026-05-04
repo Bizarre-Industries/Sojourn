@@ -154,4 +154,272 @@ struct SyncCoordinatorTests {
     // what we assert is that push was attempted (phase != idle).
     #expect(coordinator.phase != .idle)
   }
+
+  @Test func pushStagesFilesBeforeScanningStagedSecrets() async throws {
+    let workroot = FileManager.default.temporaryDirectory
+      .appendingPathComponent("sojourn-sync-order-\(UUID().uuidString)", isDirectory: true)
+    try FileManager.default.createDirectory(at: workroot, withIntermediateDirectories: true)
+    defer { try? FileManager.default.removeItem(at: workroot) }
+
+    let events = SyncEventRecorder()
+    let git = GitService(gitURL: URL(fileURLWithPath: "/usr/bin/git")) { args, _ in
+      await events.record("git:\(args.first ?? "")")
+      return SubprocessResult(exitCode: 0, stdout: Data(), stderr: Data())
+    }
+    let secrets = SecretScanService.mock { _ in
+      await events.record("scan")
+      return Data()
+    }
+    let coordinator = try makeMockCoordinator(
+      workroot: workroot,
+      git: git,
+      secrets: secrets
+    )
+
+    await coordinator.push(branch: "main", message: "test: sync")
+
+    let observed = await events.values
+    #expect(observed.firstIndex(of: "git:add")! < observed.firstIndex(of: "scan")!)
+    #expect(observed.firstIndex(of: "scan")! < observed.firstIndex(of: "git:commit")!)
+    #expect(observed.firstIndex(of: "git:commit")! < observed.firstIndex(of: "git:push")!)
+  }
+
+  @Test func pushFailsClosedWhenSecretScannerUnavailable() async throws {
+    let workroot = FileManager.default.temporaryDirectory
+      .appendingPathComponent("sojourn-sync-no-scanner-\(UUID().uuidString)", isDirectory: true)
+    try FileManager.default.createDirectory(at: workroot, withIntermediateDirectories: true)
+    defer { try? FileManager.default.removeItem(at: workroot) }
+
+    let events = SyncEventRecorder()
+    let git = GitService(gitURL: URL(fileURLWithPath: "/usr/bin/git")) { args, _ in
+      await events.record("git:\(args.first ?? "")")
+      return SubprocessResult(exitCode: 0, stdout: Data(), stderr: Data())
+    }
+    let coordinator = try makeMockCoordinator(
+      workroot: workroot,
+      git: git,
+      secrets: nil
+    )
+
+    await coordinator.push(branch: "main", message: "test: sync")
+
+    let observed = await events.values
+    #expect(observed.contains("git:add"))
+    #expect(observed.contains("git:reset"))
+    #expect(!observed.contains("git:commit"))
+    #expect(!observed.contains("git:push"))
+    guard case .failed(let message) = coordinator.phase else {
+      Issue.record("expected failed phase, got \(coordinator.phase)")
+      return
+    }
+    #expect(message.contains("secret scanning is unavailable"))
+    let backups = try FileManager.default.contentsOfDirectory(
+      at: workroot.appendingPathComponent("backups", isDirectory: true),
+      includingPropertiesForKeys: nil
+    )
+    #expect(backups.isEmpty)
+  }
+
+  @Test func pushBlocksUnrelatedPreStagedPathsBeforeScanning() async throws {
+    let workroot = FileManager.default.temporaryDirectory
+      .appendingPathComponent("sojourn-sync-prestaged-\(UUID().uuidString)", isDirectory: true)
+    try FileManager.default.createDirectory(at: workroot, withIntermediateDirectories: true)
+    defer { try? FileManager.default.removeItem(at: workroot) }
+
+    let events = SyncEventRecorder()
+    let git = GitService(gitURL: URL(fileURLWithPath: "/usr/bin/git")) { args, _ in
+      await events.record("git:\(args.first ?? "")")
+      if args == ["diff", "--cached", "--name-only", "-z"] {
+        return SubprocessResult(
+          exitCode: 0,
+          stdout: Data("Brewfile.common\0notes.txt\0".utf8),
+          stderr: Data()
+        )
+      }
+      return SubprocessResult(exitCode: 0, stdout: Data(), stderr: Data())
+    }
+    let secrets = SecretScanService.mock { _ in
+      await events.record("scan")
+      return Data()
+    }
+    let coordinator = try makeMockCoordinator(
+      workroot: workroot,
+      git: git,
+      secrets: secrets
+    )
+
+    await coordinator.push(branch: "main", message: "test: sync")
+
+    let observed = await events.values
+    #expect(observed.contains("git:add"))
+    #expect(observed.contains("git:diff"))
+    #expect(observed.contains("git:reset"))
+    #expect(!observed.contains("scan"))
+    #expect(!observed.contains("git:commit"))
+    #expect(!observed.contains("git:push"))
+    guard case .failed(let message) = coordinator.phase else {
+      Issue.record("expected failed phase, got \(coordinator.phase)")
+      return
+    }
+    #expect(message.contains("staged files outside Sojourn sync paths"))
+    #expect(message.contains("notes.txt"))
+    let backups = try FileManager.default.contentsOfDirectory(
+      at: workroot.appendingPathComponent("backups", isDirectory: true),
+      includingPropertiesForKeys: nil
+    )
+    #expect(backups.isEmpty)
+  }
+
+  @Test func pushUnstagesAndStopsWhenStagedScanFindsHighConfidenceSecret() async throws {
+    let workroot = FileManager.default.temporaryDirectory
+      .appendingPathComponent("sojourn-sync-secret-\(UUID().uuidString)", isDirectory: true)
+    try FileManager.default.createDirectory(at: workroot, withIntermediateDirectories: true)
+    defer { try? FileManager.default.removeItem(at: workroot) }
+
+    let events = SyncEventRecorder()
+    let git = GitService(gitURL: URL(fileURLWithPath: "/usr/bin/git")) { args, _ in
+      await events.record("git:\(args.first ?? "")")
+      return SubprocessResult(exitCode: 0, stdout: Data(), stderr: Data())
+    }
+    let finding = SecretFinding(
+      description: "GitHub personal access token",
+      file: "Brewfile.common",
+      startLine: 1,
+      endLine: 1,
+      match: "REDACTED",
+      secret: "REDACTED",
+      ruleID: "github-fine-grained-pat",
+      fingerprint: "Brewfile.common:github-fine-grained-pat:1",
+      entropy: nil
+    )
+    let findingJSON = try JSONEncoder().encode([finding])
+    let secrets = SecretScanService.mock { _ in
+      await events.record("scan")
+      return findingJSON
+    }
+    let coordinator = try makeMockCoordinator(
+      workroot: workroot,
+      git: git,
+      secrets: secrets
+    )
+
+    await coordinator.push(branch: "main", message: "test: sync")
+
+    let observed = await events.values
+    #expect(observed.contains("git:add"))
+    #expect(observed.contains("scan"))
+    #expect(observed.contains("git:reset"))
+    #expect(!observed.contains("git:commit"))
+    #expect(!observed.contains("git:push"))
+    guard case .failed(let message) = coordinator.phase else {
+      Issue.record("expected failed phase, got \(coordinator.phase)")
+      return
+    }
+    #expect(message.contains("Push blocked by secret scan"))
+    #expect(message.contains("staged sync files"))
+    let backups = try FileManager.default.contentsOfDirectory(
+      at: workroot.appendingPathComponent("backups", isDirectory: true),
+      includingPropertiesForKeys: nil
+    )
+    #expect(backups.isEmpty)
+  }
+
+  @Test func pushReportsCleanupFailureWhenUnstageFails() async throws {
+    let workroot = FileManager.default.temporaryDirectory
+      .appendingPathComponent("sojourn-sync-unstage-fail-\(UUID().uuidString)", isDirectory: true)
+    try FileManager.default.createDirectory(at: workroot, withIntermediateDirectories: true)
+    defer { try? FileManager.default.removeItem(at: workroot) }
+
+    let events = SyncEventRecorder()
+    let git = GitService(gitURL: URL(fileURLWithPath: "/usr/bin/git")) { args, _ in
+      await events.record("git:\(args.first ?? "")")
+      if args.first == "reset" {
+        throw GitError(code: 128, stderr: "reset failed", command: args)
+      }
+      return SubprocessResult(exitCode: 0, stdout: Data(), stderr: Data())
+    }
+    let finding = SecretFinding(
+      description: "GitHub personal access token",
+      file: "Brewfile.common",
+      startLine: 1,
+      endLine: 1,
+      match: "REDACTED",
+      secret: "REDACTED",
+      ruleID: "github-fine-grained-pat",
+      fingerprint: "Brewfile.common:github-fine-grained-pat:1",
+      entropy: nil
+    )
+    let findingJSON = try JSONEncoder().encode([finding])
+    let secrets = SecretScanService.mock { _ in
+      await events.record("scan")
+      return findingJSON
+    }
+    let coordinator = try makeMockCoordinator(
+      workroot: workroot,
+      git: git,
+      secrets: secrets
+    )
+
+    await coordinator.push(branch: "main", message: "test: sync")
+
+    let observed = await events.values
+    #expect(observed.contains("git:reset"))
+    #expect(!observed.contains("git:commit"))
+    #expect(!observed.contains("git:push"))
+    guard case .failed(let message) = coordinator.phase else {
+      Issue.record("expected failed phase, got \(coordinator.phase)")
+      return
+    }
+    #expect(message.contains("Push blocked by secret scan"))
+    #expect(message.contains("Cleanup also failed"))
+    let backups = try FileManager.default.contentsOfDirectory(
+      at: workroot.appendingPathComponent("backups", isDirectory: true),
+      includingPropertiesForKeys: nil
+    )
+    #expect(backups.isEmpty)
+  }
+
+  private func makeMockCoordinator(
+    workroot: URL,
+    git: GitService,
+    secrets: SecretScanService?
+  ) throws -> SyncCoordinator {
+    let repoURL = workroot.appendingPathComponent("repo", isDirectory: true)
+    try FileManager.default.createDirectory(at: repoURL, withIntermediateDirectories: true)
+    try Data("brew \"ripgrep\"\n".utf8)
+      .write(to: repoURL.appendingPathComponent("Brewfile.common"))
+
+    let runner = SubprocessRunner()
+    let paths = try AppSupportPaths(overrideRoot: workroot)
+    let backups = BackupsDirectory(paths: paths)
+    let snapshots = SnapshotService.live(backups: backups, runner: runner)
+    let settings = try SettingsStore(paths: paths)
+    let cooldown = CooldownGate(settings: settings, fetch: { _ in (Data(), URLResponse()) })
+    let brewBundle = BrewBundleService(
+      runner: runner,
+      brewURL: URL(fileURLWithPath: "/usr/bin/false")
+    )
+    let resolver = ConflictResolver(git: git, repoURL: repoURL)
+    return SyncCoordinator(
+      repoURL: repoURL,
+      git: git,
+      chezmoi: nil,
+      brewBundle: brewBundle,
+      pref: nil,
+      secrets: secrets,
+      snapshots: snapshots,
+      cooldown: cooldown,
+      conflictResolver: resolver
+    )
+  }
+}
+
+private actor SyncEventRecorder {
+  private var storage: [String] = []
+
+  var values: [String] { storage }
+
+  func record(_ value: String) {
+    storage.append(value)
+  }
 }

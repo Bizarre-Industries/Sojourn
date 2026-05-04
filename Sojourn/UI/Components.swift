@@ -31,7 +31,7 @@ struct PushPullBar: View {
       }
       Spacer()
       Button {
-        Task { await store.sync?.pull() }
+        Task { await store.pullSync() }
       } label: {
         Label("Pull", systemImage: "arrow.down.circle")
       }
@@ -39,9 +39,7 @@ struct PushPullBar: View {
       .accessibilityIdentifier("pushpull.pull")
 
       Button {
-        Task {
-          await store.sync?.push(message: "sojourn: auto-sync")
-        }
+        Task { await store.pushSync() }
       } label: {
         Label("Push", systemImage: "arrow.up.circle")
       }
@@ -133,7 +131,7 @@ struct SojournToolbar: View {
       }
 
       Button {
-        Task { await store.sync?.pull() }
+        Task { await store.pullSync() }
       } label: {
         Label("Pull", systemImage: "arrow.down")
       }
@@ -142,7 +140,7 @@ struct SojournToolbar: View {
       .accessibilityIdentifier("toolbar.pull")
 
       Button {
-        Task { await store.sync?.push(message: "sojourn: auto-sync") }
+        Task { await store.pushSync() }
       } label: {
         Label("Push", systemImage: "arrow.up")
       }
@@ -173,167 +171,5 @@ struct LogConsoleView: View {
     }
     .background(Color(nsColor: .textBackgroundColor))
     .accessibilityIdentifier("log.console")
-  }
-}
-
-struct MenuBarRootView: View {
-  @Environment(AppStore.self) private var store
-
-  var body: some View {
-    VStack(alignment: .leading, spacing: 0) {
-      // Brand strip
-      HStack(spacing: 8) {
-        SojournMenuBarIconView(size: 14, color: .bzrLime)
-        Text("SOJOURN")
-          .font(.bzrStencil(size: 14, weight: .heavy))
-          .tracking(1.6)
-          .foregroundStyle(Color.txtPrimary)
-        Spacer()
-        StatusDot(kind: store.sync == nil ? .warn : .lime)
-      }
-      .padding(.horizontal, 14)
-      .padding(.vertical, 12)
-      .overlay(
-        Rectangle().fill(Color.hairline).frame(height: 0.5),
-        alignment: .bottom
-      )
-
-      // Status row
-      VStack(alignment: .leading, spacing: 4) {
-        HStack(spacing: 6) {
-          Text(machineName.uppercased())
-            .font(.bzrMono(size: 10, weight: .semibold))
-            .tracking(1.4)
-            .foregroundStyle(Color.bzrLimeText)
-          Text("·")
-            .font(.bzrMono(size: 10))
-            .foregroundStyle(Color.txtTertiary)
-          Text(syncRelative)
-            .font(.bzrMono(size: 10))
-            .foregroundStyle(Color.txtTertiary)
-        }
-        Text(store.sync == nil ? "Sync not configured" : "Writer · clean")
-          .font(.bzrBody(size: 11))
-          .foregroundStyle(Color.txtSecondary)
-      }
-      .padding(.horizontal, 14)
-      .padding(.vertical, 10)
-      .frame(maxWidth: .infinity, alignment: .leading)
-
-      // Quick actions
-      VStack(spacing: 6) {
-        Button {
-          Task { await store.refreshBrewfile() }
-        } label: {
-          HStack(spacing: 6) {
-            Image(systemName: "arrow.clockwise")
-              .font(.system(size: 10, weight: .semibold))
-            Text("Update Brewfile")
-            Spacer()
-          }
-        }
-        .buttonStyle(GlassCapsuleButtonStyle())
-        .accessibilityIdentifier("menubar.update")
-
-        Button {
-          Task { await store.sync?.pull() }
-        } label: {
-          HStack(spacing: 6) {
-            Image(systemName: "arrow.down")
-              .font(.system(size: 10, weight: .semibold))
-            Text("Pull")
-            Spacer()
-          }
-        }
-        .buttonStyle(GlassCapsuleButtonStyle())
-        .disabled(store.sync == nil)
-        .accessibilityIdentifier("menubar.pull")
-
-        Button {
-          Task { await store.sync?.push(message: "sojourn: menu-bar push") }
-        } label: {
-          HStack(spacing: 6) {
-            Image(systemName: "arrow.up")
-              .font(.system(size: 10, weight: .semibold))
-            Text("Push")
-            Spacer()
-          }
-        }
-        .buttonStyle(GlassCapsuleButtonStyle())
-        .disabled(store.sync == nil)
-        .accessibilityIdentifier("menubar.push")
-
-        Button {
-          Task {
-            await store.sync?.pull()
-            await store.sync?.push(message: "sojourn: menu-bar sync")
-          }
-        } label: {
-          HStack(spacing: 6) {
-            Image(systemName: "arrow.triangle.2.circlepath")
-              .font(.system(size: 10, weight: .semibold))
-            Text("Sync (Pull then Push)")
-            Spacer()
-          }
-        }
-        .buttonStyle(GlassPrimaryButtonStyle())
-        .disabled(store.sync == nil)
-        .accessibilityIdentifier("menubar.sync")
-
-        if !store.sparkleService.statusMessage.isEmpty {
-          HStack(alignment: .top, spacing: 6) {
-            Image(systemName: "arrow.down.circle")
-              .font(.system(size: 10, weight: .semibold))
-              .accessibilityHidden(true)
-            Text(store.sparkleService.statusMessage)
-              .fixedSize(horizontal: false, vertical: true)
-            Spacer()
-          }
-          .font(.bzrBody(size: 10))
-          .foregroundStyle(Color.txtSecondary)
-          .padding(.horizontal, 8)
-          .padding(.vertical, 6)
-          .background(
-            RoundedRectangle(cornerRadius: 6, style: .continuous)
-              .fill(Color.adaptiveLighten(0.04))
-          )
-          .accessibilityIdentifier("menubar.updateStatus")
-          .accessibilityElement(children: .ignore)
-          .accessibilityLabel("Update status: \(store.sparkleService.statusMessage)")
-        }
-      }
-      .padding(.horizontal, 14)
-      .padding(.vertical, 6)
-
-      // Footer
-      VStack(spacing: 0) {
-        Rectangle().fill(Color.hairline).frame(height: 0.5)
-        HStack(spacing: 6) {
-          Button("Open Sojourn…") {
-            NSApp.activate(ignoringOtherApps: true)
-          }
-          .buttonStyle(GlassGhostButtonStyle())
-          .accessibilityIdentifier("menubar.open")
-          Spacer()
-          Button("Quit") { NSApp.terminate(nil) }
-            .buttonStyle(GlassGhostButtonStyle())
-            .accessibilityIdentifier("menubar.quit")
-        }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 8)
-      }
-    }
-    .frame(width: 300, alignment: .leading)
-  }
-
-  private var machineName: String {
-    Host.current().localizedName ?? "this-mac"
-  }
-
-  private var syncRelative: String {
-    if let last = store.settings.lastSyncTime {
-      return last.formatted(.relative(presentation: .named))
-    }
-    return "never synced"
   }
 }

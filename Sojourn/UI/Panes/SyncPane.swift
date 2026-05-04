@@ -59,6 +59,8 @@ internal struct SyncPane: View {
 
       Divider()
 
+      syncStatusBanner
+
       Group {
         switch tab {
         case .history:   HistoryPane()
@@ -81,6 +83,69 @@ internal struct SyncPane: View {
         tab = .conflicts
         didAutoRoute = true
       }
+      if !didAutoRoute, case .awaitingPullDecision = store.sync?.phase {
+        tab = .conflicts
+        didAutoRoute = true
+      }
     }
+  }
+
+  @ViewBuilder
+  private var syncStatusBanner: some View {
+    switch store.sync?.phase {
+    case .failed(let reason):
+      statusBanner(
+        symbol: "xmark.octagon",
+        title: "Sync needs attention",
+        message: "\(reason) Fix the cause, then retry Pull and Apply or Push After Scan from the toolbar.",
+        actionTitle: "Dismiss failure",
+        actionHint: "Clears this message only; it does not retry sync or undo staged files.",
+        action: { store.sync?.reset() }
+      )
+      Divider()
+    case .awaitingPullDecision(let commits):
+      statusBanner(
+        symbol: "exclamationmark.triangle",
+        title: "\(commits.count) inbound commit(s)",
+        message: "Review Conflicts and choose rebase, merge, or abort before pushing.",
+        actionTitle: "Review Conflicts",
+        action: { tab = .conflicts }
+      )
+      Divider()
+    case .idle, .pulling, .resolvingConflicts, .scanningSecrets, .pushing, .done, nil:
+      EmptyView()
+    }
+  }
+
+  private func statusBanner(
+    symbol: String,
+    title: String,
+    message: String,
+    actionTitle: String,
+    actionHint: String? = nil,
+    action: @escaping () -> Void
+  ) -> some View {
+    HStack(alignment: .top, spacing: 12) {
+      Image(systemName: symbol)
+        .foregroundStyle(Color.orange)
+        .frame(width: 22)
+        .accessibilityHidden(true)
+      VStack(alignment: .leading, spacing: 4) {
+        Text(title)
+          .font(.callout.weight(.semibold))
+        Text(message)
+          .font(.caption)
+          .foregroundStyle(.secondary)
+          .fixedSize(horizontal: false, vertical: true)
+      }
+      .accessibilityElement(children: .combine)
+      .accessibilityLabel("\(title). \(message)")
+      Spacer()
+      Button(actionTitle, action: action)
+        .accessibilityHint(actionHint ?? "")
+    }
+    .padding(.horizontal, 24)
+    .padding(.vertical, 12)
+    .background(Color(nsColor: .windowBackgroundColor))
   }
 }

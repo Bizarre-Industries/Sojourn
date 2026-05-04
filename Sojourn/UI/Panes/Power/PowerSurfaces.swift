@@ -1,24 +1,194 @@
 // Sojourn — Power surfaces
 //
-// Each surface exposes a backend that was previously implicit. The Stage 1
-// JSX-derived stubs (with hardcoded demo data) are gone in v0.2 — every
-// surface now renders a `PaneEmptyState` describing what will populate it
-// once the corresponding service is wired in v0.3+. The struct names are
-// preserved so future subnav routing can keep its existing `case .x: XPane()`
-// references compiling.
+// Each surface exposes a backend that was previously implicit. Power panes
+// keep their stable identifiers while individual service-backed details are
+// wired in stages.
 
 import SwiftUI
 
 // MARK: - Job Inspector (routed: .jobs)
 
 struct JobInspectorPane: View {
+  @Environment(AppStore.self) private var store
+
   var body: some View {
-    PaneEmptyState(
-      eyebrow: "JOBS · JobRunner · LogBuffer · ANSIParser",
-      title: "JOBS.",
-      subtitle: "Live tail per Process: PID, runtime, exit code, structured argv. The active-jobs list and per-job log surface in v0.3 once the JobInspectorPane is wired to JobRunner's AsyncStream output."
-    )
+    ScrollView {
+      VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 4) {
+          Text("Jobs")
+            .font(.title2.weight(.semibold))
+          Text("Recent JobRunner activity, subprocess state, and exit status.")
+            .foregroundStyle(.secondary)
+        }
+
+        if recentJobs.isEmpty {
+          ContentUnavailableView(
+            "No jobs",
+            systemImage: "terminal",
+            description: Text("Refresh, pull, push, snapshot, and scan operations appear here while running and after completion.")
+          )
+          .frame(maxWidth: .infinity, minHeight: 220)
+        } else {
+          if let currentJob {
+            CurrentJobView(job: currentJob)
+          }
+
+          GroupBox {
+            VStack(alignment: .leading, spacing: 0) {
+              ForEach(recentJobs) { job in
+                jobRow(job)
+                if job.id != recentJobs.last?.id {
+                  Divider()
+                }
+              }
+            }
+          }
+        }
+      }
+      .padding(24)
+      .frame(maxWidth: 900, alignment: .leading)
+    }
+    .background(Color(nsColor: .windowBackgroundColor))
     .accessibilityIdentifier("pane.jobs")
+  }
+
+  private var recentJobs: [Job] {
+    Array(store.jobRunner.jobs.suffix(100).reversed())
+  }
+
+  private var currentJob: Job? {
+    store.jobRunner.jobs.last { !$0.state.isTerminal }
+  }
+
+  private func jobRow(_ job: Job) -> some View {
+    HStack(spacing: 12) {
+      Image(systemName: icon(for: job.state))
+        .foregroundStyle(color(for: job.state))
+        .frame(width: 22)
+        .accessibilityHidden(true)
+      VStack(alignment: .leading, spacing: 2) {
+        Text(job.label)
+          .font(.callout.weight(.semibold))
+        Text(job.id.rawValue.uuidString)
+          .font(.caption.monospaced())
+          .foregroundStyle(.secondary)
+      }
+      Spacer()
+      Text(label(for: job.state))
+        .font(.caption)
+        .foregroundStyle(color(for: job.state))
+    }
+    .padding(.vertical, 8)
+    .accessibilityElement(children: .combine)
+    .accessibilityLabel("\(job.label). \(label(for: job.state)).")
+  }
+
+  private func icon(for state: JobState) -> String {
+    switch state {
+    case .pending:   return "clock"
+    case .running:   return "progress.indicator"
+    case .succeeded: return "checkmark.circle"
+    case .failed:    return "xmark.octagon"
+    case .cancelled: return "minus.circle"
+    }
+  }
+
+  private func color(for state: JobState) -> Color {
+    switch state {
+    case .pending, .cancelled: return .secondary
+    case .running:             return .accentColor
+    case .succeeded:           return .green
+    case .failed:              return .red
+    }
+  }
+
+  private func label(for state: JobState) -> String {
+    switch state {
+    case .pending:
+      return "Pending"
+    case .running:
+      return "Running"
+    case .succeeded(let code):
+      return "Exit \(code)"
+    case .failed(let reason):
+      return "Failed: \(reason)"
+    case .cancelled:
+      return "Cancelled"
+    }
+  }
+}
+
+private struct CurrentJobView: View {
+  @Environment(AppStore.self) private var store
+  let job: Job
+  @State private var lastLogLine = "No log output yet."
+
+  var body: some View {
+    GroupBox("Current Operation") {
+      HStack(alignment: .top, spacing: 12) {
+        Image(systemName: "progress.indicator")
+          .foregroundStyle(Color.accentColor)
+          .frame(width: 22)
+          .accessibilityHidden(true)
+
+        VStack(alignment: .leading, spacing: 4) {
+          Text(job.label)
+            .font(.callout.weight(.semibold))
+          Text(phaseLabel)
+            .font(.caption)
+            .foregroundStyle(.secondary)
+          Text(lastLogLine)
+            .font(.caption.monospaced())
+            .foregroundStyle(.tertiary)
+            .lineLimit(2)
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Current operation: \(job.label). \(phaseLabel). Last log line: \(lastLogLine).")
+
+        Spacer()
+
+        Button("Cancel") {
+          store.jobRunner.cancel(job.id)
+        }
+        .disabled(!store.jobRunner.canCancel(job.id))
+        .accessibilityIdentifier("jobs.cancel-current")
+        .accessibilityLabel("Cancel current operation")
+      }
+      .padding(.vertical, 4)
+    }
+    .task(id: job.logBufferID.rawValue) {
+      await followLog()
+    }
+  }
+
+  private var phaseLabel: String {
+    switch job.state {
+    case .pending:
+      return "Pending"
+    case .running:
+      return "Running"
+    case .succeeded(let code):
+      return "Completed with exit \(code)"
+    case .failed(let reason):
+      return "Failed: \(reason)"
+    case .cancelled:
+      return "Cancelled"
+    }
+  }
+
+  private func followLog() async {
+    guard let buffer = store.jobRunner.buffer(job.logBufferID) else { return }
+    if let line = await buffer.latestLine() {
+      lastLogLine = displayText(for: line)
+    }
+    let stream = await buffer.subscribeLive()
+    for await line in stream {
+      lastLogLine = displayText(for: line)
+    }
+  }
+
+  private func displayText(for line: LogLine) -> String {
+    line.text.isEmpty ? "(blank log line)" : line.text
   }
 }
 
@@ -29,7 +199,7 @@ struct ScheduleInspectorPane: View {
     PaneEmptyState(
       eyebrow: "SCHEDULE · NSBackgroundActivityScheduler",
       title: "SCHEDULE.",
-      subtitle: "Background tasks (refresh-outdated 1h, refresh-advisories 6h) wire here once the scheduler ships in v0.3. The skip-log + next-fire timing render once that's live."
+      subtitle: "Background tasks, skip-log entries, and next-fire timing render here once scheduler state is exposed."
     )
     .accessibilityIdentifier("pane.schedule")
   }
@@ -42,7 +212,7 @@ struct AgeKeysPane: View {
     PaneEmptyState(
       eyebrow: "AGE · X25519 · KeychainBroker",
       title: "AGE KEYS.",
-      subtitle: "Local identity at ~/.config/chezmoi/key.txt; per-machine recipients in .sojourn/recipients.txt. The list + rotate flow ship in v0.3 alongside the secrets broker."
+      subtitle: "Local identity at ~/.config/chezmoi/key.txt and per-machine recipients in .sojourn/recipients.txt."
     )
     .accessibilityIdentifier("pane.age")
   }
@@ -55,7 +225,7 @@ struct ChezmoiTemplatesPane: View {
     PaneEmptyState(
       eyebrow: "TEMPLATES · chezmoi data · managed · diff",
       title: "TEMPLATES.",
-      subtitle: "Per-host conditionals + variables surfaced from `chezmoi data --format=json`. Parsed view ships in v0.3."
+      subtitle: "Per-host conditionals and variables surfaced from `chezmoi data --format=json`."
     )
     .accessibilityIdentifier("pane.chezmoi-templates")
   }
@@ -68,7 +238,7 @@ struct GitleaksRulesPane: View {
     PaneEmptyState(
       eyebrow: "RULES · gitleaks 8.30.1 · MIT · bundled",
       title: "RULES & ALLOWLIST.",
-      subtitle: "Builtin pattern list + per-repo allowlist editor. Each rule's hit count + expiry land once we read `.gitleaks.toml` in v0.3."
+      subtitle: "Builtin pattern list, per-repo allowlist entries, hit counts, and expiry status."
     )
     .accessibilityIdentifier("pane.gitleaks-rules")
   }
@@ -81,7 +251,7 @@ struct AuthorizationPane: View {
     PaneEmptyState(
       eyebrow: "AUTHORIZATION · TCC · SMAppService · Touch ID",
       title: "AUTHORIZATION.",
-      subtitle: "FDA grant status, helper-tool registration, Touch ID-for-sudo state. Reads from TCC.db + ServiceManagement once wired in v0.3."
+      subtitle: "FDA grant status, helper-tool registration, and Touch ID-for-sudo state."
     )
     .accessibilityIdentifier("pane.authorization")
   }
@@ -94,7 +264,7 @@ struct ManagerDetailPane: View {
     PaneEmptyState(
       eyebrow: "MANAGER DETAIL · per-ecosystem deep-dive",
       title: "MANAGER DETAIL.",
-      subtitle: "Drilldown into a single Brewfile entry tier (mas / brews / casks / cargo / etc.) with per-package install + outdated state. Lands in v0.3 alongside the outdated parsing."
+      subtitle: "Drill down into a single Brewfile entry tier with per-package install and outdated state."
     )
     .accessibilityIdentifier("pane.manager-detail")
   }
@@ -107,7 +277,7 @@ struct BackupsPane: View {
     PaneEmptyState(
       eyebrow: "BACKUPS · ~/Library/Application Support/Sojourn/generations/",
       title: "BACKUPS.",
-      subtitle: "Pre-op tarball list with per-snapshot stats. Restore action lands when SnapshotService.rollback() ships in v0.3."
+      subtitle: "Pre-operation tarball list with per-snapshot stats and restore state."
     )
     .accessibilityIdentifier("pane.backups")
   }
@@ -120,7 +290,7 @@ struct DefaultsDiscoverPane: View {
     PaneEmptyState(
       eyebrow: "DEFAULTS DISCOVER · cfprefsd · plutil",
       title: "DEFAULTS DISCOVER.",
-      subtitle: "Live record-mode that watches cfprefsd writes and surfaces which preference key changed when. Lands in v0.3 alongside the Preferences pane."
+      subtitle: "Record mode for preference writes, surfacing which domain and key changed."
     )
     .accessibilityIdentifier("pane.defaults-discover")
   }
@@ -133,7 +303,7 @@ struct RepoSetupPane: View {
     PaneEmptyState(
       eyebrow: "REPO SETUP · git · GitHub Device Flow",
       title: "REPO SETUP.",
-      subtitle: "First-run wizard: pick a sync remote, authenticate via GitHub Device Flow, create an empty .sojourn/ scaffold. The interactive wizard ships in v0.3."
+      subtitle: "First-run sync setup for choosing a remote and creating the .sojourn scaffold."
     )
     .accessibilityIdentifier("pane.repo-setup")
   }

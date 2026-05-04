@@ -16,6 +16,20 @@ import Observation
 @Observable
 @MainActor
 internal final class AppStore {
+  internal struct MacOSFeatureStatusRow: Sendable, Hashable, Identifiable {
+    internal let id: String
+    internal let title: String
+    internal let value: String
+    internal let detail: String
+    internal let symbol: String
+  }
+
+  private enum GenerationRefreshResult: Sendable {
+    case success([GenerationManifest])
+    case missingDirectory
+    case failure(String)
+  }
+
   internal let runner: SubprocessRunner
   internal let jobRunner: JobRunner
   internal let toolLocator: ToolLocator
@@ -25,6 +39,7 @@ internal final class AppStore {
   internal let deletionsDB: DeletionsDB
 
   internal let brewBundle: BrewBundleService
+  internal let brewURL: URL
   internal let git: GitService?
   internal let chezmoi: ChezmoiService?
   internal let pref: PrefService
@@ -35,6 +50,9 @@ internal final class AppStore {
   internal let cleanup: CleanupService
   internal let bootstrap: BootstrapService
   internal let containersService: ContainersService
+  internal let generationService: GenerationService
+  internal let macOSFeatures: MacOSFeaturesService
+  internal var advisoryService: AdvisoryService
   internal let masService: MasService
   internal let sparkleService: SparkleService
   internal let backgroundActivity: BackgroundActivity
@@ -61,11 +79,34 @@ internal final class AppStore {
   /// Populated by `refreshContainers()` (called by ContainersPane on
   /// appear / "Rescan" gesture). Empty until first probe.
   internal var containers: ContainersSnapshot = .empty
+  internal var generations: [GenerationManifest] = []
+  internal var generationLoadError: String?
+  internal var touchIDForSudoEnabled: Bool = false
+  internal var macOSFeatureRows: [MacOSFeatureStatusRow] = []
+  internal var preferenceDomains: [PreferenceDomainEntry] = []
+  internal var advisorySnapshot = AdvisorySnapshot(
+    advisories: [],
+    freshness: .unavailable,
+    lastSuccessAt: nil,
+    lastAttemptAt: nil,
+    cacheKeySHA256: nil
+  )
+  internal var advisoryMessage: String?
 
   /// Last-observed SMAppService.daemon status of the MasHelper per
   /// ADR-0024. Refreshed by `refreshMasHelperStatus()` (called by
   /// PackagesPane on appear / Register / Revoke gestures).
   internal var masHelperStatus: MasHelperStatus = .notRegistered
+
+  @ObservationIgnored private var brewfileRefreshTask: Task<BrewfileAST?, Never>?
+  @ObservationIgnored private var containersRefreshTask: Task<ContainersSnapshot, Never>?
+  @ObservationIgnored private var generationsRefreshTask: Task<GenerationRefreshResult, Never>?
+  @ObservationIgnored private var macOSFeatureRefreshTask: Task<(Bool, [MacOSFeatureStatusRow]), Never>?
+  @ObservationIgnored private var advisoryRefreshTask: Task<AdvisorySnapshot, Never>?
+  @ObservationIgnored private var preferenceDomainsRefreshTask: Task<[PreferenceDomainEntry], Never>?
+#if DEBUG
+  @ObservationIgnored internal private(set) var debugContainersRefreshStarts = 0
+#endif
 
   internal init(
     paths: AppSupportPaths,
@@ -73,6 +114,7 @@ internal final class AppStore {
     deletionsDB: DeletionsDB,
     historyDB: HistoryDB?,
     brewBundle: BrewBundleService,
+    brewURL: URL = URL(fileURLWithPath: "/opt/homebrew/bin/brew"),
     git: GitService?,
     chezmoi: ChezmoiService?,
     secrets: SecretScanService?
@@ -87,6 +129,7 @@ internal final class AppStore {
     self.backups = backups
     self.deletionsDB = deletionsDB
     self.brewBundle = brewBundle
+    self.brewURL = brewURL
     self.git = git
     self.chezmoi = chezmoi
     self.secrets = secrets
@@ -98,6 +141,14 @@ internal final class AppStore {
     self.cleanup = CleanupService(deletionsDB: deletionsDB)
     self.bootstrap = BootstrapService(locator: toolLocator, brew: brew, subprocess: runner)
     self.containersService = ContainersService(runner: runner, locator: self.toolLocator)
+    self.generationService = GenerationService(runner: runner, paths: paths)
+    self.macOSFeatures = MacOSFeaturesService(runner: runner)
+    self.advisoryService = AdvisoryService(
+      runner: runner,
+      brewURL: brewURL,
+      chezmoiSourceRoot: paths.config.appendingPathComponent("sojourn-data", isDirectory: true),
+      cacheURL: paths.cache.appendingPathComponent("advisories.json")
+    )
     self.masService = MasService()
     self.sparkleService = SparkleService()
     self.backgroundActivity = BackgroundActivity()
@@ -129,7 +180,7 @@ internal final class AppStore {
 
     return AppStore(
       paths: paths, settingsStore: settings, deletionsDB: deletions, historyDB: history,
-      brewBundle: brewBundle, git: git, chezmoi: chezmoi, secrets: secrets
+      brewBundle: brewBundle, brewURL: brewURL, git: git, chezmoi: chezmoi, secrets: secrets
     )
   }
 
@@ -144,6 +195,8 @@ internal final class AppStore {
     }
     await toolLocator.seed(settings.toolLocations)
     await cleanup.loadBundledRegistry()
+    await advisoryService.loadFromDisk()
+    self.advisorySnapshot = await advisoryService.currentSnapshot()
   }
 
   /// Persist ADR-0020 install-source classification on first launch.
@@ -214,6 +267,14 @@ internal final class AppStore {
     )
   }
 
+  internal func pullSync() async {
+    await sync?.pull()
+  }
+
+  internal func pushSync(message: String = "sojourn: sync") async {
+    await sync?.push(message: message)
+  }
+
   /// Append a history entry and persist it. Writes to `HistoryDB`
   /// (canonical) and mirrors into `Settings.history` for v0.1
   /// backwards compatibility — the mirror is dropped in v0.2.
@@ -229,8 +290,30 @@ internal final class AppStore {
 
   /// Refresh the in-memory Brewfile snapshot via `brew bundle dump`.
   /// Runs the subprocess; on success replaces `self.brewfile`.
-  internal func refreshBrewfile() async {
-    if let snap = try? await brewBundle.dump() {
+  internal func refreshBrewfile(force: Bool = false) async {
+    if !force, brewfile != nil { return }
+    if let task = brewfileRefreshTask {
+      if let snap = await task.value {
+        self.brewfile = snap
+      }
+      return
+    }
+
+    let task = Task { [brewBundle, brewURL, jobRunner] in
+      try? await jobRunner.track(JobRequest(
+        label: "Refresh Brewfile",
+        tool: brewURL,
+        args: ["bundle", "dump", "--file=-", "--all"],
+        timeout: 120,
+        kind: .advisory
+      )) {
+        try await brewBundle.dump()
+      }
+    }
+    brewfileRefreshTask = task
+    let snap = await task.value
+    brewfileRefreshTask = nil
+    if let snap {
       self.brewfile = snap
     }
   }
@@ -250,10 +333,241 @@ internal final class AppStore {
   /// "Rescan" gesture (via `forceRescan: true`). Per ADR-0023 perf
   /// invariants, no timer-based refresh — explicit gestures only.
   internal func refreshContainers(forceRescan: Bool = false) async {
-    if forceRescan {
-      self.containers = await containersService.rescan()
-    } else {
-      self.containers = await containersService.snapshot()
+    if let task = containersRefreshTask {
+      self.containers = await task.value
+      return
+    }
+
+#if DEBUG
+    debugContainersRefreshStarts += 1
+#endif
+    let task = Task { [containersService] in
+      if forceRescan {
+        return await containersService.rescan()
+      }
+      return await containersService.snapshot()
+    }
+    containersRefreshTask = task
+    self.containers = await task.value
+    containersRefreshTask = nil
+  }
+
+  /// Refresh on-disk generation manifests. Listing is pure file IO, but
+  /// still flows through AppStore so panes do not talk to services
+  /// directly.
+  internal func refreshGenerations() async {
+    if let task = generationsRefreshTask {
+      applyGenerationRefresh(await task.value)
+      return
+    }
+
+    let task = Task.detached { [generationService] in
+      do {
+        return GenerationRefreshResult.success(try await generationService.list())
+      } catch GenerationError.generationsDirMissing(_) {
+        return GenerationRefreshResult.missingDirectory
+      } catch {
+        return GenerationRefreshResult.failure(String(describing: error))
+      }
+    }
+    generationsRefreshTask = task
+    applyGenerationRefresh(await task.value)
+    generationsRefreshTask = nil
+  }
+
+  private func applyGenerationRefresh(_ result: GenerationRefreshResult) {
+    switch result {
+    case .success(let generations):
+      self.generations = generations
+      self.generationLoadError = nil
+    case .missingDirectory:
+      self.generations = []
+      self.generationLoadError = nil
+    case .failure(let error):
+      self.generations = []
+      self.generationLoadError = error
+    }
+  }
+
+  internal func refreshMacOSFeatureSnapshot(force: Bool = false) async {
+    if !force, !macOSFeatureRows.isEmpty {
+      return
+    }
+    if let task = macOSFeatureRefreshTask {
+      let snapshot = await task.value
+      self.touchIDForSudoEnabled = snapshot.0
+      self.macOSFeatureRows = snapshot.1
+      return
+    }
+
+    let task = Task { [macOSFeatures] in
+      await Self.makeMacOSFeatureSnapshot(macOSFeatures: macOSFeatures)
+    }
+    macOSFeatureRefreshTask = task
+    let snapshot = await task.value
+    self.touchIDForSudoEnabled = snapshot.0
+    self.macOSFeatureRows = snapshot.1
+    macOSFeatureRefreshTask = nil
+  }
+
+  internal func refreshAdvisorySnapshot(force: Bool = false) async {
+    if let task = advisoryRefreshTask {
+      self.advisorySnapshot = await task.value
+      applyAdvisoryMessage(force: force)
+      return
+    }
+
+    let task = Task { [advisoryService] in
+      await advisoryService.loadFromDisk()
+      return await advisoryService.currentSnapshot()
+    }
+    advisoryRefreshTask = task
+    self.advisorySnapshot = await task.value
+    advisoryRefreshTask = nil
+    applyAdvisoryMessage(force: force)
+  }
+
+  private func applyAdvisoryMessage(force: Bool) {
+    if force {
+      self.advisoryMessage = advisorySnapshot.advisories.isEmpty
+        ? String(localized: "No cached advisory snapshot. Run an advisory scan after Homebrew vulnerability data is configured, then refresh this pane.")
+        : String(localized: "Reloaded cached advisory snapshot.")
+    }
+  }
+
+  internal func refreshPreferenceDomains() async {
+    if let task = preferenceDomainsRefreshTask {
+      self.preferenceDomains = await task.value
+      return
+    }
+
+    let task = Task.detached { [pref] in
+      pref.loadDomainCorpus()
+    }
+    preferenceDomainsRefreshTask = task
+    self.preferenceDomains = await task.value
+    preferenceDomainsRefreshTask = nil
+  }
+
+  private nonisolated static func makeMacOSFeatureSnapshot(
+    macOSFeatures: MacOSFeaturesService
+  ) async -> (Bool, [MacOSFeatureStatusRow]) {
+    let touchID = macOSFeatures.isTouchIDForSudoEnabled()
+
+    var rows: [MacOSFeatureStatusRow] = [
+      MacOSFeatureStatusRow(
+        id: "touch-id-sudo",
+        title: "Touch ID for sudo",
+        value: touchID ? "Enabled" : "Disabled",
+        detail: "/etc/pam.d/sudo",
+        symbol: "touchid"
+      )
+    ]
+
+    for key in FinderDefault.allCases {
+      rows.append(await finderFeatureRow(key, macOSFeatures: macOSFeatures))
+    }
+
+    rows.append(await stringFeatureRow(
+      id: "keyboard-initial-repeat",
+      title: "Initial key repeat",
+      domain: "NSGlobalDomain",
+      key: "InitialKeyRepeat",
+      symbol: "keyboard",
+      macOSFeatures: macOSFeatures
+    ))
+    rows.append(await stringFeatureRow(
+      id: "keyboard-repeat-rate",
+      title: "Key repeat",
+      domain: "NSGlobalDomain",
+      key: "KeyRepeat",
+      symbol: "keyboard",
+      macOSFeatures: macOSFeatures
+    ))
+    rows.append(await stringFeatureRow(
+      id: "screencapture-location",
+      title: "Screenshot location",
+      domain: "com.apple.screencapture",
+      key: "location",
+      symbol: "camera.viewfinder",
+      macOSFeatures: macOSFeatures
+    ))
+    rows.append(await stringFeatureRow(
+      id: "screencapture-type",
+      title: "Screenshot type",
+      domain: "com.apple.screencapture",
+      key: "type",
+      symbol: "photo",
+      macOSFeatures: macOSFeatures
+    ))
+    rows.append(await stringFeatureRow(
+      id: "login-window-text",
+      title: "Login window text",
+      domain: "/Library/Preferences/com.apple.loginwindow",
+      key: "LoginwindowText",
+      symbol: "rectangle.and.pencil.and.ellipsis",
+      macOSFeatures: macOSFeatures
+    ))
+
+    return (touchID, rows)
+  }
+
+  private nonisolated static func finderFeatureRow(
+    _ key: FinderDefault,
+    macOSFeatures: MacOSFeaturesService
+  ) async -> MacOSFeatureStatusRow {
+    let value: String
+    do {
+      if key == .preferredViewStyle {
+        value = try await macOSFeatures.readString(domain: key.domain, key: key.rawValue) ?? "Unknown"
+      } else if let enabled = try await macOSFeatures.readFinderDefault(key) {
+        value = enabled ? "Enabled" : "Disabled"
+      } else {
+        value = "Unknown"
+      }
+    } catch {
+      value = "Unknown"
+    }
+    return MacOSFeatureStatusRow(
+      id: "finder-\(key.rawValue)",
+      title: finderTitle(for: key),
+      value: value,
+      detail: "\(key.domain) / \(key.rawValue)",
+      symbol: "finder"
+    )
+  }
+
+  private nonisolated static func stringFeatureRow(
+    id: String,
+    title: String,
+    domain: String,
+    key: String,
+    symbol: String,
+    macOSFeatures: MacOSFeaturesService
+  ) async -> MacOSFeatureStatusRow {
+    let value: String
+    do {
+      value = try await macOSFeatures.readString(domain: domain, key: key) ?? "Unknown"
+    } catch {
+      value = "Unknown"
+    }
+    return MacOSFeatureStatusRow(
+      id: id,
+      title: title,
+      value: value.isEmpty ? "Empty" : value,
+      detail: "\(domain) / \(key)",
+      symbol: symbol
+    )
+  }
+
+  private nonisolated static func finderTitle(for key: FinderDefault) -> String {
+    switch key {
+    case .showAllExtensions:  return "Show all filename extensions"
+    case .showPathbar:        return "Show path bar"
+    case .showStatusBar:      return "Show status bar"
+    case .showHiddenFiles:    return "Show hidden files"
+    case .sortFoldersFirst:   return "Sort folders first"
+    case .preferredViewStyle: return "Preferred Finder view"
     }
   }
 

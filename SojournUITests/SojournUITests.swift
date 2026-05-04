@@ -14,6 +14,9 @@ final class SojournUITests: XCTestCase {
     launchAgentApp(app)
     XCTAssertTrue(app.windows.firstMatch.waitForExistence(timeout: 10))
     XCTAssertTrue(pane(app, "pane.overview").waitForExistence(timeout: 10))
+    XCTAssertTrue(toolbarButton(app, "toolbar.refresh").waitForExistence(timeout: 4))
+    XCTAssertTrue(toolbarButton(app, "toolbar.pull").exists)
+    XCTAssertTrue(toolbarButton(app, "toolbar.push").exists)
   }
 
   /// Click each sidebar entry. Assert the corresponding pane's
@@ -92,5 +95,11 @@ final class SojournUITests: XCTestCase {
     let label = app.staticTexts[identifier]
     if label.exists { return label }
     return app.buttons[identifier]
+  }
+
+  private func toolbarButton(_ app: XCUIApplication, _ identifier: String) -> XCUIElement {
+    let button = app.buttons[identifier]
+    if button.exists { return button }
+    return app.otherElements[identifier]
   }
 }

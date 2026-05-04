@@ -15,9 +15,9 @@ Steps:
    number for this stage in `project.yml`
    (`CURRENT_PROJECT_VERSION: N` → `N+1`).
 3. Run pre-commit checks in parallel:
-   - `gitleaks dir . --no-banner` — must pass.
+   - `gitleaks dir --config=.gitleaks.toml --redact --no-banner` — must pass.
    - `swift build` — must be clean (zero warnings).
-   - `xcodebuild test -scheme Sojourn -destination 'platform=macOS,arch=arm64' -only-testing:SojournTests`
+   - `xcodebuild test -project Sojourn.xcodeproj -scheme Sojourn -destination 'platform=macOS,arch=arm64' -only-testing:SojournTests`
      — must pass.
 4. If any check fails: surface the failure, do NOT commit, propose
    the fix.

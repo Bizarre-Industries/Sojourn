@@ -85,7 +85,7 @@ repo_root="${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null || 
 # Faster than a full repo scan and matches what's about to be
 # committed.
 leak_exit=0
-leak_output="$(cd "$repo_root" && gitleaks protect --staged --no-banner 2>&1)" || leak_exit=$?
+leak_output="$(cd "$repo_root" && gitleaks protect --staged --no-banner --redact 2>&1)" || leak_exit=$?
 
 if [ "$leak_exit" -eq 0 ]; then
   exit 0

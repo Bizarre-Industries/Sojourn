@@ -20,7 +20,7 @@ Steps:
    - code deletion >100 LOC in one commit
    - any change under `Sojourn/Secrets/`, `Sojourn/Policy/`, signing
      config, or `notarize.yml`
-4. Spawn all 5 council subagents IN PARALLEL via the Agent tool with
+4. Spawn all 5 council subagents in parallel via the Agent tool with
    matching `subagent_type`:
    - `council-architect`
    - `council-security`

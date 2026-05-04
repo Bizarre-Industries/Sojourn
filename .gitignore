@@ -76,6 +76,8 @@ notarize-*.json
 !.codex/hooks/**
 !.codex/agents/
 !.codex/agents/**
+!.codex/commands/
+!.codex/commands/**
 !.codex/council-logs/
 !.codex/council-logs/**
 .codex/.last-shipped-tag

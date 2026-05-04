@@ -13,7 +13,7 @@ help:
 	@echo '  test       swift test (unit tests via Swift Testing)'
 	@echo '  generate   xcodegen generate (regenerate Sojourn.xcodeproj)'
 	@echo '  xcodebuild xcodebuild test on the generated project'
-	@echo '  leaks      gitleaks dir --config=.gitleaks.toml'
+	@echo '  leaks      gitleaks dir --config=.gitleaks.toml --redact'
 	@echo '  lint       swiftlint (advisory)'
 	@echo '  format     swift-format in place'
 	@echo '  ci-local   local release gate: workflows, leaks, pins, zizmor, expiry, advisory Swift lint'
@@ -68,7 +68,7 @@ xcodebuild:
 		CODE_SIGN_IDENTITY="$${CODE_SIGN_IDENTITY}"
 
 leaks:
-	gitleaks dir --config=.gitleaks.toml -v
+	gitleaks dir --config=.gitleaks.toml --redact -v
 
 lint:
 	-swiftlint

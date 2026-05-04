@@ -255,8 +255,13 @@ and produces inconsistent output across sessions.
 ## Slash commands and app commands
 
 Claude Code project-local commands live in `.claude/commands/`.
-Codex equivalents are exposed through native tools, hooks, and
-subagents rather than Markdown slash-command files. Current shortcuts:
+Codex command mirrors live in `.codex/commands/` and are backed by
+native tools, hooks, and subagents. Keep both command sets aligned.
+The Codex-to-Claude MCP bridge in `.codex/config.toml` is disabled by
+default. Enable it only for a deliberate local bridge session, restart
+Codex, and do not commit `enabled = true`; peer agents must not invoke
+peer MCP/council flows recursively.
+Current shortcuts:
 
 - **`/council`** — fire the 5-member council on the current diff.
   Equivalent to dispatching all 5 council-* subagents in parallel,

@@ -8,12 +8,12 @@ All notable changes to Sojourn. Follows
 
 ### Planned (post-v0.3.0)
 
-(See `docs/process/plans/v0.4-plan.md` once written by `replan-on-tag.sh`.)
+(See `docs/process/plans/v0.4-plan.md` for the active native UI reset plan.)
 
-## [0.3.0] — unreleased
+## [0.3.0] — 2026-05-04
 
-In-progress release per `docs/process/plans/v0.3-plan.md`. Build
-numbers 21 → 28 walk through stages 1-8.
+Released from commit `eabe574`. Build numbers 21 → 28 walked through
+stages 1-8.
 
 ### Added
 

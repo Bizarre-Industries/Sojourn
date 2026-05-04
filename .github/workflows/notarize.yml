@@ -116,6 +116,10 @@ jobs:
             OTHER_CODE_SIGN_FLAGS="--timestamp --options=runtime" \
             clean build
 
+      - name: Trim and re-sign Sparkle nested code
+        timeout-minutes: 10
+        run: bash scripts/sign-sparkle.sh build/Build/Products/Release/Sojourn.app
+
       - name: Create DMG
         run: bash scripts/make-dmg.sh build/Build/Products/Release/Sojourn.app
 

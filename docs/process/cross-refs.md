@@ -38,8 +38,8 @@ outcome.
 | [0022](../decisions/0022-rejected-nix-mode.md) | REJECTED Nix mode | [2026-05-01-v0.2-adr-batch](../../.claude/council-logs/2026-05-01-v0.2-adr-batch.md) | "Drop Nix as a Phase 2 mode" |
 | [0023](../decisions/0023-containers-panel-detection.md) | Containers panel detection | [2026-05-03-v0.3-adr-batch](../../.claude/council-logs/2026-05-03-v0.3-adr-batch.md) | — (pending v0.4 if write actions added) |
 | [0024](../decisions/0024-mas-touch-id-privileged-helper.md) | mas Touch-ID privileged helper | [2026-05-03-v0.3-adr-batch](../../.claude/council-logs/2026-05-03-v0.3-adr-batch.md) | "mas requires sudo on macOS 14.8.2+ / 15.7.2+ / 26.1+" |
-| [0025](../decisions/0025-sparkle-delta-updates.md) | Sparkle delta updates | [2026-05-03-v0.3-adr-batch](../../.claude/council-logs/2026-05-03-v0.3-adr-batch.md) | — (pending v0.3.1 delta-apply smoke) |
-| [0026](../decisions/0026-multi-machine-conflict-ux.md) | Multi-machine refuse-and-show-diff | [2026-05-03-v0.3-adr-batch](../../.claude/council-logs/2026-05-03-v0.3-adr-batch.md) | — |
+| [0025](../decisions/0025-sparkle-delta-updates.md) | Sparkle delta updates | [2026-05-03-v0.3-adr-batch](../../.claude/council-logs/2026-05-03-v0.3-adr-batch.md), [2026-05-04-stage6-sparkle-delta](../../.claude/council-logs/2026-05-04-stage6-sparkle-delta.md) | — (pending v0.3.0 corrupt-delta VM smoke) |
+| [0026](../decisions/0026-multi-machine-conflict-ux.md) | Multi-machine refuse-and-show-diff | [2026-05-03-v0.3-adr-batch](../../.claude/council-logs/2026-05-03-v0.3-adr-batch.md), [2026-05-04-stage5-conflict-resolver](../../.claude/council-logs/2026-05-04-stage5-conflict-resolver.md) | — |
 
 ## Council logs without an ADR
 

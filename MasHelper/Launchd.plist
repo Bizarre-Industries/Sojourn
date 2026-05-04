@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>industries.bizarre.Sojourn.helper</string>
+  <!-- BundleProgram is a path relative to the parent app's bundle
+       root. SMAppService.daemon resolves this from the app's
+       Contents/Library/LaunchDaemons/<name>.plist at register
+       time. -->
+  <key>BundleProgram</key>
+  <string>Contents/MacOS/industries.bizarre.Sojourn.helper</string>
+  <key>MachServices</key>
+  <dict>
+    <key>industries.bizarre.Sojourn.helper.mach</key>
+    <true/>
+  </dict>
+  <!-- AssociatedBundleIdentifiers lets `launchctl print` cross-link
+       to Sojourn.app for diagnostics. -->
+  <key>AssociatedBundleIdentifiers</key>
+  <array>
+    <string>app.bizarre.sojourn</string>
+  </array>
+</dict>
+</plist>

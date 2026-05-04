@@ -35,6 +35,7 @@ internal final class AppStore {
   internal let cleanup: CleanupService
   internal let bootstrap: BootstrapService
   internal let containersService: ContainersService
+  internal let masService: MasService
   internal let backgroundActivity: BackgroundActivity
 
   internal let historyDB: HistoryDB?
@@ -55,6 +56,11 @@ internal final class AppStore {
   /// Populated by `refreshContainers()` (called by ContainersPane on
   /// appear / "Rescan" gesture). Empty until first probe.
   internal var containers: ContainersSnapshot = .empty
+
+  /// Last-observed SMAppService.daemon status of the MasHelper per
+  /// ADR-0024. Refreshed by `refreshMasHelperStatus()` (called by
+  /// PackagesPane on appear / Register / Revoke gestures).
+  internal var masHelperStatus: MasHelperStatus = .notRegistered
 
   internal init(
     paths: AppSupportPaths,
@@ -87,6 +93,7 @@ internal final class AppStore {
     self.cleanup = CleanupService(deletionsDB: deletionsDB)
     self.bootstrap = BootstrapService(locator: toolLocator, brew: brew, subprocess: runner)
     self.containersService = ContainersService(runner: runner, locator: self.toolLocator)
+    self.masService = MasService()
     self.backgroundActivity = BackgroundActivity()
     self.historyDB = historyDB
     self.bootstrapCoordinator = BootstrapCoordinator(
@@ -190,5 +197,25 @@ internal final class AppStore {
     } else {
       self.containers = await containersService.snapshot()
     }
+  }
+
+  /// Refresh the MasHelper status surface (per ADR-0024). Called by
+  /// PackagesPane on appear and after Register / Revoke gestures.
+  /// `SMAppService.status` is a synchronous synth — no subprocess.
+  internal func refreshMasHelperStatus() async {
+    self.masHelperStatus = await masService.status()
+  }
+
+  /// Trigger MasHelper register flow (user sees system prompt the
+  /// first time). Refreshes status after.
+  internal func registerMasHelper() async throws {
+    try await masService.register()
+    await refreshMasHelperStatus()
+  }
+
+  /// Trigger MasHelper unregister + cleanup. Refreshes status after.
+  internal func unregisterMasHelper() async throws {
+    try await masService.unregister()
+    await refreshMasHelperStatus()
   }
 }

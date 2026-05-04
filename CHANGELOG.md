@@ -46,6 +46,45 @@ numbers 21 → 28 walk through stages 1-8.
   effectiveTimeout fallback, watchdog overrun, install/upgrade
   exemption, natural-completion vs watchdog race, cancel vs
   watchdog non-interference.
+- `MasHelper` Xcode target (Swift command-line tool) — privileged
+  daemon binary `industries.bizarre.Sojourn.helper` embedded at
+  `Sojourn.app/Contents/MacOS/`. Listens on
+  `industries.bizarre.Sojourn.helper.mach`. Per-connection
+  `setCodeSigningRequirement` validation gates every XPC call (DEBUG
+  builds skip; Release builds pin to Sojourn's Developer ID
+  identifier). Helper-side 600s subprocess cap with SIGTERM+SIGKILL
+  watchdog. argv discipline: App Store IDs cross XPC as
+  `NSNumber<UInt64>` validated `> 0` before reaching `Process`.
+- `Sojourn/Services/MasHelperProtocol.swift` — shared `@objc` XPC
+  contract + constants (mach name, bundle id, plist name, sentinel
+  exit codes, 600s timeout). Compiled into both targets.
+- `Sojourn/Services/MasHelperClient.swift` — XPC client actor
+  bridging reply-block API to `async throws`. Symmetric per-connection
+  code-signing pin on Release builds.
+- `Sojourn/Services/MasService.swift` — high-level wrapper over
+  `SMAppService.daemon(plistName:)` lifecycle (register / unregister
+  / status) + forwards install/upgrade to `MasHelperClient`.
+- `Sojourn/Store/AppStore.swift` — `masService` member,
+  `masHelperStatus` observable, `refreshMasHelperStatus()` /
+  `registerMasHelper()` / `unregisterMasHelper()` async methods.
+- `Sojourn/UI/Panes/PackagesPane.swift` — "Touch-ID install helper
+  active" status row (visible when `mas` manager selected) with
+  StatusDot + Register/Revoke button + accessibility label distinct
+  from color (per ADR-0024 council 2026-05-03 amendment).
+- `MasHelper/Info.plist` — `SMAuthorizedClients` requirement string
+  pinning Sojourn's Developer ID identifier.
+- `MasHelper/Launchd.plist` — daemon plist embedded into
+  `Sojourn.app/Contents/Library/LaunchDaemons/` via postBuildScript
+  for `SMAppService.daemon(plistName:)` to find at register time.
+- `project.yml` postBuildScript embeds helper binary into
+  `Contents/MacOS/` + re-codesigns with hardened runtime + entitlements
+  using whichever identity is available (Developer ID in CI, ad-hoc
+  locally).
+- `SojournTests/Services/MasHelperClientTests.swift` — 14 tests cover
+  protocol constants (mach name, bundle id, sentinels),
+  `MasInvocationResult` accessors, error descriptions + equality,
+  client UInt64 input validation (rejects zero ID + zero in upgrade
+  list).
 
 ## [0.2.0] — 2026-05-01
 

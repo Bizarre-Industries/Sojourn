@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>CFBundleIdentifier</key>
+  <string>industries.bizarre.Sojourn.helper</string>
+  <key>CFBundleName</key>
+  <string>MasHelper</string>
+  <key>CFBundleExecutable</key>
+  <string>industries.bizarre.Sojourn.helper</string>
+  <key>CFBundlePackageType</key>
+  <string>APPL</string>
+  <key>CFBundleShortVersionString</key>
+  <string>$(MARKETING_VERSION)</string>
+  <key>CFBundleVersion</key>
+  <string>$(CURRENT_PROJECT_VERSION)</string>
+  <!-- SMAuthorizedClients pins the Sojourn app identity that's
+       allowed to install / unregister this helper via SMAppService.
+       Per council 2026-05-03 amendment to ADR-0024: identifier pin
+       binds the helper to one app bundle id; certificate clauses
+       restrict to Apple-signed Developer ID Application leaf. -->
+  <key>SMAuthorizedClients</key>
+  <array>
+    <string>anchor apple generic and identifier "app.bizarre.sojourn" and certificate 1[field.1.2.840.113635.100.6.2.6] and certificate leaf[field.1.2.840.113635.100.6.1.13]</string>
+  </array>
+</dict>
+</plist>

@@ -8,13 +8,115 @@ struct PackagesPane: View {
   @State private var filter: String = "All"
 
   var body: some View {
-    HStack(spacing: 0) {
-      managerMidlist
-      Rectangle().fill(Color.hairline).frame(width: 0.5)
-      packageDetail
+    VStack(spacing: 0) {
+      if selectedManager == "mas" {
+        masHelperStatusRow
+        Rectangle().fill(Color.hairline).frame(height: 0.5)
+      }
+      HStack(spacing: 0) {
+        managerMidlist
+        Rectangle().fill(Color.hairline).frame(width: 0.5)
+        packageDetail
+      }
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
     .accessibilityIdentifier("pane.packages")
+    .task {
+      await store.refreshMasHelperStatus()
+    }
+  }
+
+  // MARK: MasHelper status row (ADR-0024)
+
+  /// Per ADR-0024 amendment "Helper authorization status surface": a
+  /// row showing whether the privileged Touch-ID install helper is
+  /// active, plus a Register / Revoke control. Visible only when the
+  /// "mas" manager is selected so it sits in context.
+  @ViewBuilder
+  private var masHelperStatusRow: some View {
+    HStack(spacing: 12) {
+      StatusDot(kind: masDotKind)
+      VStack(alignment: .leading, spacing: 2) {
+        Text(masStatusTitle)
+          .font(.bzrBody(size: 13, weight: .semibold))
+          .foregroundStyle(Color.txtPrimary)
+        Text(masStatusSubtitle)
+          .font(.bzrMono(size: 10))
+          .foregroundStyle(Color.txtTertiary)
+          .lineLimit(1)
+      }
+      Spacer()
+      masStatusButton
+    }
+    .padding(.horizontal, 20)
+    .padding(.vertical, 12)
+    .background(Color.white.opacity(0.04))
+    .accessibilityIdentifier("packages.mas-helper-status")
+    .accessibilityLabel(masStatusAccessibilityLabel)
+  }
+
+  private var masDotKind: StatusDotKind {
+    switch store.masHelperStatus {
+    case .registered:        return .lime
+    case .requiresApproval:  return .warn
+    case .notRegistered:     return .ok
+    case .missing, .unknown: return .danger
+    }
+  }
+
+  private var masStatusTitle: String {
+    switch store.masHelperStatus {
+    case .registered:       return "Touch-ID install helper active"
+    case .requiresApproval: return "Helper needs your approval"
+    case .notRegistered:    return "Touch-ID install helper not yet installed"
+    case .missing:          return "Helper missing from app bundle"
+    case .unknown:          return "Helper status unknown"
+    }
+  }
+
+  private var masStatusSubtitle: String {
+    switch store.masHelperStatus {
+    case .registered:
+      return "App Store installs run silently after first authorization"
+    case .requiresApproval:
+      return "Open System Settings → General → Login Items"
+    case .notRegistered:
+      return "Click Register to install (one-time admin prompt)"
+    case .missing:
+      return "Reinstall Sojourn or rebuild from source"
+    case .unknown:
+      return "Could not read SMAppService status"
+    }
+  }
+
+  private var masStatusAccessibilityLabel: String {
+    "MasHelper status: \(masStatusTitle). \(masStatusSubtitle)"
+  }
+
+  @ViewBuilder
+  private var masStatusButton: some View {
+    switch store.masHelperStatus {
+    case .registered:
+      Button("Revoke") {
+        Task {
+          try? await store.unregisterMasHelper()
+        }
+      }
+      .buttonStyle(.bordered)
+      .controlSize(.small)
+      .accessibilityIdentifier("packages.mas-helper-revoke")
+    case .notRegistered, .requiresApproval:
+      Button("Register") {
+        Task {
+          try? await store.registerMasHelper()
+        }
+      }
+      .buttonStyle(.borderedProminent)
+      .controlSize(.small)
+      .accessibilityIdentifier("packages.mas-helper-register")
+    case .missing, .unknown:
+      EmptyView()
+    }
   }
 
   // MARK: Midlist

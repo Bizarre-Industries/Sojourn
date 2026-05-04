@@ -44,6 +44,7 @@
 		4A5F2856940C55ECD4D50CCC /* SojournApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC7AC9EC2C343DE83DB1830A /* SojournApp.swift */; };
 		4AB1BACFB2400962D5F880A7 /* AgeBroker.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDA4FD795AD7787A7A6C0461 /* AgeBroker.swift */; };
 		4B4A8ADACF22F71ED24B76A2 /* GenerationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 887AAF2686F9A376CC67B150 /* GenerationService.swift */; };
+		4BAE706F0368C1E47768E36C /* MasHelperClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD38BF30D6CBEB4EFF1A4FD7 /* MasHelperClientTests.swift */; };
 		4DE366BB1A9A86717FCF2ABE /* Job.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0814F9583EAFEE9FAF041AE /* Job.swift */; };
 		508C867592BF7AA7D2D54400 /* SubprocessRunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D717FBA5804F28F8892BC95F /* SubprocessRunnerTests.swift */; };
 		51FFB7477224BF2F58CFB77E /* CleanupPane.swift in Sources */ = {isa = PBXBuildFile; fileRef = 917C3CA7A3B22318CCEC81F1 /* CleanupPane.swift */; };
@@ -54,6 +55,7 @@
 		592812DD4D79A19E29AE9854 /* HistoryDB.swift in Sources */ = {isa = PBXBuildFile; fileRef = 277FC75194E246A84AB1A2A9 /* HistoryDB.swift */; };
 		5B90DE31FC7F4180A0AF34B8 /* SojournUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10DD40CBD9A7ADFED1E94D4 /* SojournUITests.swift */; };
 		5E34B40CBCF540DA3F3A74FF /* DiagnosticsPane.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F73FECB65986451C136A8A2 /* DiagnosticsPane.swift */; };
+		611FBB090546801CDE52B8A7 /* MasHelperProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB4FE8184AADB56514189B5D /* MasHelperProtocol.swift */; };
 		6AC8674D8D977F7C108ADF81 /* LogBufferTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DD4943AD10D37C3DB9CFBC9 /* LogBufferTests.swift */; };
 		70AEDCB3E9609070650F669A /* CleanupServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A36CD6BB083EBA6FA642F71F /* CleanupServiceTests.swift */; };
 		7306D135492D8656BD304B68 /* PreferencesPane.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC453885D2E108F361A7299D /* PreferencesPane.swift */; };
@@ -93,6 +95,9 @@
 		A73BAE6B0DA18AE332A12AF6 /* SyncMergeTargetTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2F3D8B1FA0E7E41B914FD76 /* SyncMergeTargetTests.swift */; };
 		A7B98E701D5EBDB9570D49F7 /* DiagnosticBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4852A96E28C5AE7EFD35C49 /* DiagnosticBundle.swift */; };
 		A89F889B6885C77574D1A9DB /* LogExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B138DB8D40A2A098C28ED4CB /* LogExporter.swift */; };
+		A9A1ACC2E910BABFA68FCDA2 /* MasHelperService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 885D1B68EB7366BB93BB0DFA /* MasHelperService.swift */; };
+		AA33BC82E753FD68DFD4B771 /* MasHelperProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB4FE8184AADB56514189B5D /* MasHelperProtocol.swift */; };
+		AB65C0850E45096716071226 /* MasHelperClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC16F379586B175695E71BF2 /* MasHelperClient.swift */; };
 		ABB5C20DDEE082F71A36EF69 /* SojournIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81F879A8DCA19A0D5AA7B0AB /* SojournIcon.swift */; };
 		ABF59B843BD9670834DF9AB3 /* ServicesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 012D1D3CEBF6D99B901ABA36 /* ServicesTests.swift */; };
 		AC18825BFD4E02CF41B6C03C /* V02Stubs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ABC2036FA3F9FAFEEC00ED2 /* V02Stubs.swift */; };
@@ -111,6 +116,7 @@
 		C44DB6B79B4C736DEC87106E /* MachineMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDF057685B19AB3503933B08 /* MachineMetadata.swift */; };
 		C63650F6F57BDB8D36CDC7E9 /* OrphanCandidate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA82E2DC35BD66C0CCB3D31C /* OrphanCandidate.swift */; };
 		C6E76168AC77E5F2B66C1A00 /* ToolLocatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3631080B96D92DFD843F72AE /* ToolLocatorTests.swift */; };
+		C9B5636F619F4D29C1EC1E72 /* MasService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E429313D0E0FB1D51FABD2F /* MasService.swift */; };
 		D7151A2078906FDB7B990AD6 /* GenerationsPane.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DFAB02C29720FAB30864DCB /* GenerationsPane.swift */; };
 		D8E561923A9C07751DB4532E /* Spacing.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF63E8F9CAA2A0B02F398EB9 /* Spacing.swift */; };
 		DE03A44AB78A511EEE4CD4F1 /* BootstrapService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14A5F035C01184E1BF26CB2F /* BootstrapService.swift */; };
@@ -119,6 +125,7 @@
 		E4AE7D402977E4174F6AA917 /* PackagesPane.swift in Sources */ = {isa = PBXBuildFile; fileRef = E85F38538D64D3F9E1B06485 /* PackagesPane.swift */; };
 		E50919FD33E2914DF758D069 /* JobRunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72893E315B28B7A4C2D41119 /* JobRunnerTests.swift */; };
 		E72C0687340E4387E829A79E /* MainWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82A52B4280B84BAE4A95BCBF /* MainWindowView.swift */; };
+		E83D3436EED0F981FD480712 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D6ADA76780BBF30B8F9F8D3 /* main.swift */; };
 		E8CF049FDC844E6B057A072A /* SojournIconMark.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABEBDD56226C708B2BB5B500 /* SojournIconMark.swift */; };
 		F0C1DCDB2BC208481EBF15E2 /* ToolProbeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D5FA41A6CFE57A332299D96 /* ToolProbeTests.swift */; };
 		F40C659088BA7D50CF171576 /* ManagerSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D1CE3F585241A7C3832E1FC /* ManagerSnapshot.swift */; };
@@ -142,6 +149,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 940E88B3F1FF4F0B348B13A6;
 			remoteInfo = Sojourn;
+		};
+		C34A9E6A23B2D74308BEF6AE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8859980E698820D5DE487503 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 91A31580165B19BE5C6D6C8B;
+			remoteInfo = MasHelper;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -174,6 +188,7 @@
 		382E9466BCD14C7A5C4CA0A7 /* OnboardPane.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardPane.swift; sourceTree = "<group>"; };
 		3A05293DDD6F76E28F023833 /* Redactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Redactor.swift; sourceTree = "<group>"; };
 		3A0B5A8BB60D9FFFA8948472 /* data */ = {isa = PBXFileReference; lastKnownFileType = folder; name = data; path = Sojourn/Resources/data; sourceTree = SOURCE_ROOT; };
+		3BF1AACCC465682DC48834DF /* MasHelper */ = {isa = PBXFileReference; includeInIndex = 0; path = MasHelper; sourceTree = BUILT_PRODUCTS_DIR; };
 		3D1CE3F585241A7C3832E1FC /* ManagerSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagerSnapshot.swift; sourceTree = "<group>"; };
 		3E2C81F1F7CEDB139F93278C /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
 		46A3581F13A50DB09A6F343F /* CycloneDX.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CycloneDX.swift; sourceTree = "<group>"; };
@@ -182,6 +197,7 @@
 		4A54E029B5D676EBB2312038 /* ToolInstaller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolInstaller.swift; sourceTree = "<group>"; };
 		4B4C7A81F96BAD6A1DB0EAA0 /* DotfilesPane.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DotfilesPane.swift; sourceTree = "<group>"; };
 		4CAA3F1AB2A8BAE4DFC84DC0 /* Brewfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Brewfile.swift; sourceTree = "<group>"; };
+		4E429313D0E0FB1D51FABD2F /* MasService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MasService.swift; sourceTree = "<group>"; };
 		4F811FB480E52C17173F18BE /* StateDB.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StateDB.swift; sourceTree = "<group>"; };
 		5067374206B171480C067C6A /* SojournTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SojournTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		50E78DBDD1F8570D95723E0D /* SecretsPane.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecretsPane.swift; sourceTree = "<group>"; };
@@ -209,9 +225,11 @@
 		81F879A8DCA19A0D5AA7B0AB /* SojournIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SojournIcon.swift; sourceTree = "<group>"; };
 		82A52B4280B84BAE4A95BCBF /* MainWindowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainWindowView.swift; sourceTree = "<group>"; };
 		85CA5EF14259B836AD6AED4E /* DotfileOwner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DotfileOwner.swift; sourceTree = "<group>"; };
+		885D1B68EB7366BB93BB0DFA /* MasHelperService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MasHelperService.swift; sourceTree = "<group>"; };
 		887AAF2686F9A376CC67B150 /* GenerationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenerationService.swift; sourceTree = "<group>"; };
 		8884B2AE7CA5668066930F1F /* AdvisoryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvisoryService.swift; sourceTree = "<group>"; };
 		8CF3E7F8591B56E1E9859A73 /* PrefService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrefService.swift; sourceTree = "<group>"; };
+		8D6ADA76780BBF30B8F9F8D3 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		8DED6874FE4B27207A890E6E /* GitHubDeviceAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubDeviceAuth.swift; sourceTree = "<group>"; };
 		90C0FA8590D68C1D74288A32 /* VersionFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VersionFile.swift; sourceTree = "<group>"; };
 		917C3CA7A3B22318CCEC81F1 /* CleanupPane.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CleanupPane.swift; sourceTree = "<group>"; };
@@ -229,6 +247,8 @@
 		AA82E2DC35BD66C0CCB3D31C /* OrphanCandidate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrphanCandidate.swift; sourceTree = "<group>"; };
 		AAB806B3F130A1371E112DC8 /* ContainersService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContainersService.swift; sourceTree = "<group>"; };
 		ABEBDD56226C708B2BB5B500 /* SojournIconMark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SojournIconMark.swift; sourceTree = "<group>"; };
+		AC16F379586B175695E71BF2 /* MasHelperClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MasHelperClient.swift; sourceTree = "<group>"; };
+		AD38BF30D6CBEB4EFF1A4FD7 /* MasHelperClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MasHelperClientTests.swift; sourceTree = "<group>"; };
 		B0A7A91337334537033977DB /* Modals.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Modals.swift; sourceTree = "<group>"; };
 		B10DD40CBD9A7ADFED1E94D4 /* SojournUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SojournUITests.swift; sourceTree = "<group>"; };
 		B138DB8D40A2A098C28ED4CB /* LogExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogExporter.swift; sourceTree = "<group>"; };
@@ -264,6 +284,7 @@
 		E4FDE1104A51EA62C619BA04 /* TierClassifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierClassifier.swift; sourceTree = "<group>"; };
 		E85F38538D64D3F9E1B06485 /* PackagesPane.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackagesPane.swift; sourceTree = "<group>"; };
 		E9E64BDF45BE87A78922A385 /* HistoryEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryEntry.swift; sourceTree = "<group>"; };
+		EB4FE8184AADB56514189B5D /* MasHelperProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MasHelperProtocol.swift; sourceTree = "<group>"; };
 		EC1E1DC7914BD10A9F64131C /* Sidebar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sidebar.swift; sourceTree = "<group>"; };
 		EDA4FD795AD7787A7A6C0461 /* AgeBroker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgeBroker.swift; sourceTree = "<group>"; };
 		EDF057685B19AB3503933B08 /* MachineMetadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MachineMetadata.swift; sourceTree = "<group>"; };
@@ -343,6 +364,7 @@
 		229A8660CAFF1E38993C29D9 /* Products */ = {
 			isa = PBXGroup;
 			children = (
+				3BF1AACCC465682DC48834DF /* MasHelper */,
 				C40858EDF69CF14EA473AF3F /* Sojourn.app */,
 				5067374206B171480C067C6A /* SojournTests.xctest */,
 				BC0CD2FDD4876C335C51A7F6 /* SojournUITests.xctest */,
@@ -424,6 +446,7 @@
 				72893E315B28B7A4C2D41119 /* JobRunnerTests.swift */,
 				1635E82D1CC28DB81B7AB96E /* JobRunnerTimeoutPolicyTests.swift */,
 				2DD4943AD10D37C3DB9CFBC9 /* LogBufferTests.swift */,
+				AD38BF30D6CBEB4EFF1A4FD7 /* MasHelperClientTests.swift */,
 				012D1D3CEBF6D99B901ABA36 /* ServicesTests.swift */,
 				D717FBA5804F28F8892BC95F /* SubprocessRunnerTests.swift */,
 				3631080B96D92DFD843F72AE /* ToolLocatorTests.swift */,
@@ -511,6 +534,9 @@
 				F4207776C9EC0D4B31D82E91 /* JobRunner.swift */,
 				75102F527B8749FB644C0444 /* LogBuffer.swift */,
 				BF0F7E5B022F32A9CF6BF028 /* MacOSFeaturesService.swift */,
+				AC16F379586B175695E71BF2 /* MasHelperClient.swift */,
+				EB4FE8184AADB56514189B5D /* MasHelperProtocol.swift */,
+				4E429313D0E0FB1D51FABD2F /* MasService.swift */,
 				8CF3E7F8591B56E1E9859A73 /* PrefService.swift */,
 				07993C2265D99A08965BAA61 /* SecretScanService.swift */,
 				D6059260CDDBEFAD1D8B25EE /* SojournLog.swift */,
@@ -560,6 +586,15 @@
 			path = SojournTests;
 			sourceTree = "<group>";
 		};
+		E4390F68A76BDF2A31AB03C1 /* MasHelper */ = {
+			isa = PBXGroup;
+			children = (
+				8D6ADA76780BBF30B8F9F8D3 /* main.swift */,
+				885D1B68EB7366BB93BB0DFA /* MasHelperService.swift */,
+			);
+			path = MasHelper;
+			sourceTree = "<group>";
+		};
 		E7BED3DB067A81B0C64AE9EC /* SojournUITests */ = {
 			isa = PBXGroup;
 			children = (
@@ -599,6 +634,7 @@
 		F1B336C23BC566D8FC6623BC = {
 			isa = PBXGroup;
 			children = (
+				E4390F68A76BDF2A31AB03C1 /* MasHelper */,
 				1EBA80D95A728FBBF2987A09 /* Sojourn */,
 				E34DB116FC2DC6D41E6A6108 /* SojournTests */,
 				E7BED3DB067A81B0C64AE9EC /* SojournUITests */,
@@ -681,6 +717,23 @@
 			productReference = 5067374206B171480C067C6A /* SojournTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		91A31580165B19BE5C6D6C8B /* MasHelper */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B2C6763179968C37CC3588BC /* Build configuration list for PBXNativeTarget "MasHelper" */;
+			buildPhases = (
+				1F71087C640EB8BDBF15AE48 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MasHelper;
+			packageProductDependencies = (
+			);
+			productName = MasHelper;
+			productReference = 3BF1AACCC465682DC48834DF /* MasHelper */;
+			productType = "com.apple.product-type.tool";
+		};
 		940E88B3F1FF4F0B348B13A6 /* Sojourn */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 2D4A2A3120869E1A7EFCC9F7 /* Build configuration list for PBXNativeTarget "Sojourn" */;
@@ -689,10 +742,12 @@
 				4238063442628CD3CA847C39 /* Sources */,
 				7C1898715F990B521D28067B /* Resources */,
 				9C4284049F2422D90142F370 /* Frameworks */,
+				B13F7BEE7DDF897669AC04AE /* Embed MasHelper binary + launchd plist */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				1BC543AB0DB7E6DDC3D36566 /* PBXTargetDependency */,
 			);
 			name = Sojourn;
 			packageProductDependencies = (
@@ -721,6 +776,10 @@
 						DevelopmentTeam = "";
 						ProvisioningStyle = Automatic;
 					};
+					91A31580165B19BE5C6D6C8B = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
 					940E88B3F1FF4F0B348B13A6 = {
 						DevelopmentTeam = "";
 						ProvisioningStyle = Automatic;
@@ -745,6 +804,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
+				91A31580165B19BE5C6D6C8B /* MasHelper */,
 				940E88B3F1FF4F0B348B13A6 /* Sojourn */,
 				7DA063196B509545940AC43B /* SojournTests */,
 				336FFBA988AC531D54137038 /* SojournUITests */,
@@ -794,9 +854,42 @@
 			shellPath = /bin/sh;
 			shellScript = "# Re-sign gitleaks and age with hardened runtime\n# See docs/ARCHITECTURE.md §11 (bundled binaries)\nif [ -f \"${SRCROOT}/scripts/sign.sh\" ]; then\n  \"${SRCROOT}/scripts/sign.sh\" \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/Contents/Resources/bin\"\nfi\n";
 		};
+		B13F7BEE7DDF897669AC04AE /* Embed MasHelper binary + launchd plist */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/MasHelper/Launchd.plist",
+				"$(BUILT_PRODUCTS_DIR)/industries.bizarre.Sojourn.helper",
+			);
+			name = "Embed MasHelper binary + launchd plist";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/$(PRODUCT_NAME).app/Contents/MacOS/industries.bizarre.Sojourn.helper",
+				"$(BUILT_PRODUCTS_DIR)/$(PRODUCT_NAME).app/Contents/Library/LaunchDaemons/industries.bizarre.Sojourn.helper.plist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# SMAppService.daemon(plistName:) requires:\n#   1) helper binary at Contents/MacOS/<helper-name>\n#   2) launchd plist at Contents/Library/LaunchDaemons/<plist-name>\n# The plist's BundleProgram field points at the binary's\n# bundle-relative path. Per ADR-0024 + council 2026-05-03.\nset -euo pipefail\napp_bundle=\"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app\"\nsrc_bin=\"${BUILT_PRODUCTS_DIR}/industries.bizarre.Sojourn.helper\"\ndst_bin_dir=\"${app_bundle}/Contents/MacOS\"\ndst_plist_dir=\"${app_bundle}/Contents/Library/LaunchDaemons\"\n\nmkdir -p \"${dst_bin_dir}\" \"${dst_plist_dir}\"\ncp \"${src_bin}\" \"${dst_bin_dir}/industries.bizarre.Sojourn.helper\"\ncp \"${SRCROOT}/MasHelper/Launchd.plist\" \"${dst_plist_dir}/industries.bizarre.Sojourn.helper.plist\"\n\n# Re-codesign the embedded binary in the same step. Without\n# this the helper retains its standalone signature which\n# references its original path, and macOS rejects the\n# SMAppService.register() call.\nif [ -n \"${EXPANDED_CODE_SIGN_IDENTITY:-}\" ]; then\n  codesign --force --options=runtime \\\n    --entitlements \"${SRCROOT}/MasHelper/MasHelper.entitlements\" \\\n    --sign \"${EXPANDED_CODE_SIGN_IDENTITY}\" \\\n    \"${dst_bin_dir}/industries.bizarre.Sojourn.helper\"\nelse\n  codesign --force --sign - \\\n    --entitlements \"${SRCROOT}/MasHelper/MasHelper.entitlements\" \\\n    \"${dst_bin_dir}/industries.bizarre.Sojourn.helper\"\nfi\n";
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		1F71087C640EB8BDBF15AE48 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				611FBB090546801CDE52B8A7 /* MasHelperProtocol.swift in Sources */,
+				A9A1ACC2E910BABFA68FCDA2 /* MasHelperService.swift in Sources */,
+				E83D3436EED0F981FD480712 /* main.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		4238063442628CD3CA847C39 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -856,6 +949,9 @@
 				368EF18A0521C70C0CFA7796 /* MachinesPane.swift in Sources */,
 				E72C0687340E4387E829A79E /* MainWindowView.swift in Sources */,
 				F40C659088BA7D50CF171576 /* ManagerSnapshot.swift in Sources */,
+				AB65C0850E45096716071226 /* MasHelperClient.swift in Sources */,
+				AA33BC82E753FD68DFD4B771 /* MasHelperProtocol.swift in Sources */,
+				C9B5636F619F4D29C1EC1E72 /* MasService.swift in Sources */,
 				7B98835FDA9E4A886C5F474B /* Modals.swift in Sources */,
 				5637BD907CE29C5CEA91B8EB /* OnboardPane.swift in Sources */,
 				C63650F6F57BDB8D36CDC7E9 /* OrphanCandidate.swift in Sources */,
@@ -911,6 +1007,7 @@
 				85BADF9EB318C9F3BD3588AE /* JobRunnerTimeoutPolicyTests.swift in Sources */,
 				739CFE8BD8A15E3E95B5B376 /* KeychainBrokerTests.swift in Sources */,
 				6AC8674D8D977F7C108ADF81 /* LogBufferTests.swift in Sources */,
+				4BAE706F0368C1E47768E36C /* MasHelperClientTests.swift in Sources */,
 				DEC7987D1C49E0302153500B /* PersistenceTests.swift in Sources */,
 				3459760BF114763DEA982DC3 /* RedactorTests.swift in Sources */,
 				ABF59B843BD9670834DF9AB3 /* ServicesTests.swift in Sources */,
@@ -933,6 +1030,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		1BC543AB0DB7E6DDC3D36566 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 91A31580165B19BE5C6D6C8B /* MasHelper */;
+			targetProxy = C34A9E6A23B2D74308BEF6AE /* PBXContainerItemProxy */;
+		};
 		70C82EA66B9FA3604114CDB1 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 940E88B3F1FF4F0B348B13A6 /* Sojourn */;
@@ -1041,7 +1143,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Sojourn/Sojourn.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 22;
+				CURRENT_PROJECT_VERSION = 23;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Sojourn/Info.plist;
@@ -1082,7 +1184,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Sojourn/Sojourn.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 22;
+				CURRENT_PROJECT_VERSION = 23;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Sojourn/Info.plist;
@@ -1098,6 +1200,31 @@
 				xcconfig = Sojourn/Config/Release.xcconfig;
 			};
 			name = Release;
+		};
+		A791B816A1F505C6DAA09093 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = MasHelper/MasHelper.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				CREATE_INFOPLIST_SECTION_IN_BINARY = YES;
+				CURRENT_PROJECT_VERSION = 24;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = MasHelper/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 0.3.0;
+				PRODUCT_BUNDLE_IDENTIFIER = industries.bizarre.Sojourn.helper;
+				PRODUCT_NAME = industries.bizarre.Sojourn.helper;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_UPCOMING_FEATURE_EXISTENTIAL_ANY = YES;
+			};
+			name = Debug;
 		};
 		B0212FD4523A6328DF7D5A92 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -1134,6 +1261,31 @@
 				TEST_TARGET_NAME = Sojourn;
 			};
 			name = Debug;
+		};
+		B8B5FF389D7210D94E0FAE52 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = MasHelper/MasHelper.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				CREATE_INFOPLIST_SECTION_IN_BINARY = YES;
+				CURRENT_PROJECT_VERSION = 24;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = MasHelper/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 0.3.0;
+				PRODUCT_BUNDLE_IDENTIFIER = industries.bizarre.Sojourn.helper;
+				PRODUCT_NAME = industries.bizarre.Sojourn.helper;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_UPCOMING_FEATURE_EXISTENTIAL_ANY = YES;
+			};
+			name = Release;
 		};
 		BF3A7C66B8AE7137C7DC38D6 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -1207,6 +1359,15 @@
 			buildConfigurations = (
 				5CC4F7F4C027C06BA4EB3D29 /* Debug */,
 				735CDFFBC5E8C059EACD4295 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		B2C6763179968C37CC3588BC /* Build configuration list for PBXNativeTarget "MasHelper" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A791B816A1F505C6DAA09093 /* Debug */,
+				B8B5FF389D7210D94E0FAE52 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

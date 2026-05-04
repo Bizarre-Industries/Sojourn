@@ -23,6 +23,16 @@ fi
 
 payload="$(cat)"
 
+# Most Bash calls are harmless probes. Avoid jq + regex-loop overhead
+# unless the raw payload contains a token this hook can actually act on.
+case "$payload" in
+  *WebFetch*|*notarytool*|*stapler*|*codesign*|*sign_update*|*softwareupdate*|*gh\ release*|*gh\ repo*|*gh\ pr*|*gh\ issue*|*op\ item*|*op\ signout*|*defaults*|*PlistBuddy*|*SMAppService*|*launchctl*|*mas*|*container*|*curl*|*wget*|*--no-verify*|*rm\ -rf*|*git\ push*|*git\ reset*|*git\ tag\ -d*|*git\ branch\ -D*|*git\ rebase\ --abort*|*diskutil*|*sudo*|*chmod\ 777*|*chmod\ -R\ 777*)
+    ;;
+  *)
+    exit 0
+    ;;
+esac
+
 tool_name="$(echo "$payload" | jq -r '.tool_name // empty')"
 command_str="$(echo "$payload" | jq -r '.tool_input.command // .tool_input.url // empty')"
 
@@ -108,14 +118,14 @@ declare -a watch_patterns=(
 reminder=""
 
 for c in "${watch_combos[@]}"; do
-  if echo "$command_str" | grep -qE "$c"; then
+  if echo "$command_str" | grep -qE -- "$c"; then
     reminder="State-mutating operation detected: '${c}'. Before relying on this call, confirm: (1) the flag/subcommand is still spelled correctly in the current upstream version (\`<tool> --help\` or man page), (2) the operation is reversible OR a snapshot was taken first, (3) any required env vars / secrets are loaded from 1Password and not committed. If you can't verify, ask before running."
     break
   fi
 done
 
 for p in "${watch_patterns[@]}"; do
-  if echo "$command_str" | grep -qE "$p"; then
+  if echo "$command_str" | grep -qE -- "$p"; then
     if [ -n "$reminder" ]; then
       reminder="${reminder} Additionally, the command matches a high-risk shell pattern ('${p}'). Confirm this is intended; the disk-bricking deny-list catches only the most catastrophic cases — '--force' / '-D' / 'reset --hard' destroy work without prompting."
     else

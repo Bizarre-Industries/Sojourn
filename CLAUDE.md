@@ -1,8 +1,9 @@
-# CLAUDE.md — entry point for any AI agent (Claude Code, Cursor, Codex, Aider, future) editing Sojourn
+# CLAUDE.md — Claude Code mirror for agents editing Sojourn
 
-This file is the single source. Replaces the previous `CLAUDE.md` +
-`AGENTS.md` split (consolidated 2026-05-01 per v0.2 pivot). Read top to
-bottom before touching code.
+`AGENTS.md` is the agent-agnostic source. This file is kept as the
+Claude Code mirror because Claude loads this name natively. Keep both
+files semantically in sync before committing agent workflow changes.
+Read top to bottom before touching code.
 
 ## What Sojourn is
 
@@ -21,8 +22,9 @@ top-to-bottom. Do not pause for confirmation on routine work.
 You may pause only on:
 
 - A council deliberation has been requested by the trigger list (below)
-  and the verdict has not yet been written to
-  `.claude/council-logs/`. Wait for the file, then read it before acting.
+  and the verdict has not yet been written to the matching
+  `.claude/council-logs/` or `.codex/council-logs/` directory. Wait for
+  the file, then read it before acting.
 - The plan's premise has been invalidated by something you discovered
   (an upstream tool was archived, an Apple API was removed, a CVE
   changed the threat model). Update the plan in place, commit the
@@ -55,11 +57,13 @@ Council automatically fires before you commit a change that does any of:
 - Touches `Sojourn/Secrets/`, `Sojourn/Policy/`, signing configuration,
   or `notarize.yml`.
 
-Council members are five `.claude/agents/council-*.md` subagents:
-`architect`, `security`, `devil-advocate`, `ux-critic`, `perf-skeptic`.
-They fire in parallel single-shot, return structured `Decision /
-Dissents / Risks`. You write a deliberation log to
-`.claude/council-logs/<YYYY-MM-DD>-<slug>.md` before continuing.
+Council members are five mirrored subagents: Claude Code reads
+`.claude/agents/council-*.md`; Codex reads `.codex/agents/council-*.toml`.
+Roles are `architect`, `security`, `devil-advocate`, `ux-critic`,
+`perf-skeptic`. They fire in parallel single-shot, return structured
+`Decision / Dissents / Risks`. You write a deliberation log to the
+matching `.claude/council-logs/<YYYY-MM-DD>-<slug>.md` or
+`.codex/council-logs/<YYYY-MM-DD>-<slug>.md` before continuing.
 
 Everything else: spawn one `self-critique` subagent on the diff before
 commit. Cheaper, catches obvious mistakes, doesn't need formal logging.
@@ -198,19 +202,26 @@ commit. Cheaper, catches obvious mistakes, doesn't need formal logging.
 - `docs/` — strict Diátaxis. `decisions/` (ADRs), `process/`,
   `design/` are siblings.
   - `docs/process/plans/v0.X-plan.md` — current execution target.
-- `.claude/` — agent config.
+- `.claude/` — Claude Code config.
   - `.claude/agents/council-*.md` — 5 council members.
   - `.claude/agents/mechanical.md` — Haiku-backed for rename/move/format.
   - `.claude/hooks/` — `replan-on-tag.sh`, `mark-replanned.sh`,
-    `never-guess.sh`.
+    `never-guess.sh`, `pre-commit-gitleaks.sh`.
   - `.claude/council-logs/` — deliberation transcripts.
   - `.claude/.last-shipped-tag` — replan-on-tag marker (ignored from git).
+- `.codex/` — Codex config.
+  - `.codex/agents/*.toml` — Codex mirrors of the Claude subagents.
+  - `.codex/hooks.json` + `.codex/hooks/` — Codex lifecycle hooks.
+  - `.codex/council-logs/` — Codex deliberation transcripts.
+  - `.codex/.last-shipped-tag` — replan-on-tag marker (ignored from git).
+- `.agents/skills/` — Codex project skills. Mirrors `.claude/skills/`.
 
-## Skills (`.claude/skills/`)
+## Skills (`.agents/skills/` and `.claude/skills/`)
 
 Project-local skills are loaded automatically. Invoke them via the
 Skill tool when a task matches the trigger; do not paraphrase what
-they teach. Roster:
+they teach. Codex reads `.agents/skills`; Claude Code reads
+`.claude/skills`. Keep the two trees mirrored. Roster:
 
 - **`swift-concurrency`** — actor isolation, Sendable, @MainActor,
   data race fixes, async/await migration. Trigger: any change inside
@@ -235,20 +246,23 @@ they teach. Roster:
 - **`sojourn-stage-workflow`** — codifies the v0.X 8-stage release
   loop (bump build → ADRs → council → service → pane → tests →
   gitleaks → commit → next stage). Invoke at the start of every
-  stage to skip re-deriving the loop from CLAUDE.md.
+  stage to skip re-deriving the loop from this file.
 
 When a skill applies, invoke it via the Skill tool BEFORE writing
 code. Skipping the skill and re-deriving its content burns tokens
 and produces inconsistent output across sessions.
 
-## Slash commands (`.claude/commands/`)
+## Slash commands and app commands
 
-Project-local commands are user-invokable shortcuts:
+Claude Code project-local commands live in `.claude/commands/`.
+Codex equivalents are exposed through native tools, hooks, and
+subagents rather than Markdown slash-command files. Current shortcuts:
 
 - **`/council`** — fire the 5-member council on the current diff.
   Equivalent to dispatching all 5 council-* subagents in parallel,
   collecting verdicts, writing a deliberation log to
-  `.claude/council-logs/<date>-<slug>.md`.
+  `.claude/council-logs/<date>-<slug>.md` or
+  `.codex/council-logs/<date>-<slug>.md`.
 - **`/stage-commit`** — pre-flight a stage commit: gitleaks, swift
   build, xcodebuild test, self-critique on diff. Bumps
   `CURRENT_PROJECT_VERSION`. Drafts the commit message.

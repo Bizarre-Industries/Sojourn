@@ -40,6 +40,7 @@ outcome.
 | [0024](../decisions/0024-mas-touch-id-privileged-helper.md) | mas Touch-ID privileged helper | [2026-05-03-v0.3-adr-batch](../../.claude/council-logs/2026-05-03-v0.3-adr-batch.md) | "mas requires sudo on macOS 14.8.2+ / 15.7.2+ / 26.1+" |
 | [0025](../decisions/0025-sparkle-delta-updates.md) | Sparkle delta updates | [2026-05-03-v0.3-adr-batch](../../.claude/council-logs/2026-05-03-v0.3-adr-batch.md), [2026-05-04-stage6-sparkle-delta](../../.claude/council-logs/2026-05-04-stage6-sparkle-delta.md) | — (pending v0.3.0 corrupt-delta VM smoke) |
 | [0026](../decisions/0026-multi-machine-conflict-ux.md) | Multi-machine refuse-and-show-diff | [2026-05-03-v0.3-adr-batch](../../.claude/council-logs/2026-05-03-v0.3-adr-batch.md), [2026-05-04-stage5-conflict-resolver](../../.claude/council-logs/2026-05-04-stage5-conflict-resolver.md) | — |
+| [0027](../decisions/0027-agent-tooling-bridges.md) | Project-scoped agent tooling bridges | [2026-05-04-release-signing-and-agent-tooling](../../.codex/council-logs/2026-05-04-release-signing-and-agent-tooling.md) | "Global peer-agent MCP bridges must not point at another repo" |
 
 ## Council logs without an ADR
 

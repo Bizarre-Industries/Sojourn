@@ -52,7 +52,7 @@ notarize-*.json
 *.swo
 *~
 
-# Project-local harness (Claude Code, remember)
+# Project-local harness (Claude Code + Codex)
 # .claude/ tracks settings.json + hooks/ (replan-on-ship infra), but
 # ignores per-clone state (last-shipped-tag marker, local settings).
 .claude/*
@@ -67,10 +67,22 @@ notarize-*.json
 .claude-cache/
 .claude-plans/
 
-# Plugin-managed skill caches and lockfiles. The canonical project
-# skills live under .claude/skills/; .agents/ is a plugin-driven
-# duplicate that drifts and should never be committed.
-.agents/
+# Codex project config and skills. Codex reads repository skills from
+# .agents/skills and lifecycle hooks/config from .codex/.
+.codex/*
+!.codex/config.toml
+!.codex/hooks.json
+!.codex/hooks/
+!.codex/hooks/**
+!.codex/agents/
+!.codex/agents/**
+!.codex/council-logs/
+!.codex/council-logs/**
+.codex/.last-shipped-tag
+.codex/settings.local.toml
+.agents/*
+!.agents/skills/
+!.agents/skills/**
 skills-lock.json
 .remember/
 .task/

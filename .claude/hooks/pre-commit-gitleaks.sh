@@ -13,22 +13,40 @@
 # - On leak: emits permissionDecision=deny + the leak summary.
 # - On clean: emits no output (allows the commit).
 #
-# Skips gracefully if jq or gitleaks aren't installed (logged to
-# stderr, exit 0).
+# Skips gracefully for non-commit commands if jq or gitleaks are not
+# installed. Fails closed for commit commands when either dependency is
+# missing.
 
 set -euo pipefail
 
+payload="$(cat)"
+
+raw_has_commit() {
+  echo "$payload" | grep -qE '(^|[^a-zA-Z])git[[:space:]]+commit([[:space:]]|$)'
+}
+
+deny_static() {
+  local reason="$1"
+  printf '{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"%s"}}\n' "$reason"
+}
+
 if ! command -v jq >/dev/null 2>&1; then
-  echo "pre-commit-gitleaks.sh: jq not found, skipping" >&2
+  if raw_has_commit; then
+    deny_static "AGENTS.md requires gitleaks before every auto-commit. jq is missing, so the hook cannot verify this commit. Install jq with 'brew install jq' and retry."
+  else
+    echo "pre-commit-gitleaks.sh: jq not found, skipping non-commit command" >&2
+  fi
   exit 0
 fi
 
 if ! command -v gitleaks >/dev/null 2>&1; then
-  echo "pre-commit-gitleaks.sh: gitleaks not found, skipping" >&2
+  if raw_has_commit; then
+    deny_static "AGENTS.md requires gitleaks before every auto-commit. gitleaks is missing, so this commit is blocked. Install gitleaks with 'brew install gitleaks' or put it on PATH, then retry."
+  else
+    echo "pre-commit-gitleaks.sh: gitleaks not found, skipping non-commit command" >&2
+  fi
   exit 0
 fi
-
-payload="$(cat)"
 
 tool_name="$(echo "$payload" | jq -r '.tool_name // empty')"
 command_str="$(echo "$payload" | jq -r '.tool_input.command // empty')"
@@ -43,10 +61,19 @@ if ! echo "$command_str" | grep -qE '(^|[^a-zA-Z])git[[:space:]]+commit([[:space
   exit 0
 fi
 
-# Skip if --no-verify is being used. CLAUDE.md disallows it
-# (security review separately enforces). The general never-guess.sh
-# already pattern-matches --no-verify in its watch_patterns.
-if echo "$command_str" | grep -qE '(--no-verify|--no-gpg-sign)'; then
+deny() {
+  local reason="$1"
+  jq -n --arg reason "$reason" '{
+    hookSpecificOutput: {
+      hookEventName: "PreToolUse",
+      permissionDecision: "deny",
+      permissionDecisionReason: $reason
+    }
+  }'
+}
+
+if echo "$command_str" | grep -qE -- '--no-verify'; then
+  deny "AGENTS.md requires gitleaks before every auto-commit. Remove --no-verify and retry."
   exit 0
 fi
 
@@ -78,10 +105,4 @@ To proceed:
    .gitleaks.toml::[allowlist].regexes.
 3. Re-stage the fix and retry the commit."
 
-jq -n --arg reason "$reason" '{
-  hookSpecificOutput: {
-    hookEventName: "PreToolUse",
-    permissionDecision: "deny",
-    permissionDecisionReason: $reason
-  }
-}'
+deny "$reason"

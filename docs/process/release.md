@@ -104,18 +104,21 @@ are the local equivalents of the macOS jobs in `build.yml`.
 ### Replan-on-ship hook
 
 Opening an agent session in this repo after a `v*` tag is pushed fires
-`.Codex/hooks/replan-on-tag.sh`. The hook compares `git tag -l 'v*'`
-against the per-clone marker `.Codex/.last-shipped-tag` (gitignored). If
-a new tag is found, the next session writes the next active plan at
+the project replan hook. Claude Code uses `.claude/hooks/replan-on-tag.sh`
+and Codex uses `.codex/hooks/replan-on-tag.sh`. Each hook compares
+`git tag -l 'v*'` against its per-clone marker
+`.claude/.last-shipped-tag` or `.codex/.last-shipped-tag` (gitignored).
+If a new tag is found, the next session writes the next active plan at
 `docs/process/plans/v0.X-plan.md`.
 
 After the new plan is written and approved, advance the marker with
-`bash .Codex/hooks/mark-replanned.sh <tag>` so subsequent sessions start
-clean. The marker is **per-clone, never committed**.
+`bash .claude/hooks/mark-replanned.sh <tag>` for Claude Code or
+`bash .codex/hooks/mark-replanned.sh <tag>` for Codex so subsequent
+sessions start clean. The marker is **per-clone, never committed**.
 
-Manual override: edit `.Codex/.last-shipped-tag` directly (or `rm` it to
-re-trigger), or write a tag string the hook should treat as "already
-replanned."
+Manual override: edit the matching `.last-shipped-tag` directly (or
+`rm` it to re-trigger), or write a tag string the hook should treat as
+"already replanned."
 
 ## Troubleshooting
 

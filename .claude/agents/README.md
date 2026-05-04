@@ -1,7 +1,9 @@
-# `.claude/agents/` — Sojourn agent roster
+# Sojourn agent roster
 
 Drives the council and self-critique pattern described in
-[`CLAUDE.md`](../../CLAUDE.md). Read in this order:
+[`AGENTS.md`](../../AGENTS.md) and mirrored in [`CLAUDE.md`](../../CLAUDE.md).
+Claude Code reads Markdown agents from `.claude/agents`; Codex reads TOML
+agents from `.codex/agents`. Read in this order:
 
 1. **[`self-critique.md`](self-critique.md)** — fires before every
    commit. Single-shot, Opus-backed. Cheap. Finds the most likely

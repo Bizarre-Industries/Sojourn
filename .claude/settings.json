@@ -1,5 +1,5 @@
 {
-  "$comment": "Sojourn project Claude Code settings. Committed to repo, applies to every session in this repo. Pairs with ~/.claude/settings.json (user-global). Per docs/process/plans/v0.X-plan.md and CLAUDE.md.",
+  "$comment": "Sojourn project Claude Code settings. Committed to repo, applies to every session in this repo. Pairs with ~/.claude/settings.json (user-global). Per docs/process/plans/v0.X-plan.md, AGENTS.md, and CLAUDE.md.",
 
   "permissions": {
     "$comment": "defaultMode 'bypassPermissions' = zero pauses for unmatched tools. Deny list catches only laptop-bricking patterns, not project-breaking ones. Council is the runtime sanity check; deny list is the irrecoverable-only safety net.",

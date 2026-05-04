@@ -1,0 +1,17 @@
+[features]
+codex_hooks = true
+
+[shell_environment_policy]
+inherit = "core"
+
+[shell_environment_policy.set]
+"$comment" = "CLAUDE_CODE_SUBAGENT_MODEL controls model used for subagents that have model: inherit. Set to Haiku for cheap mechanical ops; council members and main loop override to Opus 4.7 in their own frontmatter or via this default. Override per-agent via YAML frontmatter 'model: opus' or 'model: claude-opus-4-7'."
+CLAUDE_CODE_SUBAGENT_MODEL = "claude-haiku-4-5-20251001"
+
+[mcp_servers.claude_code]
+command = "claude"
+args = ["mcp", "serve"]
+enabled = false
+required = false
+startup_timeout_sec = 20
+tool_timeout_sec = 600

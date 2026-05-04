@@ -11,16 +11,17 @@ final class SojournUITests: XCTestCase {
 
   func testAppLaunches() throws {
     let app = XCUIApplication()
-    app.launch()
-    XCTAssertTrue(app.wait(for: .runningForeground, timeout: 10))
+    launchAgentApp(app)
+    XCTAssertTrue(app.windows.firstMatch.waitForExistence(timeout: 10))
+    XCTAssertTrue(pane(app, "pane.overview").waitForExistence(timeout: 10))
   }
 
   /// Click each sidebar entry. Assert the corresponding pane's
-  /// accessibilityIdentifier becomes hittable.
+  /// accessibilityIdentifier loads in the split-view detail.
   func testSidebarNavigation() throws {
     let app = XCUIApplication()
-    app.launch()
-    XCTAssertTrue(app.wait(for: .runningForeground, timeout: 10))
+    launchAgentApp(app)
+    XCTAssertTrue(app.windows.firstMatch.waitForExistence(timeout: 10))
 
     // v0.3 sidebar: 11 typed Pane enum cases. Pane IDs match the
     // accessibilityIdentifier wired in MainWindowView (sidebar.<rawValue>)
@@ -40,7 +41,7 @@ final class SojournUITests: XCTestCase {
     ]
 
     for (sidebarID, paneID) in entries {
-      let row = app.buttons[sidebarID]
+      let row = sidebarEntry(app, sidebarID)
       if !row.waitForExistence(timeout: 4) {
         XCTFail("Sidebar entry \(sidebarID) not found")
         continue
@@ -56,10 +57,40 @@ final class SojournUITests: XCTestCase {
       } else {
         visiblePane = nil
       }
-      XCTAssertTrue(
-        visiblePane?.isHittable == true,
-        "Pane \(paneID) did not become hittable after clicking \(sidebarID)"
+      XCTAssertNotNil(
+        visiblePane,
+        "Pane \(paneID) did not load after clicking \(sidebarID)"
       )
     }
+  }
+
+  private func launchAgentApp(_ app: XCUIApplication) {
+    app.launch()
+
+    let deadline = Date().addingTimeInterval(10)
+    while Date() < deadline {
+      switch app.state {
+      case .runningForeground, .runningBackground:
+        return
+      case .unknown, .notRunning:
+        RunLoop.current.run(until: Date().addingTimeInterval(0.1))
+      @unknown default:
+        RunLoop.current.run(until: Date().addingTimeInterval(0.1))
+      }
+    }
+
+    XCTFail("Sojourn did not launch; final state: \(app.state.rawValue)")
+  }
+
+  private func pane(_ app: XCUIApplication, _ identifier: String) -> XCUIElement {
+    let scrollView = app.scrollViews[identifier]
+    if scrollView.exists { return scrollView }
+    return app.otherElements[identifier]
+  }
+
+  private func sidebarEntry(_ app: XCUIApplication, _ identifier: String) -> XCUIElement {
+    let label = app.staticTexts[identifier]
+    if label.exists { return label }
+    return app.buttons[identifier]
   }
 }

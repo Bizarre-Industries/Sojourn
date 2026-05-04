@@ -116,6 +116,24 @@ numbers 21 → 28 walk through stages 1-8.
 - `Package.swift` excludes `Services/SparkleService.swift` from the
   SPM library build (Sparkle binaryTarget needs an AppKit bundle;
   Xcode-only via project.yml dependencies).
+- `BootstrapState.installingMas` — additive enum case for the
+  `brew install mas` step in `BootstrapService.proceed()`.
+  `probeTools` now includes `mas` so the bootstrap rail surfaces
+  the install latency.
+- `Sojourn/UI/Modals.swift::BootstrapView` rail extended to 8 steps
+  (PROBE / CONSENT / XCODE CLT / HOMEBREW / MPM / CHEZMOI / MAS /
+  READY); progress fractions adjusted; `STEP n / 8` labels.
+- `Sojourn/UI/Panes/OnboardPane.swift` — replaced v0.2 stub with
+  inline bootstrap status row + "Setup new dotfiles repo" section.
+  "Copy repro-drift issue template to dotfiles repo" button uses
+  `fileImporter`, security-scoped resource access, and `FileManager`
+  to write `<repo>/.github/ISSUE_TEMPLATE/repro-drift.md`.
+- `Sojourn/Resources/data/repro-drift.md` — bundled template
+  (matches `.github/ISSUE_TEMPLATE/repro-drift.md`) so the copy
+  flow runs offline.
+- `SojournTests/Services/BootstrapServiceMasInstallTests.swift` —
+  5 tests (probeTools shape, installingMas pattern-match, bundle
+  resolution).
 - `MasHelper` Xcode target (Swift command-line tool) — privileged
   daemon binary `industries.bizarre.Sojourn.helper` embedded at
   `Sojourn.app/Contents/MacOS/`. Listens on

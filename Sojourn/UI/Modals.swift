@@ -29,7 +29,8 @@ struct BootstrapView: View {
     .init(id: "4", label: "HOMEBREW"),
     .init(id: "5", label: "MPM"),
     .init(id: "6", label: "CHEZMOI"),
-    .init(id: "7", label: "READY")
+    .init(id: "7", label: "MAS"),
+    .init(id: "8", label: "READY")
   ]
 
   private var activeStep: Int {
@@ -40,7 +41,8 @@ struct BootstrapView: View {
     case .installingBrew: return 3
     case .installingMPM: return 4
     case .installingChezmoi: return 5
-    case .ready: return 6
+    case .installingMas: return 6
+    case .ready: return 7
     case .failed: return 1
     }
   }
@@ -159,7 +161,7 @@ struct BootstrapView: View {
   private var contentBody: some View {
     switch state {
     case .unknown, .probingSystem:
-      stepHeader(stepLabel: "STEP 1 / 7 · PROBING", title: "WHAT'S ON THIS MAC?")
+      stepHeader(stepLabel: "STEP 1 / 8 · PROBING", title: "WHAT'S ON THIS MAC?")
       Text("Walking ToolLocator's hardcoded candidate paths for git, brew, chezmoi, age, gitleaks. App-context $PATH is LaunchServices-minimal — `which` lies here, so we probe explicit paths.")
         .font(.bzrBody(size: 13))
         .foregroundStyle(Color.txtSecondary)
@@ -168,7 +170,7 @@ struct BootstrapView: View {
         .padding(.top, 8)
 
     case .reportingStatus(let inv), .awaitingUserConsent(let inv):
-      stepHeader(stepLabel: "STEP 2 / 7 · CONSENT", title: "INSTALL WHAT'S MISSING?")
+      stepHeader(stepLabel: "STEP 2 / 8 · CONSENT", title: "INSTALL WHAT'S MISSING?")
       Text("Probe done. We'll install missing tools and ask macOS for one Authorization dialog up front. Bundled gitleaks + age stay inside Sojourn.app — no system install needed.")
         .font(.bzrBody(size: 13))
         .foregroundStyle(Color.txtSecondary)
@@ -200,7 +202,7 @@ struct BootstrapView: View {
 
     case .installingCLT:
       installingPane(
-        stepLabel: "STEP 3 / 7 · INSTALLING",
+        stepLabel: "STEP 3 / 8 · INSTALLING",
         title: "XCODE COMMAND LINE TOOLS",
         subtitle: "macOS sheet is open. We're polling xcode-select -p every 5s and watching for exit code 0. Minimize to the menu bar — Sojourn will keep going.",
         progress: 0.30
@@ -208,30 +210,38 @@ struct BootstrapView: View {
 
     case .installingBrew:
       installingPane(
-        stepLabel: "STEP 4 / 7 · INSTALLING",
+        stepLabel: "STEP 4 / 8 · INSTALLING",
         title: "HOMEBREW",
         subtitle: "Signed .pkg installer via /usr/sbin/installer. Authorization.framework prompt — no curl|bash. Apple-Silicon prefix /opt/homebrew. ~2 min.",
-        progress: 0.50
+        progress: 0.45
       )
 
     case .installingMPM:
       installingPane(
-        stepLabel: "STEP 5 / 7 · INSTALLING",
+        stepLabel: "STEP 5 / 8 · INSTALLING",
         title: "META-PACKAGE-MANAGER",
         subtitle: "brew install --no-quarantine. Sojourn shells out to brew bundle for the declarative source of truth. brew bundle natively manages 11 ecosystems (brew, cask, mas, vscode, go, cargo, uv, krew, npm, flatpak, tap) per ADR-0018.",
-        progress: 0.70
+        progress: 0.60
       )
 
     case .installingChezmoi:
       installingPane(
-        stepLabel: "STEP 6 / 7 · INSTALLING",
+        stepLabel: "STEP 6 / 8 · INSTALLING",
         title: "CHEZMOI",
         subtitle: "brew install chezmoi. Templates + age encryption + per-host overrides. Pinned 2.70.2+ for the --format=json status output.",
+        progress: 0.78
+      )
+
+    case .installingMas:
+      installingPane(
+        stepLabel: "STEP 7 / 8 · INSTALLING",
+        title: "MAS",
+        subtitle: "brew install mas. Mac App Store CLI used by MasHelper for Touch-ID-gated install/upgrade of App Store apps without per-call password prompts.",
         progress: 0.90
       )
 
     case .ready:
-      stepHeader(stepLabel: "STEP 7 / 7 · READY", title: "YOUR MAC IS YOUR MAC.")
+      stepHeader(stepLabel: "STEP 8 / 8 · READY", title: "YOUR MAC IS YOUR MAC.")
       Text("All tools detected. You can close this and start carrying. Configure a remote in Settings → Sync to start pushing.")
         .font(.bzrBody(size: 13))
         .foregroundStyle(Color.txtSecondary)

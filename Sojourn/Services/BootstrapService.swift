@@ -26,6 +26,7 @@ internal enum BootstrapState: Sendable, Equatable {
   case installingBrew
   case installingMPM
   case installingChezmoi
+  case installingMas
   case ready
   case failed(String)
 
@@ -54,7 +55,7 @@ internal final class BootstrapService {
     self.subprocess = subprocess
   }
 
-  internal static let probeTools = ["brew", "git", "chezmoi", "age", "gitleaks"]
+  internal static let probeTools = ["brew", "git", "chezmoi", "age", "gitleaks", "mas"]
 
   internal func probe() async {
     let signpost = SojournSignpost.bootstrap
@@ -115,6 +116,14 @@ internal final class BootstrapService {
       state = .installingChezmoi
       if await brewInstall(formula: "chezmoi") == false {
         state = .failed("chezmoi install via brew failed.")
+        return
+      }
+    }
+
+    if inv.missing.contains("mas") {
+      state = .installingMas
+      if await brewInstall(formula: "mas") == false {
+        state = .failed("mas install via brew failed.")
         return
       }
     }

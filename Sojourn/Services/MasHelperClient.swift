@@ -22,7 +22,7 @@ internal struct MasInvocationResult: Sendable, Equatable {
 
   internal var didSucceed: Bool { exitCode == 0 }
   internal var didTimeOut: Bool { exitCode == masHelperTimeoutExitCode }
-  internal var didReject: Bool  { exitCode == masHelperInvalidInputExitCode }
+  internal var didReject: Bool { exitCode == masHelperInvalidInputExitCode }
 }
 
 internal enum MasHelperClientError: Error, Sendable, Equatable, CustomStringConvertible {
@@ -98,7 +98,7 @@ internal actor MasHelperClient {
   private func ensureConnection() throws -> NSXPCConnection {
     if let connection { return connection }
     let conn = NSXPCConnection(machServiceName: masHelperMachServiceName, options: .privileged)
-    conn.remoteObjectInterface = NSXPCInterface(with: MasHelperProtocol.self)
+    conn.remoteObjectInterface = NSXPCInterface(with: (any MasHelperProtocol).self)
 #if !DEBUG
     let requirement = """
       anchor apple generic \
@@ -142,7 +142,7 @@ internal actor MasHelperClient {
       let proxy = conn.remoteObjectProxyWithErrorHandler { error in
         continuation.resume(throwing: MasHelperClientError.helperUnreachable(error.localizedDescription))
       }
-      guard let typedProxy = proxy as? MasHelperProtocol else {
+      guard let typedProxy = proxy as? any MasHelperProtocol else {
         continuation.resume(throwing: MasHelperClientError.invalidProxyShape)
         return
       }
@@ -160,7 +160,7 @@ internal actor MasHelperClient {
       let proxy = conn.remoteObjectProxyWithErrorHandler { error in
         continuation.resume(throwing: MasHelperClientError.helperUnreachable(error.localizedDescription))
       }
-      guard let typedProxy = proxy as? MasHelperProtocol else {
+      guard let typedProxy = proxy as? any MasHelperProtocol else {
         continuation.resume(throwing: MasHelperClientError.invalidProxyShape)
         return
       }

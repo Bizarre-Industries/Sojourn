@@ -22,18 +22,7 @@ internal actor CleanupService {
   }
 
   internal func loadBundledRegistry() {
-    // Resource lookup differs between SPM (Bundle.module flattened by
-    // .process) and Xcode app bundles (Contents/Resources). Both are
-    // probed below.
-    let url: URL? = {
-      #if SWIFT_PACKAGE
-      return Bundle.module.url(forResource: "dotfile_owners", withExtension: "toml")
-      #else
-      return Bundle.main.url(
-        forResource: "dotfile_owners", withExtension: "toml", subdirectory: "data"
-      ) ?? Bundle.main.url(forResource: "dotfile_owners", withExtension: "toml")
-      #endif
-    }()
+    let url = BundledResourceLocator.dotfileOwnersURL()
     guard let url, let text = try? String(contentsOf: url, encoding: .utf8) else {
       return
     }

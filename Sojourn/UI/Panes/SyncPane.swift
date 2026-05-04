@@ -1,13 +1,14 @@
-// Sojourn — v0.2 pane shell
+// Sojourn — SyncPane
 //
-// SyncPane is the consolidated multi-tab surface that hosts the four
-// pre-existing sync sub-panes (push/pull history, conflicts, onboarding,
-// machine writer-lock status). The earlier stub `StubView` is gone now
-// that all v0.2 panes are real.
+// Consolidated multi-tab surface hosting the four sync sub-panes
+// (push/pull history, conflicts, onboarding, machine writer-lock
+// status). Extracted from V02Stubs.swift in v0.3 stage 5 per CLAUDE.md
+// "File names match primary declaration" + ADR-0026 §"Consequences"
+// (V02Stubs.swift wrapper removed).
 //
-// Refs: docs/process/plans/v0.2-plan.md;
-//       ADR-0012 (cooperative writer lock — pull resolves any conflict
-//                 before push is allowed).
+// Refs: ADR-0012 cooperative writer lock — pull resolves any conflict
+//       before push is allowed;
+//       ADR-0026 multi-machine conflict UX.
 
 import SwiftUI
 
@@ -39,7 +40,9 @@ internal struct SyncPane: View {
     }
   }
 
+  @Environment(AppStore.self) private var store
   @State private var tab: Tab = .history
+  @State private var didAutoRoute = false
 
   var body: some View {
     VStack(spacing: 0) {
@@ -68,5 +71,16 @@ internal struct SyncPane: View {
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     .accessibilityIdentifier("pane.sync")
+    .onAppear {
+      // ADR-0026: first-appearance auto-routes to Conflicts tab when
+      // the resolver knows about pending inbound work, so the user
+      // lands on the resolution surface, not History. Guarded by
+      // didAutoRoute so a manual return to History sticks (council
+      // 2026-05-04 ux-critic condition).
+      if !didAutoRoute, case .conflictPending = store.conflictResolver?.state {
+        tab = .conflicts
+        didAutoRoute = true
+      }
+    }
   }
 }

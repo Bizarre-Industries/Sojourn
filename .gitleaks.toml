@@ -23,6 +23,7 @@ paths = [
   '''Sojourn\.xcodeproj/.*''',
   '''Sojourn/Config/.*''',
   '''.claude/.*''',
+  '''\.agents/.*''',
 ]
 
 # Regex allowlist: obvious sample/placeholder patterns.

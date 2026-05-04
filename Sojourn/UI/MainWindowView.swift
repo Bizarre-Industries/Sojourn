@@ -70,9 +70,21 @@ internal struct MainWindowView: View {
   var body: some View {
     NavigationSplitView {
       List(Pane.allCases, selection: $selection) { pane in
-        Label(pane.label, systemImage: pane.icon)
-          .tag(pane)
-          .accessibilityIdentifier("sidebar.\(pane.rawValue)")
+        HStack(spacing: 8) {
+          Label(pane.label, systemImage: pane.icon)
+          if pane == .sync, let count = syncBadgeCount, count > 0 {
+            // ADR-0026 + council 2026-05-04 devil-advocate amendment:
+            // count + glyph (not color-only) so colorblind users get
+            // the signal too.
+            Label("\(count)", systemImage: "exclamationmark.circle.fill")
+              .labelStyle(.titleAndIcon)
+              .font(.caption)
+              .foregroundStyle(.orange)
+              .accessibilityLabel("\(count) inbound commits pending")
+          }
+        }
+        .tag(pane)
+        .accessibilityIdentifier("sidebar.\(pane.rawValue)")
       }
       .navigationTitle("Sojourn")
       .navigationSplitViewColumnWidth(min: 220, ideal: 240, max: 320)
@@ -92,6 +104,19 @@ internal struct MainWindowView: View {
           Task { await store.bootstrap.probe() }
         }
       )
+    }
+  }
+
+  /// Count of inbound commits when ConflictResolver knows about
+  /// pending or blocked work. nil otherwise. ADR-0026 amendment
+  /// "cross-pane conflict-pending visibility" + council 2026-05-04
+  /// devil-advocate amendment (count over dot for fleet visibility).
+  private var syncBadgeCount: Int? {
+    guard let resolver = store.conflictResolver else { return nil }
+    switch resolver.state {
+    case .conflictPending(let commits): return commits.count
+    case .blockedFromPush, .failed:     return resolver.pendingCommits.count > 0 ? resolver.pendingCommits.count : 1
+    case .clean, .detecting, .resolving, .resolved: return nil
     }
   }
 

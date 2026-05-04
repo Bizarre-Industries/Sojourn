@@ -1,0 +1,9 @@
+a1b2c3d4e5f6789012345678901234567890abcd	Alice Engineer	2026-05-04T12:00:00+00:00	feat: add containers panel detection
+ 3 files changed, 120 insertions(+), 4 deletions(-)
+
+b2c3d4e5f6789012345678901234567890abcdef	Bob Developer	2026-05-04T13:30:00+00:00	fix: brew bundle parser ignores comments
+
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+c3d4e5f6789012345678901234567890abcdef01	Carol Maintainer	2026-05-04T14:15:30+00:00	docs: update ADR-0026 copy spec
+ 2 files changed, 8 insertions(+)

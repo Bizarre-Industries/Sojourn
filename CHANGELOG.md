@@ -46,6 +46,46 @@ numbers 21 → 28 walk through stages 1-8.
   effectiveTimeout fallback, watchdog overrun, install/upgrade
   exemption, natural-completion vs watchdog race, cancel vs
   watchdog non-interference.
+- `Sojourn/Sync/ConflictResolver.swift` — refuse-and-show-diff state
+  machine (clean / detecting / conflictPending / resolving / resolved
+  / blockedFromPush / failed) per ADR-0026. Idempotent `detect()`
+  guard; `apply(_:)` cleans up via `git rebase --abort` /
+  `git merge --abort` on failure.
+- `Sojourn/Services/GitService.swift` gains `fetch`, `inboundCommits`,
+  `pullRebase`, `pullMerge`, `parseInboundCommits`, `rebaseAbort`,
+  `mergeAbort`. Revspec args separated by `--`; revspecs starting with
+  `-` rejected (council 2026-05-04 stage5 security condition).
+- `Sojourn/Models/InboundCommit.swift` — Sendable + Identifiable value
+  type for inbound commit metadata (sha, author, ISO8601 date,
+  subject, file-stat).
+- `Sojourn/UI/Panes/SyncPane.swift` — extracted from V02Stubs.swift
+  (deleted); first-appearance auto-routes to Conflicts tab when
+  conflictPending, guarded by `didAutoRoute` so manual navigation
+  sticks.
+- `Sojourn/UI/Panes/ConflictsPane.swift` — replaces v0.2 stub with
+  state-driven UI per ADR-0026 copy spec ("Pull and rebase your
+  work" / "Pull and merge" / "Cancel — leave local alone"). Uses
+  `List(commits, id: \.sha)` row recycling per ADR-0026 amendment.
+- `SyncCoordinator.pull` runs `ConflictResolver.detect` first; if
+  inbound commits present, sets `phase = .awaitingPullDecision(...)`
+  and returns. `.blockedFromPush` is recoverable — pull resets the
+  resolver before re-detecting.
+- `SyncCoordinator.push` refuses while `ConflictResolver.canPush` is
+  false; surfaces `pushBlockedReason` to the user.
+- `SyncPhase.awaitingPullDecision([InboundCommit])` enum case for the
+  conflict-pending phase. `Components.swift::phaseLabel` extended.
+- `MainWindowView` sidebar shows `<count>` plus
+  `exclamationmark.circle.fill` glyph when ConflictResolver is
+  conflictPending / blockedFromPush / failed (count + glyph over
+  color-only dot per council 2026-05-04 amendment).
+- `SojournTests/Sync/ConflictResolverTests.swift` — 6 end-to-end
+  tests using a local bare git repo as the remote.
+- `SojournTests/Services/GitServiceInboundCommitsTests.swift` — 7
+  parser-only tests against
+  `SojournTests/Fixtures/git/inbound-commits.txt`.
+- `.gitleaks.toml` allowlists `.agents/` (gitignored plugin dir
+  triggers false-positive Apple-app-specific-password matches on
+  swiftui-expert-skill heading anchors).
 - `MasHelper` Xcode target (Swift command-line tool) — privileged
   daemon binary `industries.bizarre.Sojourn.helper` embedded at
   `Sojourn.app/Contents/MacOS/`. Listens on

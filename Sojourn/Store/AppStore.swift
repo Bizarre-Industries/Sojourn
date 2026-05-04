@@ -42,6 +42,10 @@ internal final class AppStore {
   internal let bootstrapCoordinator: BootstrapCoordinator
 
   internal var sync: SyncCoordinator?
+  /// Multi-machine conflict resolver per ADR-0026. Lifecycle matches
+  /// `sync`: instantiated by `configureSync(repoURL:)` and shared with
+  /// the SyncCoordinator that observes its state for pull/push gating.
+  internal var conflictResolver: ConflictResolver?
   internal var settings: Settings = .empty
   internal var brewfile: BrewfileAST?
   internal var history: [HistoryEntry] = []
@@ -144,6 +148,8 @@ internal final class AppStore {
   /// cloned their sojourn-data repo locally.
   internal func configureSync(repoURL: URL) {
     guard let git else { return }
+    let resolver = ConflictResolver(git: git, repoURL: repoURL)
+    self.conflictResolver = resolver
     self.sync = SyncCoordinator(
       repoURL: repoURL,
       git: git,
@@ -152,7 +158,8 @@ internal final class AppStore {
       pref: pref,
       secrets: secrets,
       snapshots: snapshots,
-      cooldown: cooldown
+      cooldown: cooldown,
+      conflictResolver: resolver
     )
   }
 

@@ -139,11 +139,13 @@ struct SyncCoordinatorTests {
       runner: runner,
       brewURL: URL(fileURLWithPath: "/opt/homebrew/bin/brew")
     )
+    let resolver = ConflictResolver(git: git, repoURL: workA)
     let coordinator = SyncCoordinator(
       repoURL: workA,
       git: git,
       chezmoi: nil, brewBundle: brewBundle, pref: nil, secrets: nil,
-      snapshots: snap, cooldown: cooldown
+      snapshots: snap, cooldown: cooldown,
+      conflictResolver: resolver
     )
 
     await coordinator.push(branch: "main", message: "test: add packages.toml")

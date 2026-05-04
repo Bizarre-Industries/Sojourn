@@ -14,6 +14,10 @@ internal enum SyncPhase: Sendable, Equatable {
   case idle
   case pulling
   case resolvingConflicts([Conflict])
+  /// Remote has commits not present locally. UI surfaces ConflictResolver
+  /// modal listing inbound commits + 3-button choice (rebase / merge /
+  /// abort). Per ADR-0026 refuse-and-show-diff state machine.
+  case awaitingPullDecision([InboundCommit])
   case scanningSecrets
   case pushing
   case done(HistoryEntry.Kind)
@@ -33,6 +37,7 @@ internal final class SyncCoordinator {
   private let secrets: SecretScanService?
   private let snapshots: SnapshotService
   private let cooldown: CooldownGate
+  internal let conflictResolver: ConflictResolver
 
   internal init(
     repoURL: URL,
@@ -42,7 +47,8 @@ internal final class SyncCoordinator {
     pref: PrefService?,
     secrets: SecretScanService?,
     snapshots: SnapshotService,
-    cooldown: CooldownGate
+    cooldown: CooldownGate,
+    conflictResolver: ConflictResolver
   ) {
     self.repoURL = repoURL
     self.git = git
@@ -52,6 +58,7 @@ internal final class SyncCoordinator {
     self.secrets = secrets
     self.snapshots = snapshots
     self.cooldown = cooldown
+    self.conflictResolver = conflictResolver
   }
 
   // MARK: - Pull
@@ -61,7 +68,40 @@ internal final class SyncCoordinator {
     let state = signpost.beginInterval("pull", id: signpost.makeSignpostID())
     SojournLog.sync.info("pull start branch=\(branch, privacy: .public)")
 
+    // ADR-0026 refuse-and-show-diff: detect divergence first. If
+    // remote moved while we were offline, surface inbound commits via
+    // ConflictResolver and return — the user picks rebase / merge /
+    // abort, then SyncPane re-invokes pull which reaches this point
+    // with `.clean` or `.resolved`.
     phase = .pulling
+    // Reset .blockedFromPush from a prior abort so a fresh pull can
+    // re-detect and surface inbound commits anew (council 2026-05-04
+    // stage5 architect condition: blocked is recoverable).
+    if case .blockedFromPush = conflictResolver.state {
+      conflictResolver.reset()
+    }
+    await conflictResolver.detect(branch: branch)
+    switch conflictResolver.state {
+    case .conflictPending(let commits):
+      phase = .awaitingPullDecision(commits)
+      SojournLog.sync.info("pull paused: \(commits.count, privacy: .public) inbound commits")
+      signpost.endInterval("pull", state)
+      return
+    case .failed(let msg):
+      phase = .failed("pull pre-check failed: \(msg)")
+      signpost.endInterval("pull", state)
+      return
+    case .clean, .resolved:
+      break  // proceed
+    case .detecting, .resolving, .blockedFromPush:
+      // Resolver should not be in these states after `detect` returns
+      // (blocked is reset above; detecting/resolving guarded by
+      // detect's idempotency).
+      phase = .failed("pull pre-check left resolver in unexpected state")
+      signpost.endInterval("pull", state)
+      return
+    }
+
     do {
       _ = try await snapshots.capture(operation: .syncPull, sources: [repoURL])
       try await git.pull(remote: "origin", branch: branch, cwd: repoURL)
@@ -108,6 +148,16 @@ internal final class SyncCoordinator {
     let state = signpost.beginInterval("push", id: signpost.makeSignpostID())
     defer { signpost.endInterval("push", state) }
     SojournLog.sync.info("push start branch=\(branch, privacy: .public)")
+
+    // ADR-0026: refuse push if ConflictResolver knows about unresolved
+    // inbound work. The cooperative writer lock alone is insufficient
+    // for a Mac that was offline when another acquired.
+    guard conflictResolver.canPush else {
+      let reason = conflictResolver.pushBlockedReason
+      SojournLog.sync.error("push blocked: \(reason, privacy: .public)")
+      phase = .failed(reason)
+      return
+    }
 
     phase = .scanningSecrets
     if let secrets {

@@ -57,6 +57,7 @@ struct PushPullBar: View {
     case .idle: return "idle"
     case .pulling: return "pulling…"
     case .resolvingConflicts: return "resolving conflicts"
+    case .awaitingPullDecision(let commits): return "\(commits.count) inbound — review"
     case .scanningSecrets: return "gitleaks scan"
     case .pushing: return "pushing…"
     case .done(let kind): return "done: \(kind.rawValue)"

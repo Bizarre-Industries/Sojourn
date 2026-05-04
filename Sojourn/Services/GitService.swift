@@ -92,8 +92,13 @@ internal actor GitService {
     upstream: String = "@{upstream}",
     cwd: URL
   ) async throws -> GitAheadBehind {
+    // Reject revspecs starting with `-` to prevent git argument confusion
+    // (council 2026-05-04 stage5 security condition).
+    guard !upstream.hasPrefix("-") else {
+      throw GitError(code: -1, stderr: "invalid revspec: \(upstream)", command: ["rev-list"])
+    }
     let r = try await runCommand(
-      ["rev-list", "--left-right", "--count", "HEAD...\(upstream)"],
+      ["rev-list", "--left-right", "--count", "HEAD...\(upstream)", "--"],
       cwd
     )
     let parts = r.stdoutString.split(separator: "\t")
@@ -129,6 +134,72 @@ internal actor GitService {
     _ = try await runCommand(["pull", "--ff-only", remote, branch], cwd)
   }
 
+  /// Pull with rebase (replays local commits on top of inbound). Used by
+  /// ConflictResolver `.rebase` choice per ADR-0026.
+  internal func pullRebase(remote: String = "origin", branch: String, cwd: URL) async throws {
+    _ = try await runCommand(["pull", "--rebase", remote, branch], cwd)
+  }
+
+  /// Pull with merge (records merge commit). Used by ConflictResolver
+  /// `.merge` choice per ADR-0026.
+  internal func pullMerge(remote: String = "origin", branch: String, cwd: URL) async throws {
+    _ = try await runCommand(["pull", "--no-rebase", remote, branch], cwd)
+  }
+
+  /// Fetch remote refs without merging. Cheap precursor to divergence
+  /// detection. ADR-0026 amendment: fires on user gesture or
+  /// cooldown-elapsed background sync only — NOT on every SyncPane
+  /// appearance.
+  internal func fetch(remote: String = "origin", cwd: URL) async throws {
+    _ = try await runCommand(["fetch", "--quiet", remote], cwd)
+  }
+
+  /// Abort an in-progress rebase, restoring HEAD to the pre-rebase
+  /// commit. Best-effort cleanup invoked by ConflictResolver after a
+  /// failed `pullRebase`.
+  internal func rebaseAbort(cwd: URL) async throws {
+    _ = try await runCommand(["rebase", "--abort"], cwd)
+  }
+
+  /// Abort an in-progress merge, restoring index + working tree.
+  /// Best-effort cleanup invoked by ConflictResolver after a failed
+  /// `pullMerge`.
+  internal func mergeAbort(cwd: URL) async throws {
+    _ = try await runCommand(["merge", "--abort"], cwd)
+  }
+
+  /// Structured list of commits present on `upstream` but not on `since`.
+  /// Hard-capped at `limit` (200 by default per ADR-0026 amendment) to
+  /// bound parse cost on long-asleep machines.
+  internal func inboundCommits(
+    since: String = "HEAD",
+    upstream: String = "@{upstream}",
+    cwd: URL,
+    limit: Int = 200
+  ) async throws -> [InboundCommit] {
+    // Reject revspecs starting with `-` to prevent git argument confusion
+    // (council 2026-05-04 stage5 security condition).
+    guard !since.hasPrefix("-"), !upstream.hasPrefix("-") else {
+      throw GitError(
+        code: -1,
+        stderr: "invalid revspec: \(since)..\(upstream)",
+        command: ["log"]
+      )
+    }
+    let r = try await runCommand(
+      [
+        "log",
+        "--max-count=\(limit)",
+        "--pretty=format:%H%x09%an%x09%aI%x09%s",
+        "--shortstat",
+        "\(since)..\(upstream)",
+        "--"
+      ],
+      cwd
+    )
+    return Self.parseInboundCommits(r.stdoutString)
+  }
+
   internal func clone(url: String, dest: URL, cwd: URL? = nil) async throws {
     _ = try await runCommand(["clone", url, dest.path], cwd)
   }
@@ -156,6 +227,55 @@ internal actor GitService {
         path: path,
         indexStatus: idx,
         worktreeStatus: wt
+      ))
+    }
+    return out
+  }
+
+  /// Parse `git log --pretty=format:%H%x09%an%x09%aI%x09%s --shortstat`
+  /// into a list of `InboundCommit`s. Each commit is a header line
+  /// (sha\tauthor\tISO8601\tsubject) optionally followed by a shortstat
+  /// line ("N files changed, M insertions(+), K deletions(-)").
+  /// Tolerates missing shortstats (commits with no file changes).
+  internal static func parseInboundCommits(_ raw: String) -> [InboundCommit] {
+    var out: [InboundCommit] = []
+    let formatter = ISO8601DateFormatter()
+    formatter.formatOptions = [.withInternetDateTime]
+
+    var lines = raw.split(separator: "\n", omittingEmptySubsequences: true)
+      .map { String($0) }
+    while !lines.isEmpty {
+      let header = lines.removeFirst()
+      let parts = header.split(separator: "\t", omittingEmptySubsequences: false)
+      guard parts.count >= 4 else { continue }
+      let sha = String(parts[0])
+      let author = String(parts[1])
+      guard let date = formatter.date(from: String(parts[2])) else { continue }
+      let subject = parts[3...].joined(separator: "\t")
+
+      var filesChanged = 0
+      var insertions = 0
+      var deletions = 0
+      if let next = lines.first, next.contains("changed,") || next.contains("change,") {
+        lines.removeFirst()
+        for chunk in next.split(separator: ",") {
+          let trimmed = chunk.trimmingCharacters(in: .whitespaces)
+          let scanner = Scanner(string: trimmed)
+          guard let n = scanner.scanInt() else { continue }
+          if trimmed.contains("file") { filesChanged = n }
+          else if trimmed.contains("insertion") { insertions = n }
+          else if trimmed.contains("deletion") { deletions = n }
+        }
+      }
+
+      out.append(InboundCommit(
+        sha: sha,
+        author: author,
+        date: date,
+        subject: subject,
+        filesChanged: filesChanged,
+        insertions: insertions,
+        deletions: deletions
       ))
     }
     return out

@@ -46,7 +46,7 @@
        notarize.yml fails the build if this string still equals the
        placeholder at sign time (sojourn-stage-workflow guard). -->
   <key>SUPublicEDKey</key>
-  <string>SPARKLE_EDDSA_PUBLIC_KEY_PLACEHOLDER_REPLACE_BEFORE_TAG</string>
+  <string>pdBQ5LfVVQpfBNcmpaqHBtPMT0dT75zYxa5GVYevT8M=</string>
   <key>SUEnableAutomaticChecks</key>
   <true/>
   <key>SUScheduledCheckInterval</key>

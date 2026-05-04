@@ -279,6 +279,28 @@ struct MenuBarRootView: View {
         .buttonStyle(GlassPrimaryButtonStyle())
         .disabled(store.sync == nil)
         .accessibilityIdentifier("menubar.sync")
+
+        if !store.sparkleService.statusMessage.isEmpty {
+          HStack(alignment: .top, spacing: 6) {
+            Image(systemName: "arrow.down.circle")
+              .font(.system(size: 10, weight: .semibold))
+              .accessibilityHidden(true)
+            Text(store.sparkleService.statusMessage)
+              .fixedSize(horizontal: false, vertical: true)
+            Spacer()
+          }
+          .font(.bzrBody(size: 10))
+          .foregroundStyle(Color.txtSecondary)
+          .padding(.horizontal, 8)
+          .padding(.vertical, 6)
+          .background(
+            RoundedRectangle(cornerRadius: 6, style: .continuous)
+              .fill(Color.adaptiveLighten(0.04))
+          )
+          .accessibilityIdentifier("menubar.updateStatus")
+          .accessibilityElement(children: .ignore)
+          .accessibilityLabel("Update status: \(store.sparkleService.statusMessage)")
+        }
       }
       .padding(.horizontal, 14)
       .padding(.vertical, 6)

@@ -126,6 +126,7 @@
 		C9B5636F619F4D29C1EC1E72 /* MasService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E429313D0E0FB1D51FABD2F /* MasService.swift */; };
 		D7151A2078906FDB7B990AD6 /* GenerationsPane.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DFAB02C29720FAB30864DCB /* GenerationsPane.swift */; };
 		D8E561923A9C07751DB4532E /* Spacing.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF63E8F9CAA2A0B02F398EB9 /* Spacing.swift */; };
+		DBE5E28C18D60EB11AC4CCE6 /* InstallSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D85488BB6DD8D0C67A7C27F /* InstallSource.swift */; };
 		DE03A44AB78A511EEE4CD4F1 /* BootstrapService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14A5F035C01184E1BF26CB2F /* BootstrapService.swift */; };
 		DEC7987D1C49E0302153500B /* PersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78D3E34CEC39749CE7D6E198 /* PersistenceTests.swift */; };
 		E03EFF2897106D6F59B2E163 /* ContainersPane.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F9681D54DC8472566008C6 /* ContainersPane.swift */; };
@@ -138,6 +139,7 @@
 		F0C1DCDB2BC208481EBF15E2 /* ToolProbeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D5FA41A6CFE57A332299D96 /* ToolProbeTests.swift */; };
 		F40C659088BA7D50CF171576 /* ManagerSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D1CE3F585241A7C3832E1FC /* ManagerSnapshot.swift */; };
 		F6BF2FC143BC1E32029089C9 /* GitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51654B4F53BDA5905226D68E /* GitService.swift */; };
+		F717053AAA010387755CA207 /* InstallSourceDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C24BF87404E2C937B998CCE /* InstallSourceDetector.swift */; };
 		F92E6B88164044C942516052 /* PURL.swift in Sources */ = {isa = PBXBuildFile; fileRef = D95EF49879108ECD1297E756 /* PURL.swift */; };
 		FC1D01347E391EEB39B26838 /* VersionFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90C0FA8590D68C1D74288A32 /* VersionFile.swift */; };
 		FEC5097A5FFAE8DAAA7D7B3A /* Subprocess in Frameworks */ = {isa = PBXBuildFile; productRef = 39BF93AAF2A4FCFC7EBAD55E /* Subprocess */; };
@@ -172,6 +174,7 @@
 		07993C2265D99A08965BAA61 /* SecretScanService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecretScanService.swift; sourceTree = "<group>"; };
 		0A6F6540986E83E02DB01AD6 /* ContainersServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContainersServiceTests.swift; sourceTree = "<group>"; };
 		0BADEBA10CB6637299E6E07E /* CooldownPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CooldownPolicy.swift; sourceTree = "<group>"; };
+		0D85488BB6DD8D0C67A7C27F /* InstallSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstallSource.swift; sourceTree = "<group>"; };
 		0DFAB02C29720FAB30864DCB /* GenerationsPane.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenerationsPane.swift; sourceTree = "<group>"; };
 		0E16DA51B87576598BAB7134 /* BackupsDirectory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupsDirectory.swift; sourceTree = "<group>"; };
 		101837DD34BDE8DB72BE4924 /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
@@ -238,6 +241,7 @@
 		885D1B68EB7366BB93BB0DFA /* MasHelperService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MasHelperService.swift; sourceTree = "<group>"; };
 		887AAF2686F9A376CC67B150 /* GenerationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenerationService.swift; sourceTree = "<group>"; };
 		8884B2AE7CA5668066930F1F /* AdvisoryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvisoryService.swift; sourceTree = "<group>"; };
+		8C24BF87404E2C937B998CCE /* InstallSourceDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstallSourceDetector.swift; sourceTree = "<group>"; };
 		8CF3E7F8591B56E1E9859A73 /* PrefService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrefService.swift; sourceTree = "<group>"; };
 		8D6ADA76780BBF30B8F9F8D3 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		8DED6874FE4B27207A890E6E /* GitHubDeviceAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubDeviceAuth.swift; sourceTree = "<group>"; };
@@ -369,6 +373,7 @@
 				0E16DA51B87576598BAB7134 /* BackupsDirectory.swift */,
 				519573B2007EA85FF61BF8F5 /* DeletionsDB.swift */,
 				277FC75194E246A84AB1A2A9 /* HistoryDB.swift */,
+				8C24BF87404E2C937B998CCE /* InstallSourceDetector.swift */,
 				C454DA661BE5AA7E7BB4A276 /* SettingsStore.swift */,
 				481F54F2BDF64F5380438AA6 /* SojournFileCodec.swift */,
 				4F811FB480E52C17173F18BE /* StateDB.swift */,
@@ -485,6 +490,7 @@
 				D2DAB6CE172EE5970FC7D6BB /* Generation.swift */,
 				E9E64BDF45BE87A78922A385 /* HistoryEntry.swift */,
 				AC9423CDD9933BBCD7177ED4 /* InboundCommit.swift */,
+				0D85488BB6DD8D0C67A7C27F /* InstallSource.swift */,
 				C0814F9583EAFEE9FAF041AE /* Job.swift */,
 				EDF057685B19AB3503933B08 /* MachineMetadata.swift */,
 				3D1CE3F585241A7C3832E1FC /* ManagerSnapshot.swift */,
@@ -965,6 +971,8 @@
 				1D1E0ECF892F0FA35A6CCADF /* HistoryEntry.swift in Sources */,
 				2CDD05A9671A6816D898F30D /* HistoryPane.swift in Sources */,
 				BD3DEBF934660090463D393E /* InboundCommit.swift in Sources */,
+				DBE5E28C18D60EB11AC4CCE6 /* InstallSource.swift in Sources */,
+				F717053AAA010387755CA207 /* InstallSourceDetector.swift in Sources */,
 				4DE366BB1A9A86717FCF2ABE /* Job.swift in Sources */,
 				0ED1AAAEAADA7250AF998BA2 /* JobRunner.swift in Sources */,
 				46C9573E46A6D56C4EBE855D /* KeychainBroker.swift in Sources */,

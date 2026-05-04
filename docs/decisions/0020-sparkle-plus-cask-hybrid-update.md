@@ -39,10 +39,11 @@ Ship both, with clear ownership:
   `brew upgrade --cask sojourn` work for users who prefer the brew
   workflow.
 - **Sparkle is suppressed when running under brew.** Sojourn reads
-  `prefs.toml:install_source` (set on first launch via the detection
-  sequence below). When `install_source = "cask"`, Sparkle's
-  check-for-updates is silent — `brew upgrade` is the user's
-  expected path.
+  the per-Mac `SettingsStore` value `installSource` from
+  `~/Library/Application Support/Sojourn/config/settings.json` (set on
+  first launch via the detection sequence below). When
+  `installSource = "cask"`, Sparkle's check-for-updates is silent —
+  `brew upgrade --cask sojourn` is the user's expected path.
 
 EdDSA private key lives in 1Password (vault: `Bizarre-Industries`, item:
 `sojourn-sparkle-eddsa`, fields: `private` / `public`). CI reads it via the
@@ -74,18 +75,20 @@ The original "sniff `~/Library/Caches/Homebrew/Cask/sojourn--*.dmg`"
 mechanism is brittle (`brew cleanup` purges the cache, brew may
 relayout cache paths). Replace with **persisted install source**:
 
-- On first launch, Sojourn writes `install_source` to `prefs.toml`
-  (values: `"cask"` | `"dmg"` | `"unknown"`).
+- On first launch, Sojourn writes `installSource` to `SettingsStore`
+  (values: `"cask"` | `"dmg"` | `"unknown"`). This value is per-Mac
+  runtime state, not data-repo configuration, so it intentionally does
+  not live in synced `prefs.toml`.
 - Detection sequence at first launch only:
   1. If `$HOMEBREW_PREFIX/Caskroom/sojourn/<version>/` exists →
      `cask`.
   2. Else if `Sojourn.app` is at `/Applications/Sojourn.app` and was
      opened via Finder/dock (no caskroom receipt) → `dmg`.
   3. Else `unknown` (assume `dmg` for update behavior).
-- Subsequent launches read `install_source` from `prefs.toml` and do
+- Subsequent launches read `installSource` from `SettingsStore` and do
   not re-detect.
-- The Updates pref pane offers a "Override install source"
-  toggle for users who change paths post-install.
+- General Settings offers an install-source override for users who
+  change install paths post-install.
 
 The appcast XML is uploaded to the GitHub Release alongside
 `Sojourn.dmg` and addressed through the `latest/download/appcast.xml`

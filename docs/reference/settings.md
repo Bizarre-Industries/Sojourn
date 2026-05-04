@@ -92,6 +92,7 @@ infiltration cases need 12–24 month lookback).
 | `ui.theme` | `system` | `system` \| `light` \| `dark` | Follows macOS appearance by default. |
 | `ui.show_menu_bar_extra` | `true` | bool | Toggle the `MenuBarExtra` icon. |
 | `ui.streaming_logs_default_open` | `false` | bool | Auto-open log console when a job starts. |
+| `installSource` | `unknown` | `unknown` \| `dmg` \| `cask` | Per-Mac install-source override in `SettingsStore`. `cask` suppresses Sparkle because Homebrew owns updates; `dmg` and `unknown` keep Sparkle enabled. |
 
 ### Networking
 

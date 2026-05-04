@@ -136,6 +136,7 @@ internal final class AppStore {
   /// Hydrate in-memory snapshots from disk. Safe to call multiple times.
   internal func reloadFromDisk() async {
     self.settings = await settingsStore.value
+    await resolveInstallSourceIfNeeded()
     if let historyDB, let rows = try? await historyDB.list(limit: 200) {
       self.history = rows
     } else {
@@ -143,6 +144,54 @@ internal final class AppStore {
     }
     await toolLocator.seed(settings.toolLocations)
     await cleanup.loadBundledRegistry()
+  }
+
+  /// Persist ADR-0020 install-source classification on first launch.
+  /// Unknown installs fail open to Sparkle so direct-DMG users keep an
+  /// update path even when detection cannot prove the install source.
+  internal func resolveInstallSourceIfNeeded() async {
+    guard settings.installSource == nil else {
+      if settings.effectiveInstallSource == .cask {
+        sparkleService.suppressForCaskInstall()
+      }
+      return
+    }
+
+    let detected = InstallSourceDetector.detect()
+    do {
+      var snapshot = await settingsStore.value
+      snapshot.installSource = detected
+      try await settingsStore.replace(snapshot)
+      self.settings = snapshot
+    } catch {
+      self.settings.installSource = detected
+    }
+    if detected == .cask {
+      sparkleService.suppressForCaskInstall()
+    }
+  }
+
+  internal var canCheckForUpdates: Bool {
+    settings.effectiveInstallSource.allowsSparkleUpdates
+      && sparkleService.canCheckForUpdates
+  }
+
+  internal func startSparkleIfEligible() async {
+    await resolveInstallSourceIfNeeded()
+    guard settings.effectiveInstallSource.allowsSparkleUpdates else {
+      sparkleService.suppressForCaskInstall()
+      return
+    }
+    sparkleService.start()
+  }
+
+  internal func checkForUpdates() async {
+    await resolveInstallSourceIfNeeded()
+    guard settings.effectiveInstallSource.allowsSparkleUpdates else {
+      sparkleService.suppressForCaskInstall()
+      return
+    }
+    sparkleService.checkForUpdates()
   }
 
   /// Construct a SyncCoordinator against a repo URL. Callers (typically

@@ -18,6 +18,9 @@ internal struct Settings: Sendable, Codable, Equatable {
   internal var remoteRepoURL: String?
   internal var cooldownEnabled: Bool = true
   internal var dryRunByDefault: Bool = true
+  /// First-launch install source per ADR-0020. Nil means a legacy
+  /// settings file has not been classified yet.
+  internal var installSource: InstallSource?
   /// User-supplied GitHub OAuth `client_id` for the Device Flow, set
   /// via Settings → Integrations. v0.1.0 ships without a Sojourn-owned
   /// OAuth app; users register their own GitHub OAuth App and paste
@@ -25,6 +28,10 @@ internal struct Settings: Sendable, Codable, Equatable {
   internal var githubClientID: String?
 
   internal static let empty = Settings()
+
+  internal var effectiveInstallSource: InstallSource {
+    installSource ?? .unknown
+  }
 
   internal func tier(for managerID: String) -> AutoUpdateTier {
     cooldownOverrides[managerID] ?? ManagerTier.tier(for: managerID)

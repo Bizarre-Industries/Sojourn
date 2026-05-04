@@ -29,7 +29,7 @@ struct SojournApp: App {
               // budget. SparkleService is @MainActor-owned by AppStore;
               // the detached task hops back to MainActor for `start()`.
               Task.detached(priority: .background) { [store] in
-                await store.sparkleService.start()
+                await store.startSparkleIfEligible()
               }
             }
         } else if storeBox.initError != nil {
@@ -82,9 +82,9 @@ struct SojournApp: App {
         // 2026-05-04 stage6 perf condition).
         if let store = storeBox.store {
           Button("Check for Updates…") {
-            store.sparkleService.checkForUpdates()
+            Task { await store.checkForUpdates() }
           }
-          .disabled(!store.sparkleService.canCheckForUpdates)
+          .disabled(!store.canCheckForUpdates)
         }
       }
     }

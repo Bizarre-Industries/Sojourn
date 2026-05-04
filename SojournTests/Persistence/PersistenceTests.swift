@@ -178,6 +178,8 @@ struct SettingsStoreTests {
     let s = await store.value
     #expect(s.cooldownEnabled == true)
     #expect(s.dryRunByDefault == true)
+    #expect(s.installSource == nil)
+    #expect(s.effectiveInstallSource == .unknown)
     #expect(s.toolLocations.isEmpty)
   }
 
@@ -191,6 +193,7 @@ struct SettingsStoreTests {
 
     try await store.mutate { s in
       s.cooldownEnabled = false
+      s.installSource = .cask
       s.remoteRepoURL = "git@example.invalid:u/sojourn-data.git"
       s.lastSyncTime = Date(timeIntervalSince1970: 1713895200)
     }
@@ -198,8 +201,96 @@ struct SettingsStoreTests {
     let store2 = try SettingsStore(paths: paths)
     let s2 = await store2.value
     #expect(s2.cooldownEnabled == false)
+    #expect(s2.installSource == .cask)
     #expect(s2.remoteRepoURL == "git@example.invalid:u/sojourn-data.git")
     #expect(s2.lastSyncTime?.timeIntervalSince1970 == 1713895200)
+  }
+
+  @Test func legacySettingsDecodeWithoutInstallSource() throws {
+    let data = Data("""
+    {
+      "cooldownOverrides" : {},
+      "cooldownEnabled" : true,
+      "dryRunByDefault" : false,
+      "history" : [],
+      "machines" : [],
+      "toolLocations" : [],
+      "userConsents" : {}
+    }
+    """.utf8)
+
+    let decoder = JSONDecoder()
+    decoder.dateDecodingStrategy = .iso8601
+    let settings = try decoder.decode(Settings.self, from: data)
+    #expect(settings.installSource == nil)
+    #expect(settings.effectiveInstallSource == .unknown)
+    #expect(settings.dryRunByDefault == false)
+  }
+
+  @Test func installSourceDetectorPrefersCaskReceipt() throws {
+    let tmp = FileManager.default.temporaryDirectory
+      .appendingPathComponent("sojourn-install-source-\(UUID().uuidString)", isDirectory: true)
+    defer { try? FileManager.default.removeItem(at: tmp) }
+
+    let caskVersion = tmp
+      .appendingPathComponent("Caskroom", isDirectory: true)
+      .appendingPathComponent("sojourn", isDirectory: true)
+      .appendingPathComponent("0.3.0", isDirectory: true)
+    try FileManager.default.createDirectory(at: caskVersion, withIntermediateDirectories: true)
+
+    let source = InstallSourceDetector.detect(
+      bundleURL: URL(fileURLWithPath: "/Applications/Sojourn.app"),
+      bundleVersion: "0.3.0",
+      environment: ["HOMEBREW_PREFIX": tmp.path],
+      caskroomRoots: [tmp.appendingPathComponent("Caskroom", isDirectory: true)]
+    )
+    #expect(source == .cask)
+  }
+
+  @Test func installSourceDetectorIgnoresStaleCaskReceipt() throws {
+    let tmp = FileManager.default.temporaryDirectory
+      .appendingPathComponent("sojourn-install-source-\(UUID().uuidString)", isDirectory: true)
+    defer { try? FileManager.default.removeItem(at: tmp) }
+
+    let staleVersion = tmp
+      .appendingPathComponent("Caskroom", isDirectory: true)
+      .appendingPathComponent("sojourn", isDirectory: true)
+      .appendingPathComponent("0.2.0", isDirectory: true)
+    try FileManager.default.createDirectory(at: staleVersion, withIntermediateDirectories: true)
+
+    let source = InstallSourceDetector.detect(
+      bundleURL: URL(fileURLWithPath: "/Applications/Sojourn.app"),
+      bundleVersion: "0.3.0",
+      environment: ["HOMEBREW_PREFIX": tmp.path],
+      caskroomRoots: [tmp.appendingPathComponent("Caskroom", isDirectory: true)]
+    )
+    #expect(source == .dmg)
+  }
+
+  @Test func installSourceDetectorDetectsDmgInApplications() {
+    let tmp = FileManager.default.temporaryDirectory
+      .appendingPathComponent("sojourn-install-source-\(UUID().uuidString)", isDirectory: true)
+
+    let source = InstallSourceDetector.detect(
+      bundleURL: URL(fileURLWithPath: "/Applications/Sojourn.app"),
+      bundleVersion: "0.3.0",
+      environment: ["HOMEBREW_PREFIX": tmp.path],
+      caskroomRoots: [tmp.appendingPathComponent("Caskroom", isDirectory: true)]
+    )
+    #expect(source == .dmg)
+  }
+
+  @Test func installSourceDetectorUsesUnknownAwayFromApplications() {
+    let tmp = FileManager.default.temporaryDirectory
+      .appendingPathComponent("sojourn-install-source-\(UUID().uuidString)", isDirectory: true)
+
+    let source = InstallSourceDetector.detect(
+      bundleURL: tmp.appendingPathComponent("DerivedData/Build/Products/Debug/Sojourn.app"),
+      bundleVersion: "0.3.0",
+      environment: ["HOMEBREW_PREFIX": tmp.path],
+      caskroomRoots: [tmp.appendingPathComponent("Caskroom", isDirectory: true)]
+    )
+    #expect(source == .unknown)
   }
 
   @Test func tierAppliesOverrides() {

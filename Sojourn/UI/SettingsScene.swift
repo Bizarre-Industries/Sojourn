@@ -30,6 +30,18 @@ struct GeneralSettingsTab: View {
     Form {
       Toggle("Dry-run destructive operations by default", isOn: dryRunBinding)
         .accessibilityIdentifier("settings.dryRun")
+      Picker("Install source", selection: installSourceBinding) {
+        Text(InstallSource.unknown.label).tag(InstallSource.unknown)
+        Text(InstallSource.dmg.label).tag(InstallSource.dmg)
+        Text(InstallSource.cask.label).tag(InstallSource.cask)
+      }
+      .pickerStyle(.segmented)
+      .accessibilityIdentifier("settings.installSource")
+      Text(store.settings.effectiveInstallSource == .cask
+           ? "Homebrew handles updates for this install."
+           : "Sparkle handles updates for this install.")
+        .font(.caption)
+        .foregroundStyle(.secondary)
     }
   }
 
@@ -40,6 +52,20 @@ struct GeneralSettingsTab: View {
         Task {
           var snap = await store.settingsStore.value
           snap.dryRunByDefault = newValue
+          try? await store.settingsStore.replace(snap)
+          await store.reloadFromDisk()
+        }
+      }
+    )
+  }
+
+  private var installSourceBinding: Binding<InstallSource> {
+    Binding(
+      get: { store.settings.effectiveInstallSource },
+      set: { newValue in
+        Task {
+          var snap = await store.settingsStore.value
+          snap.installSource = newValue
           try? await store.settingsStore.replace(snap)
           await store.reloadFromDisk()
         }

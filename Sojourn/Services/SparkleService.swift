@@ -24,12 +24,14 @@
 // in `.Codex/council-logs/2026-05-04-stage6-sparkle-delta.md`.
 
 import Foundation
+import Observation
 #if !SWIFT_PACKAGE
 import Sparkle
 #endif
 
 /// Public-facing surface used by the SwiftUI menubar item.
 #if !SWIFT_PACKAGE
+@Observable
 @MainActor
 internal final class SparkleService: NSObject, SPUUpdaterDelegate {
   /// Diagnostic status string updated by the delegate.
@@ -51,47 +53,55 @@ internal final class SparkleService: NSObject, SPUUpdaterDelegate {
   nonisolated private static let deltaUpdateFailedCode: Int = 4002
   nonisolated private static let sparkleErrorDomain: String = "SUSparkleErrorDomain"
 
-  // Two-phase init: NSObject base class requires `super.init()` before
-  // `self` is usable as a delegate. We bootstrap with a temporary nil-
-  // delegate controller (discarded) so `self.controller` has an
-  // initial value, then swap to the real bound controller.
-  // `controller` is `var` to enable that single re-seat in init only;
-  // not mutated thereafter.
-  private var controller: SPUStandardUpdaterController
+  private var controller: SPUStandardUpdaterController?
 
   internal override init() {
-    self.controller = SPUStandardUpdaterController(
-      startingUpdater: false,
-      updaterDelegate: nil,
-      userDriverDelegate: nil
-    )
     super.init()
-    self.controller = SPUStandardUpdaterController(
-      startingUpdater: false,
-      updaterDelegate: self,
-      userDriverDelegate: nil
-    )
   }
 
   /// Begin background update checks. Safe to call multiple times.
   internal func start() {
     do {
-      try controller.updater.start()
+      try updaterController().updater.start()
+      statusMessage = ""
     } catch {
-      statusMessage = "Sparkle start failed: \(error.localizedDescription)"
+      statusMessage = String(
+        localized: "Update checker failed: \(error.localizedDescription). Try Check for Updates again."
+      )
     }
   }
 
   /// User-initiated check. Wired from the menubar "Check for Updates…"
   /// item.
   internal func checkForUpdates() {
-    controller.checkForUpdates(nil)
+    updaterController().checkForUpdates(nil)
+  }
+
+  /// Homebrew cask installs update through `brew upgrade --cask
+  /// sojourn`; Sparkle stays quiet to avoid duplicate prompts.
+  internal func suppressForCaskInstall() {
+    statusMessage = String(
+      localized: "Homebrew handles updates. Run brew upgrade --cask sojourn."
+    )
   }
 
   /// Whether the menubar item should be enabled. Reflects Sparkle's
   /// own `canCheckForUpdates` so concurrent checks do not stack.
   internal var canCheckForUpdates: Bool {
-    controller.updater.canCheckForUpdates
+    controller?.updater.canCheckForUpdates ?? false
+  }
+
+  private func updaterController() -> SPUStandardUpdaterController {
+    if let controller {
+      return controller
+    }
+    let controller = SPUStandardUpdaterController(
+      startingUpdater: false,
+      updaterDelegate: self,
+      userDriverDelegate: nil
+    )
+    self.controller = controller
+    return controller
   }
 
   // MARK: - SPUUpdaterDelegate
@@ -117,22 +127,26 @@ internal final class SparkleService: NSObject, SPUUpdaterDelegate {
       && nsError.domain == Self.sparkleErrorDomain
     guard isDeltaFailure else {
       Task { @MainActor [weak self] in
-        self?.statusMessage = "Update aborted: \(error.localizedDescription)"
+        self?.statusMessage = String(
+          localized: "Update stopped: \(error.localizedDescription). Try Check for Updates again."
+        )
       }
       return
     }
     Task { @MainActor [weak self] in
       guard let self else { return }
       if self.hasFallenBackThisSession {
-        self.statusMessage = "Update failed twice (delta + full). Try again later."
+        self.statusMessage = String(
+          localized: "Delta and full update both failed. Check your connection, then try Check for Updates."
+        )
         return
       }
       self.hasFallenBackThisSession = true
-      self.statusMessage = "Update download restarting (delta unavailable)"
+      self.statusMessage = String(localized: "Delta failed. Restarting with full download.")
       // Re-invoke the updater. Sparkle 2 will re-fetch the appcast and
       // pick the full DMG enclosure since the delta path is now poisoned
       // for this session.
-      self.controller.checkForUpdates(nil)
+      self.updaterController().checkForUpdates(nil)
     }
   }
 
@@ -147,12 +161,19 @@ internal final class SparkleService: NSObject, SPUUpdaterDelegate {
        (error as NSError).code == Self.deltaUpdateFailedCode,
        (error as NSError).domain == Self.sparkleErrorDomain {
       Task { @MainActor [weak self] in
-        self?.statusMessage = "Delta update failed; will retry full bundle on next check."
+        self?.statusMessage = String(
+          localized: "Delta failed. Use Check for Updates to retry with a full download."
+        )
+      }
+    } else if error == nil {
+      Task { @MainActor [weak self] in
+        self?.statusMessage = ""
       }
     }
   }
 }
 #else
+@Observable
 @MainActor
 internal final class SparkleService {
   /// Sparkle is Xcode-app only. The SwiftPM library target still needs
@@ -168,6 +189,10 @@ internal final class SparkleService {
 
   internal func checkForUpdates() {
     statusMessage = String(localized: "Updates unavailable in this build.")
+  }
+
+  internal func suppressForCaskInstall() {
+    statusMessage = String(localized: "Homebrew handles updates. Run brew upgrade --cask sojourn.")
   }
 
   internal var canCheckForUpdates: Bool { false }

@@ -73,7 +73,12 @@ are the local equivalents of the macOS jobs in `build.yml`.
    `CODE_SIGN_IDENTITY="Apple Development"`. An unsigned or ad-hoc
    local UI-test loader failure is not release evidence; use the
    `-only-testing:SojournTests` command only as a unit-test fallback
-   while configuring signing.
+   while configuring signing. If the runner fails with `Timed out while
+   enabling automation mode`, run
+   `sudo xcrun automationmodetool enable-automationmode-without-authentication`,
+   confirm Xcode/Xcode Helper are allowed in System Settings → Privacy &
+   Security → Accessibility if prompted, then rerun `make xcodebuild`
+   before counting the full UI-test gate as passed.
 4. Tag: `git tag -s vX.Y.Z -m "release vX.Y.Z"`.
 5. Push tag: `git push origin vX.Y.Z`.
 6. Watch GitHub Actions → `notarize.yml` workflow:

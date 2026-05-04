@@ -43,7 +43,8 @@ sojourn/
 │   │       ├── applications/       # Mackup-derived registry, GPL-3
 │   │       ├── dotfile_owners.toml
 │   │       └── gitleaks.toml
-│   ├── Sojourn.entitlements
+│   ├── Sojourn.entitlements       # Release signing entitlements
+│   ├── SojournDebug.entitlements  # Debug/XCTest signing entitlements
 │   └── Info.plist
 ├── SojournTests/                   # Swift Testing + XCTest
 │   ├── Services/

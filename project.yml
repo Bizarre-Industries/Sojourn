@@ -44,6 +44,7 @@ targets:
         excludes:
           - Info.plist
           - Sojourn.entitlements
+          - SojournDebug.entitlements
           - Resources/bin
           - Resources/data
           - Resources/Fonts
@@ -63,7 +64,6 @@ targets:
         PRODUCT_NAME: Sojourn
         PRODUCT_BUNDLE_IDENTIFIER: app.bizarre.sojourn
         INFOPLIST_FILE: Sojourn/Info.plist
-        CODE_SIGN_ENTITLEMENTS: Sojourn/Sojourn.entitlements
         MARKETING_VERSION: 0.3.0
         CURRENT_PROJECT_VERSION: 28
         GENERATE_INFOPLIST_FILE: NO
@@ -71,8 +71,10 @@ targets:
         ENABLE_USER_SCRIPT_SANDBOXING: NO  # scripts/sign.sh needs codesign access
       configs:
         Debug:
+          CODE_SIGN_ENTITLEMENTS: Sojourn/SojournDebug.entitlements
           xcconfig: Sojourn/Config/Debug.xcconfig
         Release:
+          CODE_SIGN_ENTITLEMENTS: Sojourn/Sojourn.entitlements
           xcconfig: Sojourn/Config/Release.xcconfig
     dependencies:
       - package: swift-subprocess

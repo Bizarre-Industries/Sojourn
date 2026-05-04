@@ -1173,7 +1173,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = Sojourn/Sojourn.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Sojourn/SojournDebug.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 28;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;

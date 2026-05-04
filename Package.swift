@@ -45,6 +45,7 @@ let package = Package(
       exclude: [
         "Info.plist",
         "Sojourn.entitlements",
+        "SojournDebug.entitlements",
         "Resources/bin",
         "Resources/Assets.xcassets",
         "Resources/Fonts",

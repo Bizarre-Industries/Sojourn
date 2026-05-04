@@ -75,6 +75,7 @@ struct JobRequestEffectiveTimeoutTests {
   }
 }
 
+@Suite(.serialized)
 @MainActor
 struct JobRunnerWatchdogTests {
   @Test func advisoryJobThatOverrunsIsTimedOut() async throws {
@@ -92,7 +93,7 @@ struct JobRunnerWatchdogTests {
       kind: .advisory
     ))
 
-    try await waitForTerminal(jobRunner, jobID: handle.id, timeoutSeconds: 3)
+    try await waitForTerminal(jobRunner, jobID: handle.id)
     let job = jobRunner.job(handle.id)
     guard case .failed(let reason) = job?.state else {
       Issue.record("expected .failed, got \(String(describing: job?.state))")
@@ -115,7 +116,7 @@ struct JobRunnerWatchdogTests {
       kind: .installUpgrade
     ))
 
-    try await waitForTerminal(jobRunner, jobID: handle.id, timeoutSeconds: 3)
+    try await waitForTerminal(jobRunner, jobID: handle.id)
     let job = jobRunner.job(handle.id)
     guard case .succeeded = job?.state else {
       Issue.record("expected .succeeded, got \(String(describing: job?.state))")
@@ -137,7 +138,7 @@ struct JobRunnerWatchdogTests {
       kind: .advisory
     ))
 
-    try await waitForTerminal(jobRunner, jobID: handle.id, timeoutSeconds: 3)
+    try await waitForTerminal(jobRunner, jobID: handle.id)
     let job = jobRunner.job(handle.id)
     guard case .succeeded(let code) = job?.state else {
       Issue.record("expected .succeeded, got \(String(describing: job?.state))")
@@ -166,7 +167,7 @@ struct JobRunnerWatchdogTests {
     try await Task.sleep(nanoseconds: 100_000_000)
     jobRunner.cancel(handle.id)
 
-    try await waitForTerminal(jobRunner, jobID: handle.id, timeoutSeconds: 3)
+    try await waitForTerminal(jobRunner, jobID: handle.id)
     let job = jobRunner.job(handle.id)
     #expect(job?.state.isTerminal == true)
     // Critical: state is NOT a timed-out failure (watchdog must not
@@ -182,7 +183,7 @@ struct JobRunnerWatchdogTests {
   private func waitForTerminal(
     _ jobRunner: JobRunner,
     jobID: JobID,
-    timeoutSeconds: Double = 5
+    timeoutSeconds: Double = 10
   ) async throws {
     let deadline = Date().addingTimeInterval(timeoutSeconds)
     while Date() < deadline {

@@ -22,6 +22,9 @@ All notable changes to Sojourn. Follows
 - v0.4 stage 4 UI polish and accessibility: refresh-action VoiceOver
   labels, safer minimum-window text wrapping, native machine rows, and
   expanded UI smoke assertions for pane actions.
+- v0.4 stage 5 lint cleanup: SwiftFormat config compatibility,
+  touched UI formatting, package summary extraction, and strict
+  SwiftLint cleanup for Stage 4 UI surfaces.
 
 ### Planned (post-v0.3.0)
 

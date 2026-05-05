@@ -22,7 +22,9 @@ internal struct ContainersPane: View {
         ContentUnavailableView {
           Label("No container runtime installed", systemImage: "cube.box")
         } description: {
-          Text("Open Packages and add Docker, OrbStack, Apple container, Lima, or Colima to your Brewfile before installing.")
+          Text(
+            "Open Packages and add Docker, OrbStack, Apple container, Lima, or Colima to your Brewfile before installing."
+          )
         } actions: {
           Button("Open Packages") {
             onOpenPackages?()
@@ -70,8 +72,11 @@ internal struct ContainersPane: View {
       }
       .disabled(rescanning)
       .accessibilityIdentifier("containers.rescan")
-      .accessibilityLabel(rescanning ? "Rescanning container runtimes" : "Rescan container runtimes")
-      .accessibilityHint("Rechecks installed container command-line tools without starting or stopping runtimes.")
+      .accessibilityLabel(
+        rescanning ? "Rescanning container runtimes" : "Rescan container runtimes"
+      )
+      .accessibilityHint(
+        "Rechecks installed container command-line tools without starting or stopping runtimes.")
     }
   }
 
@@ -96,11 +101,13 @@ internal struct ContainersPane: View {
           .foregroundStyle(.secondary)
           .lineLimit(2)
           .fixedSize(horizontal: false, vertical: true)
-        Text("Tool: \(status.runtime.toolName) \(status.runtime.versionArgs.joined(separator: " "))")
-          .font(.caption2.monospaced())
-          .foregroundStyle(.tertiary)
-          .lineLimit(1)
-          .truncationMode(.middle)
+        Text(
+          "Tool: \(status.runtime.toolName) \(status.runtime.versionArgs.joined(separator: " "))"
+        )
+        .font(.caption2.monospaced())
+        .foregroundStyle(.tertiary)
+        .lineLimit(1)
+        .truncationMode(.middle)
       }
       .layoutPriority(1)
       Spacer()
@@ -108,9 +115,11 @@ internal struct ContainersPane: View {
         Text(status.installed ? "Installed" : "Not installed")
           .font(.caption.weight(.medium))
           .foregroundStyle(status.installed ? Color.primary : Color.secondary)
-        Text(status.runtime == store.containers.activeRuntime ? "Priority active" : "Priority standby")
-          .font(.caption2)
-          .foregroundStyle(status.installed ? Color.secondary : Color.gray)
+        Text(
+          status.runtime == store.containers.activeRuntime ? "Priority active" : "Priority standby"
+        )
+        .font(.caption2)
+        .foregroundStyle(status.installed ? Color.secondary : Color.gray)
       }
       .layoutPriority(0)
     }
@@ -143,20 +152,23 @@ internal struct ContainersPane: View {
   }
 
   private func runtimeAccessibilityLabel(for status: RuntimeStatus) -> String {
-    let tool = "Tool \(status.runtime.toolName) \(status.runtime.versionArgs.joined(separator: " "))."
+    let tool =
+      "Tool \(status.runtime.toolName) \(status.runtime.versionArgs.joined(separator: " "))."
     if status.runtime == store.containers.activeRuntime, status.installed {
-      return "Active runtime: \(status.runtime.displayName). \(detail(for: status)). \(tool) Installed."
+      return
+        "Active runtime: \(status.runtime.displayName). \(detail(for: status)). \(tool) Installed."
     }
-    return "\(status.runtime.displayName). \(detail(for: status)). \(tool) \(status.installed ? "Installed." : "Not installed.")"
+    return
+      "\(status.runtime.displayName). \(detail(for: status)). \(tool) \(status.installed ? "Installed." : "Not installed.")"
   }
 
   private func symbol(for runtime: ContainerRuntime) -> String {
     switch runtime {
-    case .docker:         return "shippingbox"
-    case .orbstack:       return "square.stack.3d.up"
+    case .docker: return "shippingbox"
+    case .orbstack: return "square.stack.3d.up"
     case .appleContainer: return "apple.terminal"
-    case .lima:           return "l.square"
-    case .colima:         return "c.square"
+    case .lima: return "l.square"
+    case .colima: return "c.square"
     }
   }
 

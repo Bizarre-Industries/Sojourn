@@ -26,7 +26,8 @@ struct PackagesPane: View {
         }
         .tag(manager.id)
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(manager.name). \(manager.count) packages. Tier \(manager.tierLabel).")
+        .accessibilityLabel(
+          "\(manager.name). \(manager.count) packages. Tier \(manager.tierLabel).")
       }
       .listStyle(.inset)
       .scrollContentBackground(.hidden)
@@ -151,7 +152,9 @@ struct PackagesPane: View {
         ContentUnavailableView(
           "No Brewfile snapshot",
           systemImage: "doc.text.magnifyingglass",
-          description: Text("Refresh runs brew bundle dump and renders the current Brewfile entries when Homebrew is available.")
+          description: Text(
+            "Refresh runs brew bundle dump and renders the current Brewfile entries when Homebrew is available."
+          )
         )
         .frame(maxWidth: .infinity, minHeight: 180)
       } else if rows.isEmpty {
@@ -245,19 +248,19 @@ struct PackagesPane: View {
 
   private var masStatusSymbol: String {
     switch store.masHelperStatus {
-    case .registered:       return "checkmark.circle"
+    case .registered: return "checkmark.circle"
     case .requiresApproval: return "exclamationmark.circle"
-    case .notRegistered:    return "circle"
-    case .missing, .unknown:return "xmark.octagon"
-    case .untrustedTool:    return "lock.slash"
+    case .notRegistered: return "circle"
+    case .missing, .unknown: return "xmark.octagon"
+    case .untrustedTool: return "lock.slash"
     }
   }
 
   private var masStatusColor: Color {
     switch store.masHelperStatus {
-    case .registered:       return .green
+    case .registered: return .green
     case .requiresApproval: return .orange
-    case .notRegistered:    return .secondary
+    case .notRegistered: return .secondary
     case .missing, .unknown, .untrustedTool:
       return .red
     }
@@ -265,12 +268,12 @@ struct PackagesPane: View {
 
   private var masStatusTitle: String {
     switch store.masHelperStatus {
-    case .registered:       return "Touch ID install helper active"
+    case .registered: return "Touch ID install helper active"
     case .requiresApproval: return "Helper needs approval"
-    case .notRegistered:    return "Touch ID install helper not installed"
-    case .missing:          return "Helper missing from app bundle"
-    case .unknown:          return "Helper status unknown"
-    case .untrustedTool:    return "App Store installs disabled"
+    case .notRegistered: return "Touch ID install helper not installed"
+    case .missing: return "Helper missing from app bundle"
+    case .unknown: return "Helper status unknown"
+    case .untrustedTool: return "App Store installs disabled"
     }
   }
 
@@ -287,7 +290,8 @@ struct PackagesPane: View {
     case .unknown:
       return "Sojourn could not read SMAppService status."
     case .untrustedTool(let reason, _):
-      return "Use the App Store manually, or install a root-owned mas path and refresh. Details: \(reason)"
+      return
+        "Use the App Store manually, or install a root-owned mas path and refresh. Details: \(reason)"
     }
   }
 
@@ -316,7 +320,9 @@ struct PackagesPane: View {
       }
       .buttonStyle(.borderedProminent)
       .accessibilityIdentifier("packages.mas-helper-register")
-      .accessibilityHint("Registers a privileged helper for App Store installs and may show a macOS approval prompt.")
+      .accessibilityHint(
+        "Registers a privileged helper for App Store installs and may show a macOS approval prompt."
+      )
     case .missing, .unknown, .untrustedTool(_, false):
       EmptyView()
     }
@@ -330,121 +336,7 @@ struct PackagesPane: View {
 
   private var managerSummaries: [PackageManagerSummary] {
     let counts = store.brewfile?.counts ?? .init()
-    return [
-      .init(
-        id: "mas",
-        name: "Mac App Store",
-        symbol: "apple.logo",
-        count: counts.mas,
-        tier: .a,
-        promptLabel: "Not required",
-        source: "mas",
-        description: "Reviewed App Store applications installed through mas."
-      ),
-      .init(
-        id: "brew",
-        name: "Homebrew",
-        symbol: "terminal",
-        count: counts.brews,
-        tierLabel: "B-C",
-        cooldownWindow: "7-14 days",
-        promptLabel: "Depends on tap",
-        source: "brew",
-        description: "Homebrew formulae from the Brewfile. Third-party taps use the stricter tier."
-      ),
-      .init(
-        id: "cargo",
-        name: "Cargo",
-        symbol: "shippingbox",
-        count: counts.cargo,
-        tier: .e,
-        promptLabel: "Required before apply",
-        source: "cargo",
-        description: "Rust packages installed by cargo."
-      ),
-      .init(
-        id: "cask",
-        name: "Casks",
-        symbol: "app.dashed",
-        count: counts.casks,
-        tierLabel: "C-D",
-        cooldownWindow: "14-21 days",
-        promptLabel: "Depends on tap",
-        source: "brew cask",
-        description: "GUI apps and packaged installers."
-      ),
-      .init(
-        id: "uv",
-        name: "uv / Python",
-        symbol: "chevron.left.forwardslash.chevron.right",
-        count: counts.uv,
-        tier: .e,
-        promptLabel: "Required before apply",
-        source: "uv",
-        description: "Python tools managed through uv."
-      ),
-      .init(
-        id: "npm",
-        name: "npm global",
-        symbol: "curlybraces",
-        count: counts.npm,
-        tier: .e,
-        promptLabel: "Required before apply",
-        source: "npm",
-        description: "Global npm packages with lifecycle-script risk."
-      ),
-      .init(
-        id: "go",
-        name: "Go install",
-        symbol: "g.circle",
-        count: counts.go,
-        tier: .e,
-        promptLabel: "Required before apply",
-        source: "go",
-        description: "Go module binaries."
-      ),
-      .init(
-        id: "vscode",
-        name: "VS Code",
-        symbol: "curlybraces.square",
-        count: counts.vscode,
-        tier: .d,
-        promptLabel: "Required before apply",
-        source: "code",
-        description: "VS Code extensions."
-      ),
-      .init(
-        id: "krew",
-        name: "krew",
-        symbol: "k.square",
-        count: counts.krew,
-        tier: .e,
-        promptLabel: "Required before apply",
-        source: "kubectl krew",
-        description: "kubectl plugin manager entries."
-      ),
-      .init(
-        id: "flatpak",
-        name: "Flatpak",
-        symbol: "shippingbox.circle",
-        count: counts.flatpak,
-        tier: .e,
-        promptLabel: "Required before apply",
-        source: "flatpak",
-        description: "Flatpak application entries from the Brewfile."
-      ),
-      .init(
-        id: "tap",
-        name: "Homebrew taps",
-        symbol: "point.3.connected.trianglepath.dotted",
-        count: counts.taps,
-        tierLabel: "Reference",
-        cooldownWindow: "No package cooldown",
-        promptLabel: "Not applicable",
-        source: "brew tap",
-        description: "Additional Homebrew repositories."
-      )
-    ]
+    return PackageManagerSummary.summaries(for: counts)
   }
 
   private var masHelperErrorPresented: Binding<Bool> {
@@ -457,5 +349,4 @@ struct PackagesPane: View {
       }
     )
   }
-
 }

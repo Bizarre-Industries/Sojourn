@@ -11,7 +11,8 @@ internal struct MainWindowView: View {
   }
 
   @Environment(AppStore.self) private var store
-  @SceneStorage("mainWindow.selectedPane") private var selectedPaneRaw: String = Pane.dashboard.rawValue
+  @SceneStorage("mainWindow.selectedPane") private var selectedPaneRaw: String = Pane.dashboard
+    .rawValue
   @State private var pendingSyncAction: SyncAction?
 
   private var selectedPane: Pane {
@@ -120,7 +121,8 @@ internal struct MainWindowView: View {
       .disabled(store.sync == nil)
       .disabled(syncActionDisabled)
       .accessibilityIdentifier("toolbar.pull")
-      .accessibilityHint("Creates a generation, fetches remote changes, and may apply dotfiles and Brewfiles.")
+      .accessibilityHint(
+        "Creates a generation, fetches remote changes, and may apply dotfiles and Brewfiles.")
 
       Button {
         pendingSyncAction = .push
@@ -129,7 +131,9 @@ internal struct MainWindowView: View {
       }
       .disabled(store.sync == nil || syncActionDisabled || store.conflictResolver?.canPush == false)
       .accessibilityIdentifier("toolbar.push")
-      .accessibilityHint("Stages sync files, runs gitleaks on the staged index, commits clean changes, and pushes to origin.")
+      .accessibilityHint(
+        "Stages sync files, runs gitleaks on the staged index, commits clean changes, and pushes to origin."
+      )
 
       if case .applyingReviewedPull = store.sync?.phase {
         Button {
@@ -233,7 +237,8 @@ internal struct MainWindowView: View {
       return String(localized: "Open Sync for the failure reason and recovery steps.")
     }
     if case .awaitingPullApplyReview = store.sync?.phase {
-      return String(localized: "Open Sync. Pulled scripts, templates, or packages have not been applied.")
+      return String(
+        localized: "Open Sync. Pulled scripts, templates, or packages have not been applied.")
     }
     if let count = syncBadgeCount, count > 0 {
       return String(localized: "\(count) inbound commit(s) need review in Sync.")
@@ -312,9 +317,15 @@ internal struct MainWindowView: View {
   private var syncConfirmationMessage: String {
     switch pendingSyncAction {
     case .pull:
-      return String(localized: "Pull fetches remote changes, then either pauses for review or creates a generation before applying dotfiles and Brewfiles. Review appears when pulled scripts, templates, or packages need a second gesture.")
+      return String(
+        localized:
+          "Pull fetches remote changes, then either pauses for review or creates a generation before applying dotfiles and Brewfiles. Review appears when pulled scripts, templates, or packages need a second gesture."
+      )
     case .push:
-      return String(localized: "Push stages sync files, runs gitleaks on staged content, refuses unresolved inbound commits, captures a generation only after the scan passes, commits clean sync paths, and pushes to origin. Blocked scans stop before snapshot capture.")
+      return String(
+        localized:
+          "Push stages sync files, runs gitleaks on staged content, refuses unresolved inbound commits, captures a generation only after the scan passes, commits clean sync paths, and pushes to origin. Blocked scans stop before snapshot capture."
+      )
     case nil:
       return ""
     }
@@ -382,19 +393,20 @@ internal struct MainWindowView: View {
   @ViewBuilder
   private func detail(for pane: Pane) -> some View {
     switch pane {
-    case .dashboard:     OverviewPane()
-    case .packages:      PackagesPane()
-    case .containers:    ContainersPane {
-      selectedPaneRaw = Pane.packages.rawValue
-    }
-    case .generations:   GenerationsPane()
+    case .dashboard: OverviewPane()
+    case .packages: PackagesPane()
+    case .containers:
+      ContainersPane {
+        selectedPaneRaw = Pane.packages.rawValue
+      }
+    case .generations: GenerationsPane()
     case .macosFeatures: MacOSFeaturesPane()
-    case .preferences:   PreferencesPane()
-    case .sync:          SyncPane()
-    case .machines:      MachinesPane()
-    case .advisories:    AdvisoriesPane()
-    case .jobs:          JobInspectorPane()
-    case .settings:      SettingsPaneEmbedded()
+    case .preferences: PreferencesPane()
+    case .sync: SyncPane()
+    case .machines: MachinesPane()
+    case .advisories: AdvisoriesPane()
+    case .jobs: JobInspectorPane()
+    case .settings: SettingsPaneEmbedded()
     }
   }
 }

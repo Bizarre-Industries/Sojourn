@@ -91,21 +91,41 @@ final class SojournUITests: XCTestCase {
     XCTAssertEqual(toolbarButton(app, "toolbar.push").label, "Push After Scan")
     XCTAssertFalse(toolbarButton(app, "toolbar.status").label.isEmpty)
 
-    let paneActions: [(sidebarID: String, actionID: String, label: String)] = [
-      ("sidebar.packages", "packages.refresh", "Refresh package inventory"),
-      ("sidebar.containers", "containers.rescan", "Rescan container runtimes"),
-      ("sidebar.generations", "generations.refresh", "Refresh generations"),
-      ("sidebar.macosFeatures", "macosFeatures.refresh", "Refresh macOS feature state"),
-      ("sidebar.advisories", "advisories.refresh", "Refresh advisory cache")
+    let paneActions: [PaneAction] = [
+      PaneAction(
+        sidebarID: "sidebar.packages",
+        actionID: "packages.refresh",
+        label: "Refresh package inventory"
+      ),
+      PaneAction(
+        sidebarID: "sidebar.containers",
+        actionID: "containers.rescan",
+        label: "Rescan container runtimes"
+      ),
+      PaneAction(
+        sidebarID: "sidebar.generations",
+        actionID: "generations.refresh",
+        label: "Refresh generations"
+      ),
+      PaneAction(
+        sidebarID: "sidebar.macosFeatures",
+        actionID: "macosFeatures.refresh",
+        label: "Refresh macOS feature state"
+      ),
+      PaneAction(
+        sidebarID: "sidebar.advisories",
+        actionID: "advisories.refresh",
+        label: "Refresh advisory cache"
+      )
     ]
 
-    for (sidebarID, actionID, label) in paneActions {
-      let row = sidebarEntry(app, sidebarID)
-      XCTAssertTrue(row.waitForExistence(timeout: 4), "Missing \(sidebarID)")
+    for action in paneActions {
+      let row = sidebarEntry(app, action.sidebarID)
+      XCTAssertTrue(row.waitForExistence(timeout: 4), "Missing \(action.sidebarID)")
       row.click()
-      let action = toolbarButton(app, actionID)
-      XCTAssertTrue(action.waitForExistence(timeout: 4), "Missing \(actionID)")
-      XCTAssertEqual(action.label, label, "Unexpected label for \(actionID)")
+      let button = toolbarButton(app, action.actionID)
+      XCTAssertTrue(button.waitForExistence(timeout: 4), "Missing \(action.actionID)")
+      XCTAssertEqual(button.label, action.label, "Unexpected label for \(action.actionID)")
     }
   }
 
@@ -146,4 +166,10 @@ final class SojournUITests: XCTestCase {
     if staticText.exists { return staticText }
     return app.otherElements[identifier]
   }
+}
+
+private struct PaneAction {
+  let sidebarID: String
+  let actionID: String
+  let label: String
 }

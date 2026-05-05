@@ -13,14 +13,17 @@ struct GenerationsPane: View {
         ContentUnavailableView(
           "Could not load generations",
           systemImage: "exclamationmark.triangle",
-          description: Text("Check that the Sojourn generations folder in Application Support is readable, then refresh. Cause: \(error)")
+          description: Text(
+            "Check that the Sojourn generations folder in Application Support is readable, then refresh. Cause: \(error)"
+          )
         )
         .frame(maxWidth: .infinity, maxHeight: .infinity)
       } else if store.generations.isEmpty {
         ContentUnavailableView(
           "No generations yet",
           systemImage: "clock.arrow.circlepath",
-          description: Text("Snapshots appear here after Sojourn creates a pre-operation generation.")
+          description: Text(
+            "Snapshots appear here after Sojourn creates a pre-operation generation.")
         )
         .frame(maxWidth: .infinity, maxHeight: .infinity)
       } else {
@@ -80,11 +83,15 @@ struct GenerationsPane: View {
       }
       Spacer()
       VStack(alignment: .trailing, spacing: 3) {
-        Text(Self.dateFormatter.localizedString(for: manifest.generation.createdAt, relativeTo: Date()))
-          .font(.caption)
-        Text("\(Self.byteFormatter.string(fromByteCount: manifest.archiveSizeBytes)) · \(String(manifest.sha256.prefix(12)))")
-          .font(.caption.monospaced())
-          .foregroundStyle(.secondary)
+        Text(
+          Self.dateFormatter.localizedString(for: manifest.generation.createdAt, relativeTo: Date())
+        )
+        .font(.caption)
+        Text(
+          "\(Self.byteFormatter.string(fromByteCount: manifest.archiveSizeBytes)) · \(String(manifest.sha256.prefix(12)))"
+        )
+        .font(.caption.monospaced())
+        .foregroundStyle(.secondary)
         Text(brewfileCounts(for: manifest.generation.brewfileCounts))
           .font(.caption2)
           .foregroundStyle(.tertiary)
@@ -96,27 +103,32 @@ struct GenerationsPane: View {
   }
 
   private func generationMetadata(for manifest: GenerationManifest) -> String {
-    let commit = manifest.generation.chezmoiCommit.map {
-      " · commit \(String($0.prefix(12)))"
-    } ?? ""
+    let commit =
+      manifest.generation.chezmoiCommit.map {
+        " · commit \(String($0.prefix(12)))"
+      } ?? ""
     return "\(manifest.generation.tag)\(commit)"
   }
 
   private func brewfileCounts(for counts: BrewfileAST.Counts) -> String {
-    let total = counts.taps + counts.brews + counts.casks + counts.mas
+    let total =
+      counts.taps + counts.brews + counts.casks + counts.mas
       + counts.vscode + counts.go + counts.cargo + counts.uv
       + counts.krew + counts.npm + counts.flatpak
     return "\(total) entries · \(counts.brews) brews · \(counts.casks) casks · \(counts.mas) apps"
   }
 
   private func generationAccessibilityLabel(for manifest: GenerationManifest) -> String {
-    let commit = manifest.generation.chezmoiCommit
+    let commit =
+      manifest.generation.chezmoiCommit
       .map { "Chezmoi commit \(String($0.prefix(12)))." }
       ?? "No chezmoi commit recorded."
-    let note = manifest.generation.note.isEmpty
+    let note =
+      manifest.generation.note.isEmpty
       ? "Tag \(manifest.generation.tag)."
       : "Note \(manifest.generation.note). Tag \(manifest.generation.tag)."
-    return "Generation \(manifest.generation.number). \(note) \(commit) Archive \(Self.byteFormatter.string(fromByteCount: manifest.archiveSizeBytes)). SHA \(String(manifest.sha256.prefix(12))). \(brewfileCounts(for: manifest.generation.brewfileCounts))."
+    return
+      "Generation \(manifest.generation.number). \(note) \(commit) Archive \(Self.byteFormatter.string(fromByteCount: manifest.archiveSizeBytes)). SHA \(String(manifest.sha256.prefix(12))). \(brewfileCounts(for: manifest.generation.brewfileCounts))."
   }
 
   private static let byteFormatter: ByteCountFormatter = {

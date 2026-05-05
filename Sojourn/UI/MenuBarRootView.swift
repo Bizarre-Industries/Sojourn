@@ -1,6 +1,7 @@
 // Sojourn - Menu bar root view
 
 import SwiftUI
+
 #if canImport(AppKit)
 import AppKit
 #endif
@@ -74,7 +75,8 @@ struct MenuBarRootView: View {
         Button {
           NSApp.activate(ignoringOtherApps: true)
         } label: {
-          menuButtonLabel(String(localized: "Open Sojourn"), systemImage: "arrow.triangle.2.circlepath")
+          menuButtonLabel(
+            String(localized: "Open Sojourn"), systemImage: "arrow.triangle.2.circlepath")
         }
         .buttonStyle(GlassPrimaryButtonStyle())
         .accessibilityIdentifier("menubar.review-sync")
@@ -124,7 +126,9 @@ struct MenuBarRootView: View {
     }
     .frame(minWidth: 300, idealWidth: 340, alignment: .leading)
     .accessibilityElement(children: .contain)
-    .accessibilityLabel("Sojourn menu. \(machineName), \(syncRelative). \(syncStatus.accessibilityLabel).")
+    .accessibilityLabel(
+      "Sojourn menu. \(machineName), \(syncRelative). \(syncStatus.accessibilityLabel)."
+    )
     .confirmationDialog(
       pendingSyncAction?.confirmationTitle ?? "Confirm sync",
       isPresented: confirmationPresented,
@@ -173,12 +177,18 @@ struct MenuBarRootView: View {
 
   private var openSojournHint: String {
     if case .awaitingPullApplyReview = store.sync?.phase {
-      return String(localized: "Opens Sojourn so pulled scripts, templates, and packages can be reviewed before applying.")
+      return String(
+        localized:
+          "Opens Sojourn so pulled scripts, templates, and packages can be reviewed before applying."
+      )
     }
     if case .applyingReviewedPull = store.sync?.phase {
-      return String(localized: "Opens Sojourn so the reviewed apply progress can be monitored or cancelled.")
+      return String(
+        localized: "Opens Sojourn so the reviewed apply progress can be monitored or cancelled.")
     }
-    return String(localized: "Opens Sojourn so pull, push, and conflict details can be reviewed in the main window.")
+    return String(
+      localized:
+        "Opens Sojourn so pull, push, and conflict details can be reviewed in the main window.")
   }
 
   private func syncButton(_ action: MenuBarSyncAction) -> some View {
@@ -287,11 +297,14 @@ private enum MenuBarSyncAction: Identifiable {
   var confirmationMessage: String {
     switch self {
     case .pull:
-      return "Pull fetches remote changes, then either pauses for review or creates a generation before applying dotfiles and Brewfiles. Review appears when pulled scripts, templates, or packages need a second gesture."
+      return
+        "Pull fetches remote changes, then either pauses for review or creates a generation before applying dotfiles and Brewfiles. Review appears when pulled scripts, templates, or packages need a second gesture."
     case .push:
-      return "Push stages sync files, scans staged content with gitleaks, captures a generation only after the scan passes, commits clean sync paths, and pushes to origin. Blocked scans stop before snapshot capture."
+      return
+        "Push stages sync files, scans staged content with gitleaks, captures a generation only after the scan passes, commits clean sync paths, and pushes to origin. Blocked scans stop before snapshot capture."
     case .sync:
-      return "Sync runs Pull and Apply first. If pull does not pause for conflict or apply review, it stages sync files, scans staged content, captures a generation only after the scan passes, commits clean sync paths, and pushes to origin."
+      return
+        "Sync runs Pull and Apply first. If pull does not pause for conflict or apply review, it stages sync files, scans staged content, captures a generation only after the scan passes, commits clean sync paths, and pushes to origin."
     }
   }
 

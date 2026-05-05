@@ -37,11 +37,13 @@ struct GeneralSettingsTab: View {
       }
       .pickerStyle(.segmented)
       .accessibilityIdentifier("settings.installSource")
-      Text(store.settings.effectiveInstallSource == .cask
-           ? "Homebrew handles updates for this install."
-           : "Sparkle handles updates for this install.")
-        .font(.caption)
-        .foregroundStyle(.secondary)
+      Text(
+        store.settings.effectiveInstallSource == .cask
+          ? "Homebrew handles updates for this install."
+          : "Sparkle handles updates for this install."
+      )
+      .font(.caption)
+      .foregroundStyle(.secondary)
     }
   }
 
@@ -80,8 +82,10 @@ struct SyncSettingsTab: View {
 
   var body: some View {
     Form {
-      TextField("Remote repo URL", text: $draftURL, prompt: Text("git@github.com:you/sojourn-data.git"))
-        .accessibilityIdentifier("settings.remoteURL")
+      TextField(
+        "Remote repo URL", text: $draftURL, prompt: Text("git@github.com:you/sojourn-data.git")
+      )
+      .accessibilityIdentifier("settings.remoteURL")
       HStack {
         Button("Save + clone") {
           Task {
@@ -89,9 +93,10 @@ struct SyncSettingsTab: View {
             snap.remoteRepoURL = draftURL
             try? await store.settingsStore.replace(snap)
             await store.reloadFromDisk()
-            let localRepo = store.paths.config.appendingPathComponent("sojourn-data", isDirectory: true)
-            if !FileManager.default.fileExists(atPath: localRepo.path),
-               let git = store.git {
+            let localRepo = store.paths.config.appendingPathComponent(
+              "sojourn-data", isDirectory: true)
+            let shouldClone = !FileManager.default.fileExists(atPath: localRepo.path)
+            if shouldClone, let git = store.git {
               try? await git.clone(url: draftURL, dest: localRepo)
             }
             if FileManager.default.fileExists(atPath: localRepo.path) {
@@ -138,10 +143,12 @@ struct SecuritySettingsTab: View {
     Form {
       Text("Secret-scanning is bundled via gitleaks in Contents/Resources/bin.")
         .font(.caption).foregroundStyle(.secondary)
-      Link(
-        "Review data/gitleaks.toml",
-        destination: URL(string: "https://github.com/Bizarre-Industries/Sojourn/blob/main/Sojourn/Resources/data/gitleaks.toml")!
-      )
+      if let gitleaksConfigURL = URL(
+        string:
+          "https://github.com/Bizarre-Industries/Sojourn/blob/main/Sojourn/Resources/data/gitleaks.toml"
+      ) {
+        Link("Review data/gitleaks.toml", destination: gitleaksConfigURL)
+      }
     }
   }
 }
@@ -152,14 +159,14 @@ struct AboutTab: View {
       Text("Sojourn").font(.title2.bold())
       Text("GPL-3.0-or-later. See LICENSE.")
         .font(.caption).foregroundStyle(.secondary)
-      Link(
-        "Source",
-        destination: URL(string: "https://github.com/Bizarre-Industries/Sojourn")!
-      )
-      Link(
-        "THIRDPARTY.md",
-        destination: URL(string: "https://github.com/Bizarre-Industries/Sojourn/blob/main/THIRDPARTY.md")!
-      )
+      if let sourceURL = URL(string: "https://github.com/Bizarre-Industries/Sojourn") {
+        Link("Source", destination: sourceURL)
+      }
+      if let thirdPartyURL = URL(
+        string: "https://github.com/Bizarre-Industries/Sojourn/blob/main/THIRDPARTY.md"
+      ) {
+        Link("THIRDPARTY.md", destination: thirdPartyURL)
+      }
     }
     .frame(maxWidth: .infinity, alignment: .leading)
   }

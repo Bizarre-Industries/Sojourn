@@ -23,19 +23,19 @@ internal struct SyncPane: View {
 
     var label: String {
       switch self {
-      case .history:   return "History"
+      case .history: return "History"
       case .conflicts: return "Conflicts"
-      case .onboard:   return "Onboard"
-      case .machines:  return "Machines"
+      case .onboard: return "Onboard"
+      case .machines: return "Machines"
       }
     }
 
     var icon: String {
       switch self {
-      case .history:   return "clock"
+      case .history: return "clock"
       case .conflicts: return "exclamationmark.triangle"
-      case .onboard:   return "play.circle"
-      case .machines:  return "laptopcomputer.and.iphone"
+      case .onboard: return "play.circle"
+      case .machines: return "laptopcomputer.and.iphone"
       }
     }
   }
@@ -66,10 +66,10 @@ internal struct SyncPane: View {
 
       Group {
         switch tab {
-        case .history:   HistoryPane()
+        case .history: HistoryPane()
         case .conflicts: ConflictsPane()
-        case .onboard:   OnboardPane()
-        case .machines:  MachinesPane()
+        case .onboard: OnboardPane()
+        case .machines: MachinesPane()
         }
       }
       .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -86,7 +86,11 @@ internal struct SyncPane: View {
       }
       Button(String(localized: "Cancel"), role: .cancel) {}
     } message: {
-      Text(String(localized: "Sojourn will create a generation, run chezmoi apply, and run brew bundle install for the already-pulled data repo state. Cancel leaves the repo pulled but not applied."))
+      Text(
+        String(
+          localized:
+            "Sojourn will create a generation, run chezmoi apply, and run brew bundle install for the already-pulled data repo state. Cancel leaves the repo pulled but not applied."
+        ))
     }
     .onAppear {
       // ADR-0026: first-appearance auto-routes to Conflicts tab when
@@ -116,7 +120,8 @@ internal struct SyncPane: View {
       statusBanner(
         symbol: "xmark.octagon",
         title: "Sync needs attention",
-        message: "\(reason) Fix the cause, then retry Pull and Apply or Push After Scan from the toolbar.",
+        message:
+          "\(reason) Fix the cause, then retry Pull and Apply or Push After Scan from the toolbar.",
         actionTitle: "Dismiss failure",
         actionHint: "Clears this message only; it does not retry sync or undo staged files.",
         action: { store.sync?.reset() }
@@ -140,7 +145,8 @@ internal struct SyncPane: View {
         title: String(localized: "Applying reviewed changes"),
         message: step,
         actionTitle: String(localized: "Cancel Apply"),
-        actionHint: String(localized: "Stops the reviewed apply task before the next cancellable step."),
+        actionHint: String(
+          localized: "Stops the reviewed apply task before the next cancellable step."),
         action: { store.cancelSyncOperation() }
       )
       Divider()
@@ -191,10 +197,15 @@ internal struct SyncPane: View {
         VStack(alignment: .leading, spacing: 4) {
           Text(String(localized: "Pull apply review required"))
             .font(.callout.weight(.semibold))
-          Text(String(localized: "Pull finished. Sojourn has not applied dotfiles or Brewfiles yet. Review the listed scripts, templates, and packages before applying."))
-            .font(.caption)
-            .foregroundStyle(.secondary)
-            .fixedSize(horizontal: false, vertical: true)
+          Text(
+            String(
+              localized:
+                "Pull finished. Sojourn has not applied dotfiles or Brewfiles yet. Review the listed scripts, templates, and packages before applying."
+            )
+          )
+          .font(.caption)
+          .foregroundStyle(.secondary)
+          .fixedSize(horizontal: false, vertical: true)
         }
         .accessibilityElement(children: .combine)
         .accessibilityLabel(review.accessibilitySummary)
@@ -204,7 +215,10 @@ internal struct SyncPane: View {
             isApplyReviewConfirmationPresented = true
           }
           .accessibilityIdentifier("sync.applyReviewedPull.review")
-          .accessibilityHint(String(localized: "Opens a confirmation before running chezmoi apply and brew bundle install."))
+          .accessibilityHint(
+            String(
+              localized:
+                "Opens a confirmation before running chezmoi apply and brew bundle install."))
 
           Button(String(localized: "Leave Unapplied")) {
             store.sync?.discardPullApplyReview()
@@ -213,7 +227,8 @@ internal struct SyncPane: View {
           .font(.caption)
           .foregroundStyle(.secondary)
           .accessibilityIdentifier("sync.discardPullApplyReview")
-          .accessibilityHint(String(localized: "Clears this review without applying the already-pulled repo state."))
+          .accessibilityHint(
+            String(localized: "Clears this review without applying the already-pulled repo state."))
         }
       }
 
@@ -227,9 +242,7 @@ internal struct SyncPane: View {
 
   @ViewBuilder
   private func pullApplyReviewDetails(_ review: PullApplyReview) -> some View {
-    if !review.chezmoiScripts.isEmpty
-      || !review.chezmoiTemplates.isEmpty
-      || !review.packageReviews.isEmpty {
+    if hasPullApplyReviewDetails(review) {
       ScrollView {
         VStack(alignment: .leading, spacing: 8) {
           if !review.chezmoiScripts.isEmpty {
@@ -244,9 +257,13 @@ internal struct SyncPane: View {
             }
           }
           if review.omittedChezmoiScriptCount > 0 {
-            Text(String(localized: "\(review.omittedChezmoiScriptCount) more script(s) omitted from this preview."))
-              .font(.caption2)
-              .foregroundStyle(.secondary)
+            Text(
+              String(
+                localized:
+                  "\(review.omittedChezmoiScriptCount) more script(s) omitted from this preview.")
+            )
+            .font(.caption2)
+            .foregroundStyle(.secondary)
           }
 
           if !review.chezmoiTemplates.isEmpty {
@@ -261,9 +278,14 @@ internal struct SyncPane: View {
             }
           }
           if review.omittedChezmoiTemplateCount > 0 {
-            Text(String(localized: "\(review.omittedChezmoiTemplateCount) more template(s) omitted from this preview."))
-              .font(.caption2)
-              .foregroundStyle(.secondary)
+            Text(
+              String(
+                localized:
+                  "\(review.omittedChezmoiTemplateCount) more template(s) omitted from this preview."
+              )
+            )
+            .font(.caption2)
+            .foregroundStyle(.secondary)
           }
 
           if !review.packageReviews.isEmpty {
@@ -284,9 +306,14 @@ internal struct SyncPane: View {
             }
           }
           if review.omittedPackageReviewCount > 0 {
-            Text(String(localized: "\(review.omittedPackageReviewCount) more Brewfile entr\(review.omittedPackageReviewCount == 1 ? "y" : "ies") omitted from this preview."))
-              .font(.caption2)
-              .foregroundStyle(.secondary)
+            Text(
+              String(
+                localized:
+                  "\(review.omittedPackageReviewCount) more Brewfile entr\(review.omittedPackageReviewCount == 1 ? "y" : "ies") omitted from this preview."
+              )
+            )
+            .font(.caption2)
+            .foregroundStyle(.secondary)
           }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -295,5 +322,11 @@ internal struct SyncPane: View {
       .padding(.leading, 34)
       .accessibilityIdentifier("sync.pullApplyReview.details")
     }
+  }
+
+  private func hasPullApplyReviewDetails(_ review: PullApplyReview) -> Bool {
+    !review.chezmoiScripts.isEmpty
+      || !review.chezmoiTemplates.isEmpty
+      || !review.packageReviews.isEmpty
   }
 }

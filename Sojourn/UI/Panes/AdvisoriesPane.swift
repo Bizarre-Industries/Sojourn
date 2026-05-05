@@ -61,10 +61,12 @@ struct AdvisoriesPane: View {
 
   private func advisoryRow(_ advisory: AdvisoryReference) -> some View {
     HStack(alignment: .top, spacing: 12) {
-      Image(systemName: advisory.triggersBypass ? "exclamationmark.octagon" : "exclamationmark.triangle")
-        .foregroundStyle(color(for: advisory.severity))
-        .frame(width: 22)
-        .accessibilityHidden(true)
+      Image(
+        systemName: advisory.triggersBypass ? "exclamationmark.octagon" : "exclamationmark.triangle"
+      )
+      .foregroundStyle(color(for: advisory.severity))
+      .frame(width: 22)
+      .accessibilityHidden(true)
       VStack(alignment: .leading, spacing: 5) {
         Text(advisory.id)
           .font(.callout.weight(.semibold))
@@ -140,15 +142,18 @@ struct AdvisoriesPane: View {
     case .stale:
       return "Cached advisory snapshot is stale. \(snapshotDates)"
     case .unavailable:
-      return "No cached advisory snapshot. Configure Homebrew vulnerability data with consent, then refresh this pane."
+      return
+        "No cached advisory snapshot. Configure Homebrew vulnerability data with consent, then refresh this pane."
     }
   }
 
   private var snapshotDates: String {
-    let success = store.advisorySnapshot.lastSuccessAt
+    let success =
+      store.advisorySnapshot.lastSuccessAt
       .map { "Last success \(Self.dateFormatter.localizedString(for: $0, relativeTo: Date()))." }
       ?? "No successful scan recorded."
-    let attempt = store.advisorySnapshot.lastAttemptAt
+    let attempt =
+      store.advisorySnapshot.lastAttemptAt
       .map { "Last attempt \(Self.dateFormatter.localizedString(for: $0, relativeTo: Date()))." }
       ?? "No scan attempt recorded."
     return "\(success) \(attempt)"
@@ -162,30 +167,33 @@ struct AdvisoriesPane: View {
   }
 
   private func advisoryPackageSummary(_ advisory: AdvisoryReference) -> String {
-    let packages = advisory.affectedPackages.isEmpty
+    let packages =
+      advisory.affectedPackages.isEmpty
       ? "No affected packages recorded"
       : advisory.affectedPackages
         .map(\.canonicalString)
         .prefix(3)
         .joined(separator: ", ")
-    let fixed = advisory.fixedVersions.isEmpty
+    let fixed =
+      advisory.fixedVersions.isEmpty
       ? "No fixed versions recorded"
       : "Fixed \(advisory.fixedVersions.prefix(3).joined(separator: ", "))"
-    return "\(packages). \(fixed). Modified \(Self.dateFormatter.localizedString(for: advisory.modifiedAt, relativeTo: Date()))."
+    return
+      "\(packages). \(fixed). Modified \(Self.dateFormatter.localizedString(for: advisory.modifiedAt, relativeTo: Date()))."
   }
 
   private var freshnessLabel: String {
     switch store.advisorySnapshot.freshness {
-    case .fresh:       return "Fresh"
-    case .stale:       return "Stale"
+    case .fresh: return "Fresh"
+    case .stale: return "Stale"
     case .unavailable: return "Unavailable"
     }
   }
 
   private var freshnessSymbol: String {
     switch store.advisorySnapshot.freshness {
-    case .fresh:       return "checkmark.circle"
-    case .stale:       return "clock.badge.exclamationmark"
+    case .fresh: return "checkmark.circle"
+    case .stale: return "clock.badge.exclamationmark"
     case .unavailable: return "circle.dashed"
     }
   }
@@ -193,9 +201,9 @@ struct AdvisoriesPane: View {
   private func color(for severity: AdvisorySeverity) -> Color {
     switch severity {
     case .critical: return .red
-    case .high:     return .orange
+    case .high: return .orange
     case .moderate: return .yellow
-    case .low:      return .secondary
+    case .low: return .secondary
     }
   }
 

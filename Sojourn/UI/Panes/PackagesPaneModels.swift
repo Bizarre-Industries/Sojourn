@@ -62,6 +62,144 @@ internal struct PackageManagerSummary: Identifiable, Hashable {
     let days = tier.defaultCooldownDays
     return days == 1 ? "1 day" : "\(days) days"
   }
+
+  internal static func summaries(for counts: BrewfileAST.Counts) -> [PackageManagerSummary] {
+    appSummaries(for: counts)
+      + toolSummaries(for: counts)
+      + editorSummaries(for: counts)
+      + [tapSummary(for: counts)]
+  }
+
+  private static func appSummaries(for counts: BrewfileAST.Counts) -> [PackageManagerSummary] {
+    [
+      .init(
+        id: "mas",
+        name: "Mac App Store",
+        symbol: "apple.logo",
+        count: counts.mas,
+        tier: .a,
+        promptLabel: "Not required",
+        source: "mas",
+        description: "Reviewed App Store applications installed through mas."
+      ),
+      .init(
+        id: "brew",
+        name: "Homebrew",
+        symbol: "terminal",
+        count: counts.brews,
+        tierLabel: "B-C",
+        cooldownWindow: "7-14 days",
+        promptLabel: "Depends on tap",
+        source: "brew",
+        description: "Homebrew formulae from the Brewfile. Third-party taps use the stricter tier."
+      ),
+      .init(
+        id: "cargo",
+        name: "Cargo",
+        symbol: "shippingbox",
+        count: counts.cargo,
+        tier: .e,
+        promptLabel: "Required before apply",
+        source: "cargo",
+        description: "Rust packages installed by cargo."
+      )
+    ]
+  }
+
+  private static func toolSummaries(for counts: BrewfileAST.Counts) -> [PackageManagerSummary] {
+    [
+      .init(
+        id: "cask",
+        name: "Casks",
+        symbol: "app.dashed",
+        count: counts.casks,
+        tierLabel: "C-D",
+        cooldownWindow: "14-21 days",
+        promptLabel: "Depends on tap",
+        source: "brew cask",
+        description: "GUI apps and packaged installers."
+      ),
+      .init(
+        id: "uv",
+        name: "uv / Python",
+        symbol: "chevron.left.forwardslash.chevron.right",
+        count: counts.uv,
+        tier: .e,
+        promptLabel: "Required before apply",
+        source: "uv",
+        description: "Python tools managed through uv."
+      ),
+      .init(
+        id: "npm",
+        name: "npm global",
+        symbol: "curlybraces",
+        count: counts.npm,
+        tier: .e,
+        promptLabel: "Required before apply",
+        source: "npm",
+        description: "Global npm packages with lifecycle-script risk."
+      )
+    ]
+  }
+
+  private static func editorSummaries(for counts: BrewfileAST.Counts) -> [PackageManagerSummary] {
+    [
+      .init(
+        id: "go",
+        name: "Go install",
+        symbol: "g.circle",
+        count: counts.go,
+        tier: .e,
+        promptLabel: "Required before apply",
+        source: "go",
+        description: "Go module binaries."
+      ),
+      .init(
+        id: "vscode",
+        name: "VS Code",
+        symbol: "curlybraces.square",
+        count: counts.vscode,
+        tier: .d,
+        promptLabel: "Required before apply",
+        source: "code",
+        description: "VS Code extensions."
+      ),
+      .init(
+        id: "krew",
+        name: "krew",
+        symbol: "k.square",
+        count: counts.krew,
+        tier: .e,
+        promptLabel: "Required before apply",
+        source: "kubectl krew",
+        description: "kubectl plugin manager entries."
+      ),
+      .init(
+        id: "flatpak",
+        name: "Flatpak",
+        symbol: "shippingbox.circle",
+        count: counts.flatpak,
+        tier: .e,
+        promptLabel: "Required before apply",
+        source: "flatpak",
+        description: "Flatpak application entries from the Brewfile."
+      )
+    ]
+  }
+
+  private static func tapSummary(for counts: BrewfileAST.Counts) -> PackageManagerSummary {
+    .init(
+      id: "tap",
+      name: "Homebrew taps",
+      symbol: "point.3.connected.trianglepath.dotted",
+      count: counts.taps,
+      tierLabel: "Reference",
+      cooldownWindow: "No package cooldown",
+      promptLabel: "Not applicable",
+      source: "brew tap",
+      description: "Additional Homebrew repositories."
+    )
+  }
 }
 
 internal struct MasHelperActionError: Identifiable {
@@ -72,14 +210,16 @@ internal struct MasHelperActionError: Identifiable {
   internal static func register(_ error: any Error) -> MasHelperActionError {
     MasHelperActionError(
       title: "Could not register helper",
-      message: "System Settings may still need to approve Sojourn in General > Login Items. Cause: \(String(describing: error))"
+      message:
+        "System Settings may still need to approve Sojourn in General > Login Items. Cause: \(String(describing: error))"
     )
   }
 
   internal static func revoke(_ error: any Error) -> MasHelperActionError {
     MasHelperActionError(
       title: "Could not revoke helper",
-      message: "Check that Sojourn is allowed to manage its helper, then retry. Cause: \(String(describing: error))"
+      message:
+        "Check that Sojourn is allowed to manage its helper, then retry. Cause: \(String(describing: error))"
     )
   }
 }

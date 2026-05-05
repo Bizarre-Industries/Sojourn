@@ -5,6 +5,7 @@
   },
   "lineLength": 100,
   "maximumBlankLines": 1,
+  "multiElementCollectionTrailingCommas": false,
   "respectsExistingLineBreaks": true,
   "lineBreakBeforeControlFlowKeywords": false,
   "lineBreakBeforeEachArgument": false,
@@ -12,11 +13,9 @@
   "prioritizeKeepingFunctionOutputTogether": true,
   "indentConditionalCompilationBlocks": false,
   "indentSwitchCaseLabels": false,
-  "fileScopedDeclarationPrivacy": {
-    "accessLevel": "internal"
-  },
   "rules": {
     "AllPublicDeclarationsHaveDocumentation": false,
+    "FileScopedDeclarationPrivacy": false,
     "NoAccessLevelOnExtensionDeclaration": true,
     "NoBlockComments": false,
     "OrderedImports": true,

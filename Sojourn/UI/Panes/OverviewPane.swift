@@ -31,8 +31,10 @@ struct OverviewPane: View {
     VStack(alignment: .leading, spacing: 6) {
       Text("Overview")
         .font(.title2.weight(.semibold))
-      Text("Machine configuration status from Brewfile, sync, snapshots, containers, and update services.")
-        .foregroundStyle(.secondary)
+      Text(
+        "Machine configuration status from Brewfile, sync, snapshots, containers, and update services."
+      )
+      .foregroundStyle(.secondary)
     }
   }
 
@@ -40,7 +42,8 @@ struct OverviewPane: View {
     Grid(alignment: .leading, horizontalSpacing: 12, verticalSpacing: 12) {
       GridRow {
         metric("Packages", "\(store.brewfile?.packageCount ?? 0)", "Brewfile entries")
-        metric("Containers", "\(store.containers.runtimes.filter(\.installed).count)", containerSubtitle)
+        metric(
+          "Containers", "\(store.containers.runtimes.filter(\.installed).count)", containerSubtitle)
       }
       GridRow {
         metric("Generations", "\(store.generations.count)", "retained snapshots")
@@ -135,7 +138,8 @@ struct OverviewPane: View {
         ContentUnavailableView(
           "No recent activity",
           systemImage: "clock",
-          description: Text("Run a refresh, pull, push, or snapshot operation to populate this list.")
+          description: Text(
+            "Run a refresh, pull, push, or snapshot operation to populate this list.")
         )
         .frame(maxWidth: .infinity, minHeight: 120)
       } else {
@@ -251,12 +255,15 @@ struct OverviewPane: View {
   }
 
   private var lastSyncText: String {
-    guard let entry = store.history.reversed().first(where: { entry in
-      entry.kind == .syncPull || entry.kind == .syncPush
-    }) else {
+    guard
+      let entry = store.history.reversed().first(where: { entry in
+        entry.kind == .syncPull || entry.kind == .syncPush
+      })
+    else {
       return "No sync history recorded."
     }
-    return "\(entry.description) · \(Self.relativeFormatter.localizedString(for: entry.timestamp, relativeTo: Date()))"
+    return
+      "\(entry.description) · \(Self.relativeFormatter.localizedString(for: entry.timestamp, relativeTo: Date()))"
   }
 
   private var syncBadgeCount: Int? {
@@ -272,10 +279,10 @@ struct OverviewPane: View {
 
   private func icon(for state: JobState) -> String {
     switch state {
-    case .pending:   return "clock"
-    case .running:   return "progress.indicator"
+    case .pending: return "clock"
+    case .running: return "progress.indicator"
     case .succeeded: return "checkmark.circle"
-    case .failed:    return "xmark.octagon"
+    case .failed: return "xmark.octagon"
     case .cancelled: return "minus.circle"
     }
   }
@@ -283,9 +290,9 @@ struct OverviewPane: View {
   private func color(for state: JobState) -> Color {
     switch state {
     case .pending, .cancelled: return .secondary
-    case .running:             return .accentColor
-    case .succeeded:           return .green
-    case .failed:              return .red
+    case .running: return .accentColor
+    case .succeeded: return .green
+    case .failed: return .red
     }
   }
 

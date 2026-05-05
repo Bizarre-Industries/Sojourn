@@ -15,16 +15,20 @@ struct MachinesPane: View {
     ScrollView {
       VStack(alignment: .leading, spacing: 18) {
         let machines = store.settings.machines
-        EyebrowLabel(text: "\(machines.count) MACHINE\(machines.count == 1 ? "" : "S") · COOPERATIVE LOCK")
-          .padding(.top, 8)
+        EyebrowLabel(
+          text: "\(machines.count) MACHINE\(machines.count == 1 ? "" : "S") · COOPERATIVE LOCK"
+        )
+        .padding(.top, 8)
         Text("YOUR FLEET")
           .font(.bzrStencil(size: 30, weight: .heavy))
           .foregroundStyle(Color.txtPrimary)
-        Text("One active writer at a time. Pull before push. The lock is a hint git doesn't enforce — it catches the 95% case of a forgotten pull.")
-          .font(.bzrBody(size: 13))
-          .foregroundStyle(Color.txtSecondary)
-          .frame(maxWidth: 64 * 9, alignment: .leading)
-          .fixedSize(horizontal: false, vertical: true)
+        Text(
+          "One active writer at a time. Pull before push. The lock is a hint git doesn't enforce — it catches the 95% case of a forgotten pull."
+        )
+        .font(.bzrBody(size: 13))
+        .foregroundStyle(Color.txtSecondary)
+        .frame(maxWidth: 64 * 9, alignment: .leading)
+        .fixedSize(horizontal: false, vertical: true)
 
         if machines.isEmpty {
           BzrCard(eyebrow: "FLEET") {
@@ -32,9 +36,11 @@ struct MachinesPane: View {
               Text("No machines registered yet")
                 .font(.bzrBody(size: 13, weight: .semibold))
                 .foregroundStyle(Color.txtPrimary)
-              Text("Each Mac running Sojourn registers itself in `.sojourn/machines/<hostname>.toml` on first push. After your first sync from a second machine, you'll see both listed here.")
-                .font(.bzrBody(size: 12))
-                .foregroundStyle(Color.txtSecondary)
+              Text(
+                "Each Mac running Sojourn registers itself in `.sojourn/machines/<hostname>.toml` on first push. After your first sync from a second machine, you'll see both listed here."
+              )
+              .font(.bzrBody(size: 12))
+              .foregroundStyle(Color.txtSecondary)
             }
           }
         } else {
@@ -83,8 +89,12 @@ struct MachinesPane: View {
       )
 
       VStack(alignment: .leading, spacing: 6) {
-        machineRow("First seen", Self.relativeFormatter.localizedString(for: m.firstSeenAt, relativeTo: Date()))
-        machineRow("Last seen", Self.relativeFormatter.localizedString(for: m.lastSeenAt, relativeTo: Date()))
+        machineRow(
+          "First seen",
+          Self.relativeFormatter.localizedString(for: m.firstSeenAt, relativeTo: Date()))
+        machineRow(
+          "Last seen", Self.relativeFormatter.localizedString(for: m.lastSeenAt, relativeTo: Date())
+        )
         machineRow("Overrides", "\(m.overrides.count)", lime: !m.overrides.isEmpty)
       }
       .padding(.horizontal, 16)
@@ -125,6 +135,7 @@ struct MachinesPane: View {
 
   private func machineAccessibilityLabel(_ machine: MachineMetadata) -> String {
     let current = machine.hostname == MachineMetadata.currentHostname() ? "This Mac. " : ""
-    return "\(machine.hostname). \(current)First seen \(Self.relativeFormatter.localizedString(for: machine.firstSeenAt, relativeTo: Date())). Last seen \(Self.relativeFormatter.localizedString(for: machine.lastSeenAt, relativeTo: Date())). \(machine.overrides.count) overrides."
+    return
+      "\(machine.hostname). \(current)First seen \(Self.relativeFormatter.localizedString(for: machine.firstSeenAt, relativeTo: Date())). Last seen \(Self.relativeFormatter.localizedString(for: machine.lastSeenAt, relativeTo: Date())). \(machine.overrides.count) overrides."
   }
 }

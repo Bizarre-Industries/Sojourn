@@ -26,7 +26,9 @@ struct PreferencesPane: View {
         ContentUnavailableView(
           "No preference corpus loaded",
           systemImage: "slider.horizontal.3",
-          description: Text("The bundled domain corpus could not be found in this build. Rebuild the app bundle, then refresh.")
+          description: Text(
+            "The bundled domain corpus could not be found in this build. Rebuild the app bundle, then refresh."
+          )
         )
         .frame(maxWidth: .infinity, maxHeight: .infinity)
       } else if domains.isEmpty {
@@ -105,20 +107,20 @@ struct PreferencesPane: View {
 
   private func symbol(for domain: PreferenceDomainEntry) -> String {
     switch domain.layer {
-    case "sandboxed":      return "app.badge"
-    case "system":         return "lock.shield"
+    case "sandboxed": return "app.badge"
+    case "system": return "lock.shield"
     case "apple-internal": return "apple.logo"
-    default:               return "gearshape"
+    default: return "gearshape"
     }
   }
 
   private func layerLabel(for domain: PreferenceDomainEntry) -> String {
     switch domain.layer {
-    case "user":           return "User defaults"
-    case "sandboxed":      return "Sandboxed plist"
-    case "system":         return "System defaults"
+    case "user": return "User defaults"
+    case "sandboxed": return "Sandboxed plist"
+    case "system": return "System defaults"
     case "apple-internal": return "Apple internal"
-    default:               return domain.layer
+    default: return domain.layer
     }
   }
 

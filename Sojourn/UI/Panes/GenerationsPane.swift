@@ -70,6 +70,10 @@ struct GenerationsPane: View {
           .font(.caption)
           .foregroundStyle(.secondary)
           .lineLimit(2)
+        Text(generationMetadata(for: manifest))
+          .font(.caption2.monospaced())
+          .foregroundStyle(.tertiary)
+          .lineLimit(1)
       }
       Spacer()
       VStack(alignment: .trailing, spacing: 3) {
@@ -78,10 +82,27 @@ struct GenerationsPane: View {
         Text("\(Self.byteFormatter.string(fromByteCount: manifest.archiveSizeBytes)) · \(String(manifest.sha256.prefix(12)))")
           .font(.caption.monospaced())
           .foregroundStyle(.secondary)
+        Text(brewfileCounts(for: manifest.generation.brewfileCounts))
+          .font(.caption2)
+          .foregroundStyle(.tertiary)
       }
     }
     .padding(.vertical, 5)
     .accessibilityElement(children: .combine)
+  }
+
+  private func generationMetadata(for manifest: GenerationManifest) -> String {
+    let commit = manifest.generation.chezmoiCommit.map {
+      " · commit \(String($0.prefix(12)))"
+    } ?? ""
+    return "\(manifest.generation.tag)\(commit)"
+  }
+
+  private func brewfileCounts(for counts: BrewfileAST.Counts) -> String {
+    let total = counts.taps + counts.brews + counts.casks + counts.mas
+      + counts.vscode + counts.go + counts.cargo + counts.uv
+      + counts.krew + counts.npm + counts.flatpak
+    return "\(total) entries · \(counts.brews) brews · \(counts.casks) casks · \(counts.mas) apps"
   }
 
   private static let byteFormatter: ByteCountFormatter = {

@@ -5,6 +5,7 @@ import SwiftUI
 struct PackagesPane: View {
   @Environment(AppStore.self) private var store
   @State private var selectedManager: String? = "brew"
+  @State private var refreshingBrewfile = false
   @State private var masHelperError: MasHelperActionError?
   @State private var confirmingMasHelperRevoke = false
 
@@ -40,6 +41,7 @@ struct PackagesPane: View {
     .background(Color(nsColor: .windowBackgroundColor))
     .accessibilityIdentifier("pane.packages")
     .task {
+      await store.refreshBrewfile()
       await store.refreshMasHelperStatus()
     }
     .alert(masHelperError?.title ?? "Helper action failed", isPresented: masHelperErrorPresented) {
@@ -71,14 +73,10 @@ struct PackagesPane: View {
 
   private var packageDetail: some View {
     let manager = selectedSummary
+    let rows = inventoryRows(for: manager.id)
     return ScrollView {
       VStack(alignment: .leading, spacing: 18) {
-        VStack(alignment: .leading, spacing: 4) {
-          Text(manager.name)
-            .font(.title2.weight(.semibold))
-          Text(manager.description)
-            .foregroundStyle(.secondary)
-        }
+        header(for: manager)
 
         if manager.id == "mas" {
           masHelperStatusRow
@@ -106,18 +104,115 @@ struct PackagesPane: View {
           .frame(maxWidth: .infinity, alignment: .leading)
         }
 
-        GroupBox("Outdated") {
-          ContentUnavailableView(
-            "Outdated scan unavailable",
-            systemImage: "arrow.triangle.2.circlepath",
-            description: Text("Package counts are available. Installed-versus-latest rows are not part of the current inventory snapshot.")
-          )
-          .frame(maxWidth: .infinity, minHeight: 140)
-        }
+        inventorySection(manager: manager, rows: rows)
       }
       .padding(24)
       .frame(maxWidth: 760, alignment: .leading)
     }
+  }
+
+  private func header(for manager: PackageManagerSummary) -> some View {
+    HStack(alignment: .firstTextBaseline) {
+      VStack(alignment: .leading, spacing: 4) {
+        Text(manager.name)
+          .font(.title2.weight(.semibold))
+        Text(manager.description)
+          .foregroundStyle(.secondary)
+      }
+      Spacer()
+      Button {
+        Task { await refreshInventory() }
+      } label: {
+        Label(refreshingBrewfile ? "Refreshing" : "Refresh", systemImage: "arrow.clockwise")
+      }
+      .disabled(refreshingBrewfile)
+      .accessibilityIdentifier("packages.refresh")
+    }
+  }
+
+  @ViewBuilder
+  private func inventorySection(
+    manager: PackageManagerSummary,
+    rows: [PackageInventoryRow]
+  ) -> some View {
+    VStack(alignment: .leading, spacing: 10) {
+      HStack {
+        Text("Inventory")
+          .font(.headline)
+        Spacer()
+        Text("\(rows.count) rows")
+          .font(.caption)
+          .foregroundStyle(.secondary)
+      }
+
+      if store.brewfile == nil {
+        ContentUnavailableView(
+          "No Brewfile snapshot",
+          systemImage: "doc.text.magnifyingglass",
+          description: Text("Refresh runs brew bundle dump and renders the current Brewfile entries when Homebrew is available.")
+        )
+        .frame(maxWidth: .infinity, minHeight: 180)
+      } else if rows.isEmpty {
+        ContentUnavailableView(
+          "No \(manager.name) entries",
+          systemImage: manager.symbol,
+          description: Text("This Brewfile has no entries for \(manager.source).")
+        )
+        .frame(maxWidth: .infinity, minHeight: 180)
+      } else {
+        List(rows) { row in
+          inventoryRow(row)
+        }
+        .listStyle(.inset)
+        .scrollContentBackground(.hidden)
+        .background(Color(nsColor: .windowBackgroundColor))
+        .frame(minHeight: 220)
+      }
+    }
+    .accessibilityIdentifier("packages.inventory")
+  }
+
+  private func inventoryRow(_ row: PackageInventoryRow) -> some View {
+    HStack(alignment: .top, spacing: 12) {
+      Image(systemName: row.symbol)
+        .foregroundStyle(.secondary)
+        .frame(width: 22)
+        .accessibilityHidden(true)
+      VStack(alignment: .leading, spacing: 3) {
+        Text(row.packageID)
+          .font(.callout.weight(.semibold))
+          .textSelection(.enabled)
+        Text(row.detail)
+          .font(.caption)
+          .foregroundStyle(.secondary)
+      }
+      Spacer(minLength: 16)
+      VStack(alignment: .trailing, spacing: 3) {
+        Text(row.kindLabel)
+          .font(.caption.weight(.medium))
+        Text("Tier \(row.tierLabel) · \(row.cooldownWindow)")
+          .font(.caption)
+          .foregroundStyle(.secondary)
+        Text(row.promptLabel)
+          .font(.caption2)
+          .foregroundStyle(.tertiary)
+      }
+    }
+    .padding(.vertical, 5)
+    .accessibilityElement(children: .ignore)
+    .accessibilityLabel(
+      "\(row.packageID). \(row.kindLabel). \(row.detail). Tier \(row.tierLabel). \(row.promptLabel)."
+    )
+  }
+
+  private func inventoryRows(for managerID: String) -> [PackageInventoryRow] {
+    PackageInventoryRow.rows(from: store.brewfile, managerID: managerID)
+  }
+
+  private func refreshInventory() async {
+    refreshingBrewfile = true
+    await store.refreshBrewfile(force: true)
+    refreshingBrewfile = false
   }
 
   // MARK: - MasHelper status row

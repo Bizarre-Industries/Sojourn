@@ -77,6 +77,7 @@
 		7DC5BAB597CF4ECE62CDE01C /* ToolProbe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A07B987FC38D4FE488E8704 /* ToolProbe.swift */; };
 		7EB4436F77BF9F391CF0C28D /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 6D20408C069D9385AE80FE87 /* Sparkle */; };
 		7F35922412987A6980939F44 /* StateDB.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F811FB480E52C17173F18BE /* StateDB.swift */; };
+		7F38908B3151F7AD0E7D1868 /* PackageInventoryRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 322525F6BFB0AE5CD82D448E /* PackageInventoryRow.swift */; };
 		7F4A4A10C94FD64082D138E3 /* AdvisoryReference.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB1FBD91A2515C0261DD4EFF /* AdvisoryReference.swift */; };
 		80AA65AC31C8757820AAFDE3 /* Fixtures in Resources */ = {isa = PBXBuildFile; fileRef = F6B2E4CDB667C8A900D0EC01 /* Fixtures */; };
 		821CF9439A3A22FDBE3106C9 /* DotfileOwner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85CA5EF14259B836AD6AED4E /* DotfileOwner.swift */; };
@@ -198,6 +199,7 @@
 		2A07B987FC38D4FE488E8704 /* ToolProbe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolProbe.swift; sourceTree = "<group>"; };
 		2A4824F5864A9EC3B55E6600 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		2DD4943AD10D37C3DB9CFBC9 /* LogBufferTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogBufferTests.swift; sourceTree = "<group>"; };
+		322525F6BFB0AE5CD82D448E /* PackageInventoryRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackageInventoryRow.swift; sourceTree = "<group>"; };
 		36003675808D66439A2DE0B8 /* AppStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStoreTests.swift; sourceTree = "<group>"; };
 		3631080B96D92DFD843F72AE /* ToolLocatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolLocatorTests.swift; sourceTree = "<group>"; };
 		37F9681D54DC8472566008C6 /* ContainersPane.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContainersPane.swift; sourceTree = "<group>"; };
@@ -513,6 +515,7 @@
 				EDF057685B19AB3503933B08 /* MachineMetadata.swift */,
 				3D1CE3F585241A7C3832E1FC /* ManagerSnapshot.swift */,
 				AA82E2DC35BD66C0CCB3D31C /* OrphanCandidate.swift */,
+				322525F6BFB0AE5CD82D448E /* PackageInventoryRow.swift */,
 				92FBF1A32893C79F8C24CC6D /* PreferenceDomain.swift */,
 				D95EF49879108ECD1297E756 /* PURL.swift */,
 				B17DA112F156FC13EBFD8B18 /* Snapshot.swift */,
@@ -1014,6 +1017,7 @@
 				C63650F6F57BDB8D36CDC7E9 /* OrphanCandidate.swift in Sources */,
 				B8384A446BAC0005B38572E7 /* OverviewPane.swift in Sources */,
 				F92E6B88164044C942516052 /* PURL.swift in Sources */,
+				7F38908B3151F7AD0E7D1868 /* PackageInventoryRow.swift in Sources */,
 				E4AE7D402977E4174F6AA917 /* PackagesPane.swift in Sources */,
 				EC09A5B3183BEB61809AC07E /* PackagesPaneModels.swift in Sources */,
 				CECA18FC532B5949256AC8AD /* Pane.swift in Sources */,
@@ -1207,7 +1211,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Sojourn/SojournDebug.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 29;
+				CURRENT_PROJECT_VERSION = 30;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Sojourn/Info.plist;
@@ -1248,7 +1252,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Sojourn/Sojourn.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 29;
+				CURRENT_PROJECT_VERSION = 30;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Sojourn/Info.plist;
@@ -1271,7 +1275,7 @@
 				CODE_SIGN_ENTITLEMENTS = MasHelper/MasHelper.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
 				CREATE_INFOPLIST_SECTION_IN_BINARY = YES;
-				CURRENT_PROJECT_VERSION = 29;
+				CURRENT_PROJECT_VERSION = 30;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = MasHelper/Info.plist;
@@ -1332,7 +1336,7 @@
 				CODE_SIGN_ENTITLEMENTS = MasHelper/MasHelper.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
 				CREATE_INFOPLIST_SECTION_IN_BINARY = YES;
-				CURRENT_PROJECT_VERSION = 29;
+				CURRENT_PROJECT_VERSION = 30;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = MasHelper/Info.plist;

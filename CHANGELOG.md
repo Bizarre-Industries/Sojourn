@@ -12,6 +12,9 @@ All notable changes to Sojourn. Follows
   compact toolbar actions, native pane surfaces, AppStore-backed
   pane snapshots, bounded job history, and staged-content secret
   scanning before sync push.
+- v0.4 stage 2 pane data completion: real Brewfile package inventory
+  rows, expanded generation/advisory/container/preference metadata,
+  and Swift/UI smoke coverage for the package inventory surface.
 
 ### Planned (post-v0.3.0)
 

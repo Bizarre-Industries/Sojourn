@@ -91,11 +91,19 @@ internal struct ContainersPane: View {
         Text(detail(for: status))
           .font(.caption)
           .foregroundStyle(.secondary)
+        Text("Tool: \(status.runtime.toolName) \(status.runtime.versionArgs.joined(separator: " "))")
+          .font(.caption2.monospaced())
+          .foregroundStyle(.tertiary)
       }
       Spacer()
-      Text(status.installed ? "Installed" : "Not installed")
-        .font(.caption)
-        .foregroundStyle(status.installed ? .primary : .secondary)
+      VStack(alignment: .trailing, spacing: 3) {
+        Text(status.installed ? "Installed" : "Not installed")
+          .font(.caption.weight(.medium))
+          .foregroundStyle(status.installed ? Color.primary : Color.secondary)
+        Text(status.runtime == store.containers.activeRuntime ? "Priority active" : "Priority standby")
+          .font(.caption2)
+          .foregroundStyle(status.installed ? Color.secondary : Color.gray)
+      }
     }
     .padding(.vertical, 5)
     .accessibilityElement(children: .combine)
@@ -108,7 +116,7 @@ internal struct ContainersPane: View {
         .font(.caption)
         .foregroundStyle(.secondary)
       Spacer()
-      Text("Detection only. Start and stop actions are unavailable in this build.")
+      Text("Read-only detection. Sojourn does not start, stop, or install runtimes from this pane.")
         .font(.caption)
         .foregroundStyle(.tertiary)
     }
@@ -125,10 +133,11 @@ internal struct ContainersPane: View {
   }
 
   private func runtimeAccessibilityLabel(for status: RuntimeStatus) -> String {
+    let tool = "Tool \(status.runtime.toolName) \(status.runtime.versionArgs.joined(separator: " "))."
     if status.runtime == store.containers.activeRuntime, status.installed {
-      return "Active runtime: \(status.runtime.displayName). \(detail(for: status)). Installed."
+      return "Active runtime: \(status.runtime.displayName). \(detail(for: status)). \(tool) Installed."
     }
-    return "\(status.runtime.displayName). \(detail(for: status)). \(status.installed ? "Installed." : "Not installed.")"
+    return "\(status.runtime.displayName). \(detail(for: status)). \(tool) \(status.installed ? "Installed." : "Not installed.")"
   }
 
   private func symbol(for runtime: ContainerRuntime) -> String {

@@ -67,6 +67,20 @@ final class SojournUITests: XCTestCase {
     }
   }
 
+  func testPackagesPaneShowsStage2InventorySurface() throws {
+    let app = XCUIApplication()
+    launchAgentApp(app)
+    XCTAssertTrue(app.windows.firstMatch.waitForExistence(timeout: 10))
+
+    let row = sidebarEntry(app, "sidebar.packages")
+    XCTAssertTrue(row.waitForExistence(timeout: 4))
+    row.click()
+
+    XCTAssertTrue(pane(app, "pane.packages").waitForExistence(timeout: 4))
+    XCTAssertTrue(app.otherElements["packages.inventory"].waitForExistence(timeout: 4))
+    XCTAssertFalse(app.staticTexts["Outdated scan unavailable"].exists)
+  }
+
   private func launchAgentApp(_ app: XCUIApplication) {
     app.launch()
 

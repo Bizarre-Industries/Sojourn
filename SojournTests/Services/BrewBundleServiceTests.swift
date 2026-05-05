@@ -117,3 +117,50 @@ struct BrewfileTierTests {
     #expect(BrewfileTier.e.defaultCooldownDays == 30)
   }
 }
+
+struct PackageInventoryRowTests {
+  @Test func canonicalFixtureMapsEveryPackageEntryToInventoryRows() throws {
+    let url = try #require(
+      Bundle.sojournFixtureURL(name: "brewfiles/canonical", ext: "txt"),
+      "canonical.txt fixture not found"
+    )
+    let text = try String(contentsOf: url, encoding: .utf8)
+    let ast = BrewfileParser.parse(text)
+
+    let rows = PackageInventoryRow.rows(from: ast)
+
+    #expect(rows.count == ast.packageCount)
+    #expect(rows.map(\.managerID) == [
+      "tap", "tap",
+      "brew", "brew", "brew",
+      "cask", "cask",
+      "mas", "mas",
+      "vscode", "vscode",
+      "go",
+      "cargo", "cargo",
+      "uv",
+      "krew",
+      "npm"
+    ])
+
+    let mas = try #require(rows.first { $0.packageID == "Xcode" })
+    #expect(mas.detail == "id 497799835")
+
+    let linkedBrew = try #require(rows.first { $0.packageID == "go@1.21" })
+    #expect(linkedBrew.detail == "link: false")
+  }
+
+  @Test func rowsCanBeFilteredByManagerID() {
+    let ast = BrewfileAST(entries: [
+      .brew("ripgrep"),
+      .cask("iterm2"),
+      .mas("Xcode", id: 497799835),
+      .comment("# ignored"),
+      .blank
+    ])
+
+    #expect(PackageInventoryRow.rows(from: ast, managerID: "brew").map(\.packageID) == ["ripgrep"])
+    #expect(PackageInventoryRow.rows(from: ast, managerID: "cask").map(\.packageID) == ["iterm2"])
+    #expect(PackageInventoryRow.rows(from: ast, managerID: "mas").map(\.packageID) == ["Xcode"])
+  }
+}

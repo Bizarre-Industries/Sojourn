@@ -77,11 +77,14 @@ struct PreferencesPane: View {
         Text(domain.bundleID)
           .font(.caption.monospaced())
           .foregroundStyle(.secondary)
+        Text(accessLabel(for: domain))
+          .font(.caption2)
+          .foregroundStyle(.tertiary)
       }
       Spacer()
       VStack(alignment: .trailing, spacing: 3) {
-        Text(domain.layer)
-          .font(.caption)
+        Text(layerLabel(for: domain))
+          .font(.caption.weight(.medium))
         Text(domain.syncable ? "Syncable" : "Reference")
           .font(.caption)
           .foregroundStyle(.secondary)
@@ -89,7 +92,9 @@ struct PreferencesPane: View {
     }
     .padding(.vertical, 5)
     .accessibilityElement(children: .combine)
-    .accessibilityLabel("\(domain.displayName). \(domain.bundleID). \(domain.layer). \(domain.syncable ? "Syncable" : "Reference").")
+    .accessibilityLabel(
+      "\(domain.displayName). \(domain.bundleID). \(layerLabel(for: domain)). \(accessLabel(for: domain)). \(domain.syncable ? "Syncable" : "Reference")."
+    )
   }
 
   private func symbol(for domain: PreferenceDomainEntry) -> String {
@@ -98,6 +103,27 @@ struct PreferencesPane: View {
     case "system":         return "lock.shield"
     case "apple-internal": return "apple.logo"
     default:               return "gearshape"
+    }
+  }
+
+  private func layerLabel(for domain: PreferenceDomainEntry) -> String {
+    switch domain.layer {
+    case "user":           return "User defaults"
+    case "sandboxed":      return "Sandboxed plist"
+    case "system":         return "System defaults"
+    case "apple-internal": return "Apple internal"
+    default:               return domain.layer
+    }
+  }
+
+  private func accessLabel(for domain: PreferenceDomainEntry) -> String {
+    switch domain.layer {
+    case "sandboxed":
+      return "Container preference path; Full Disk Access may be required"
+    case "system", "apple-internal":
+      return "System preference path; Full Disk Access may be required"
+    default:
+      return "User preference domain"
     }
   }
 }

@@ -24,6 +24,9 @@ struct AdvisoriesPane: View {
         .scrollContentBackground(.hidden)
         .background(Color(nsColor: .windowBackgroundColor))
       }
+
+      Divider()
+      cacheFooter
     }
     .padding(24)
     .background(Color(nsColor: .windowBackgroundColor))
@@ -54,27 +57,63 @@ struct AdvisoriesPane: View {
   }
 
   private func advisoryRow(_ advisory: AdvisoryReference) -> some View {
-    HStack(spacing: 12) {
+    HStack(alignment: .top, spacing: 12) {
       Image(systemName: advisory.triggersBypass ? "exclamationmark.octagon" : "exclamationmark.triangle")
         .foregroundStyle(color(for: advisory.severity))
         .frame(width: 22)
         .accessibilityHidden(true)
-      VStack(alignment: .leading, spacing: 2) {
+      VStack(alignment: .leading, spacing: 5) {
         Text(advisory.id)
           .font(.callout.weight(.semibold))
         Text(advisory.summary)
           .font(.caption)
           .foregroundStyle(.secondary)
           .lineLimit(2)
+        Text(advisoryPackageSummary(advisory))
+          .font(.caption2)
+          .foregroundStyle(.tertiary)
+          .lineLimit(2)
       }
       Spacer()
-      Text(advisory.severity.rawValue.capitalized)
-        .font(.caption)
-        .foregroundStyle(color(for: advisory.severity))
+      VStack(alignment: .trailing, spacing: 4) {
+        Text(advisory.severity.rawValue.capitalized)
+          .font(.caption.weight(.semibold))
+          .foregroundStyle(color(for: advisory.severity))
+        Text(advisory.feed.rawValue.uppercased())
+          .font(.caption2.monospaced())
+          .foregroundStyle(.secondary)
+        Text(advisory.triggersBypass ? "Bypasses cooldown" : "Cooldown applies")
+          .font(.caption2)
+          .foregroundStyle(advisory.triggersBypass ? Color.orange : Color.secondary)
+        if let url = advisory.referenceURL {
+          Link("Reference", destination: url)
+            .font(.caption2)
+        }
+      }
     }
     .padding(.vertical, 5)
     .accessibilityElement(children: .combine)
-    .accessibilityLabel("\(advisory.id). \(advisory.severity.rawValue.capitalized). \(advisory.summary).")
+    .accessibilityLabel(
+      "\(advisory.id). \(advisory.severity.rawValue.capitalized). \(advisory.feed.rawValue.uppercased()). \(advisory.summary). \(advisoryPackageSummary(advisory))."
+    )
+  }
+
+  private var cacheFooter: some View {
+    HStack(alignment: .top) {
+      VStack(alignment: .leading, spacing: 3) {
+        Text(snapshotDates)
+          .font(.caption)
+          .foregroundStyle(.secondary)
+        Text(cacheKeyLabel)
+          .font(.caption.monospaced())
+          .foregroundStyle(.tertiary)
+      }
+      Spacer()
+      Text("\(store.advisorySnapshot.advisories.count) advisories")
+        .font(.caption)
+        .foregroundStyle(.secondary)
+    }
+    .accessibilityIdentifier("advisories.cache-metadata")
   }
 
   private var emptyDescription: String {
@@ -101,6 +140,26 @@ struct AdvisoriesPane: View {
       .map { "Last attempt \(Self.dateFormatter.localizedString(for: $0, relativeTo: Date()))." }
       ?? "No scan attempt recorded."
     return "\(success) \(attempt)"
+  }
+
+  private var cacheKeyLabel: String {
+    guard let key = store.advisorySnapshot.cacheKeySHA256 else {
+      return "Cache key unavailable"
+    }
+    return "Cache key \(String(key.prefix(12)))"
+  }
+
+  private func advisoryPackageSummary(_ advisory: AdvisoryReference) -> String {
+    let packages = advisory.affectedPackages.isEmpty
+      ? "No affected packages recorded"
+      : advisory.affectedPackages
+        .map(\.canonicalString)
+        .prefix(3)
+        .joined(separator: ", ")
+    let fixed = advisory.fixedVersions.isEmpty
+      ? "No fixed versions recorded"
+      : "Fixed \(advisory.fixedVersions.prefix(3).joined(separator: ", "))"
+    return "\(packages). \(fixed). Modified \(Self.dateFormatter.localizedString(for: advisory.modifiedAt, relativeTo: Date()))."
   }
 
   private var freshnessLabel: String {

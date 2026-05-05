@@ -40,4 +40,21 @@ struct RedactorTests {
     #expect(out.contains("<GITHUB_PAT>"))
     #expect(!out.contains(synthetic))
   }
+
+  @Test("masks current GitHub token formats")
+  func currentGitHubTokenFormats() {
+    let r = Redactor(username: "alice", host: "synthetic-host-9001")
+    let tokens = [
+      ("github_pat_EXAMPLE" + String(repeating: "A", count: 75), "<GITHUB_FINE_GRAINED_PAT>"),
+      ("ghu_EXAMPLE" + String(repeating: "B", count: 30), "<GITHUB_APP_USER_TOKEN>"),
+      ("ghr_EXAMPLE" + String(repeating: "C", count: 30), "<GITHUB_APP_REFRESH_TOKEN>"),
+      ("ghs_123456_EXAMPLE" + String(repeating: "D", count: 110) + "." + String(repeating: "E", count: 110), "<GITHUB_APP_TOKEN>")
+    ]
+
+    for (token, replacement) in tokens {
+      let out = r.redact("token=\(token) end")
+      #expect(out.contains(replacement))
+      #expect(!out.contains(token))
+    }
+  }
 }

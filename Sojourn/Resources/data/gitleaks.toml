@@ -36,13 +36,37 @@ tags = ["aws", "sojourn"]
 [[rules]]
 id = "sojourn-github-pat"
 description = "GitHub classic personal access token"
-regex = '''ghp_[A-Za-z0-9]{36}'''
+regex = '''ghp_[A-Za-z0-9_]{20,}'''
 tags = ["github", "sojourn"]
 
 [[rules]]
 id = "sojourn-github-fine-grained-pat"
 description = "GitHub fine-grained PAT"
-regex = '''github_pat_[A-Za-z0-9_]{82}'''
+regex = '''github_pat_[A-Za-z0-9_]{20,}'''
+tags = ["github", "sojourn"]
+
+[[rules]]
+id = "sojourn-github-oauth-token"
+description = "GitHub OAuth access token"
+regex = '''gho_[A-Za-z0-9_]{20,}'''
+tags = ["github", "sojourn"]
+
+[[rules]]
+id = "sojourn-github-app-user-token"
+description = "GitHub App user-to-server token"
+regex = '''ghu_[A-Za-z0-9_]{20,}'''
+tags = ["github", "sojourn"]
+
+[[rules]]
+id = "sojourn-github-app-installation-token"
+description = "GitHub App installation token"
+regex = '''ghs_[A-Za-z0-9_\.]{20,}'''
+tags = ["github", "sojourn"]
+
+[[rules]]
+id = "sojourn-github-app-refresh-token"
+description = "GitHub App refresh token"
+regex = '''ghr_[A-Za-z0-9_]{20,}'''
 tags = ["github", "sojourn"]
 
 [[rules]]

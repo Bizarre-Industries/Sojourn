@@ -120,6 +120,21 @@ struct SecretScanServiceTests {
     #expect(text.contains("secretGroup = 1"))
   }
 
+  @Test func bundledConfigCoversCurrentGitHubTokenFormats() throws {
+    let url = try #require(SecretScanService.bundledConfigURL())
+    let text = try String(contentsOf: url, encoding: .utf8)
+    #expect(text.contains("id = \"sojourn-github-pat\""))
+    #expect(text.contains("id = \"sojourn-github-fine-grained-pat\""))
+    #expect(text.contains("id = \"sojourn-github-oauth-token\""))
+    #expect(text.contains("id = \"sojourn-github-app-user-token\""))
+    #expect(text.contains("id = \"sojourn-github-app-installation-token\""))
+    #expect(text.contains("id = \"sojourn-github-app-refresh-token\""))
+    #expect(text.contains("github_pat_"))
+    #expect(text.contains("ghu_"))
+    #expect(text.contains("ghs_"))
+    #expect(text.contains("ghr_"))
+  }
+
   @Test func decodesFixtureReport() async throws {
     let url = try #require(
       Bundle.sojournFixtureURL(name: "gitleaks-report", ext: "json"),
@@ -179,6 +194,30 @@ struct SecretScanServiceTests {
       entropy: nil
     )
     #expect(f.isHighConfidence)
+  }
+
+  @Test func bundledGitHubAppRulesBlockAsHighConfidence() {
+    let ruleIDs = [
+      "sojourn-github-oauth-token",
+      "sojourn-github-app-user-token",
+      "sojourn-github-app-installation-token",
+      "sojourn-github-app-refresh-token"
+    ]
+
+    for ruleID in ruleIDs {
+      let f = SecretFinding(
+        description: "GitHub token",
+        file: "Brewfile.common",
+        startLine: 12,
+        endLine: 12,
+        match: "REDACTED",
+        secret: "REDACTED",
+        ruleID: ruleID,
+        fingerprint: "Brewfile.common:\(ruleID):12",
+        entropy: nil
+      )
+      #expect(f.isHighConfidence)
+    }
   }
 }
 

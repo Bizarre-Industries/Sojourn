@@ -29,6 +29,10 @@ regexes = [
   '''ghp_[A-Z]{36}''',                            # all-caps placeholder PATs
   '''ghp_[xX]{36,}''',                            # all-x placeholder PATs (design handoff)
   '''ghp_EXAMPLE[A-Za-z0-9]{0,40}''',             # synthetic fixture PATs
+  '''github_pat_EXAMPLE[A-Za-z0-9_]{0,90}''',      # synthetic fine-grained PATs
+  '''ghu_EXAMPLE[A-Za-z0-9_]{0,90}''',             # synthetic app user tokens
+  '''ghr_EXAMPLE[A-Za-z0-9_]{0,90}''',             # synthetic app refresh tokens
+  '''ghs_[0-9]+_EXAMPLE[A-Za-z0-9_\.]{0,260}''',   # synthetic app installation tokens
   '''AKIAIOSFODNN7EXAMPLE''',                     # AWS docs canary
   '''AKIAEXAMPLE[A-Z0-9]{0,16}''',                # synthetic fixture AWS keys
   '''wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY''', # AWS docs canary
@@ -47,9 +51,39 @@ keywords = ["AKIA", "ASIA"]
 
 [[rules]]
 id = "sojourn-github-pat"
-description = "GitHub personal access token"
-regex = '''ghp_[A-Za-z0-9]{36}'''
+description = "GitHub classic personal access token"
+regex = '''ghp_[A-Za-z0-9_]{20,}'''
 keywords = ["ghp_"]
+
+[[rules]]
+id = "sojourn-github-fine-grained-pat"
+description = "GitHub fine-grained personal access token"
+regex = '''github_pat_[A-Za-z0-9_]{20,}'''
+keywords = ["github_pat_"]
+
+[[rules]]
+id = "sojourn-github-oauth-token"
+description = "GitHub OAuth access token"
+regex = '''gho_[A-Za-z0-9_]{20,}'''
+keywords = ["gho_"]
+
+[[rules]]
+id = "sojourn-github-app-user-token"
+description = "GitHub App user-to-server token"
+regex = '''ghu_[A-Za-z0-9_]{20,}'''
+keywords = ["ghu_"]
+
+[[rules]]
+id = "sojourn-github-app-installation-token"
+description = "GitHub App installation token"
+regex = '''ghs_[A-Za-z0-9_\.]{20,}'''
+keywords = ["ghs_"]
+
+[[rules]]
+id = "sojourn-github-app-refresh-token"
+description = "GitHub App refresh token"
+regex = '''ghr_[A-Za-z0-9_]{20,}'''
+keywords = ["ghr_"]
 
 [[rules]]
 id = "sojourn-openai-key"

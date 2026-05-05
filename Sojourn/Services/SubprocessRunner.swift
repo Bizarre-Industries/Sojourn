@@ -1,7 +1,7 @@
 // Sojourn — SubprocessRunner
 //
 // Single chokepoint for every external-process invocation. Per
-// docs/ARCHITECTURE.md §11 and LICENSING.md §1 (IPC-not-linking invariant):
+// docs/reference/architecture.md and docs/reference/licensing.md (IPC-not-linking invariant):
 // UI and services never touch `Process` directly — they go through this
 // actor. Implementation uses Apple's Foundation `Process` + `Pipe` to stay
 // within documented APIs (per CLAUDE.md "prefer boring, documented Apple

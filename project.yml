@@ -96,7 +96,7 @@ targets:
       - name: Re-sign bundled binaries
         script: |
           # Re-sign gitleaks and age with hardened runtime
-          # See docs/ARCHITECTURE.md §11 (bundled binaries)
+          # See docs/reference/architecture.md (bundled binaries)
           if [ -f "${SRCROOT}/scripts/sign.sh" ]; then
             "${SRCROOT}/scripts/sign.sh" "${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/Contents/Resources/bin"
           fi

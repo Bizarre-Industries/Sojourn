@@ -2,8 +2,8 @@
 //
 // Per-ecosystem tier controlling whether an update is auto-applied, how
 // long the cooldown is, and whether user confirmation is required. Mirrors
-// the tier table in docs/SECURITY.md (Supply-chain cooldown) and
-// docs/ARCHITECTURE.md §7.
+// the tier table in SECURITY.md (Supply-chain cooldown) and
+// docs/reference/architecture.md.
 
 import Foundation
 

@@ -1,7 +1,7 @@
 // Sojourn — SnapshotService
 //
 // Takes a pre-operation snapshot before any destructive sync or apply.
-// See docs/ARCHITECTURE.md §6. Uses /usr/bin/tar for archive creation so
+// See docs/reference/architecture.md. Uses /usr/bin/tar for archive creation so
 // we stay aligned with CLAUDE.md "prefer boring, documented Apple APIs".
 
 import Foundation

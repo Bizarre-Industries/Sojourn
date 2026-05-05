@@ -1,7 +1,7 @@
 // Sojourn — BrewService
 //
 // Bootstrap installer for Homebrew. Avoids the `curl | bash` path because
-// a GUI cannot cache a sudo ticket (see docs/BOOTSTRAP.md). Instead:
+// a GUI cannot cache a sudo ticket (see docs/explain/bootstrap-state-machine.md). Instead:
 //
 //   1. Fetch latest Homebrew release from GitHub API.
 //   2. Download the signed `.pkg`.

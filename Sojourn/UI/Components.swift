@@ -4,7 +4,7 @@
 // - LogConsoleView: ANSI-attributed streaming console for Job logs.
 // - MenuBarRootView: MenuBarExtra content; status + Open App button.
 //
-// See docs/ARCHITECTURE.md §11.
+// See docs/reference/architecture.md.
 
 import SwiftUI
 #if canImport(AppKit)

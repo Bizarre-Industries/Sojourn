@@ -4,7 +4,7 @@
 // that owns it. Populated from
 // `Sojourn/Resources/data/dotfile_owners.toml` (Phase 5) plus runtime
 // augmentation from chezmoi/brew-bundle output. Used by CleanupService to classify
-// orphan candidates. See docs/ARCHITECTURE.md §10.
+// orphan candidates. See docs/reference/architecture.md.
 
 import Foundation
 

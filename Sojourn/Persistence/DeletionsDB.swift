@@ -3,7 +3,7 @@
 // Append-only audit log of every file/dir Sojourn has moved to Trash. No
 // row represents an `rm`; Sojourn never calls `rm`. Backed by SQLite
 // (sqlite3, Apple-shipped) so we get durable, crash-safe writes without a
-// new dependency. See docs/ARCHITECTURE.md §10 and docs/SECURITY.md.
+// new dependency. See docs/reference/architecture.md and SECURITY.md.
 
 import Foundation
 import SQLite3

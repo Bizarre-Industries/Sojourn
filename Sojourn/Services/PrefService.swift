@@ -1,7 +1,7 @@
 // Sojourn — PrefService
 //
 // Plist round-trip via `defaults export` / `defaults import` + `plutil`.
-// See docs/ARCHITECTURE.md §8 (plist app preference sync strategy) and
+// See docs/reference/architecture.md (plist app preference sync strategy) and
 // CLAUDE.md ("Do not symlink anything in ~/Library/Preferences").
 //
 // FDA canary: Sojourn is not sandboxed, but reading Container-scoped

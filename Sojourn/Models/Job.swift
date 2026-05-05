@@ -2,7 +2,7 @@
 //
 // Subprocess-execution unit tracked by `JobRunner`. Every external-process
 // invocation Sojourn makes flows through a Job so the UI has a stable handle
-// to cancel, tail logs, and surface errors. See docs/ARCHITECTURE.md §11.
+// to cancel, tail logs, and surface errors. See docs/reference/architecture.md.
 
 import Foundation
 

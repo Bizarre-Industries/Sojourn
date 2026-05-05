@@ -1,7 +1,7 @@
 // Sojourn — AppSupportPaths
 //
 // Canonicalizes every on-disk location Sojourn owns under
-// `~/Library/Application Support/Sojourn/`. See docs/ARCHITECTURE.md §6
+// `~/Library/Application Support/Sojourn/`. See docs/reference/architecture.md
 // (snapshots) and §17/§18 (logging, observability).
 
 import Foundation

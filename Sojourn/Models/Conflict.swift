@@ -2,7 +2,7 @@
 //
 // A single file-level conflict surfaced by SyncCoordinator during pull
 // (remote → local). Resolved in the UI via ConflictResolutionView (Phase 6)
-// three-way-diff style. See docs/ARCHITECTURE.md §6.
+// three-way-diff style. See docs/reference/architecture.md.
 
 import Foundation
 

@@ -2,8 +2,8 @@
 //
 // Subprocess wrapper over /usr/bin/git. Uses argv invocation and porcelain
 // v2 -z output for stable machine parsing. Never shells out through
-// /bin/sh -c. See docs/ARCHITECTURE.md §3a and CLAUDE.md ("Do not call
-// /bin/bash -c ..."). No libgit2 or SwiftGit2 per docs/LICENSING.md §1.
+// /bin/sh -c. See docs/reference/architecture.md and CLAUDE.md ("Do not call
+// /bin/bash -c ..."). No libgit2 or SwiftGit2 per docs/reference/licensing.md.
 
 import Foundation
 

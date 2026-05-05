@@ -2,7 +2,7 @@
 //
 // Ring buffer of log lines with a broadcaster. Every Job owns one; the log
 // console view subscribes to its stream. Bounded capacity prevents runaway
-// memory from chatty processes (e.g., npm install). See docs/ARCHITECTURE.md
+// memory from chatty processes (e.g., npm install). See docs/reference/architecture.md
 // §11 and §18 (observability).
 
 import Foundation

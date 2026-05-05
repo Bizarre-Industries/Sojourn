@@ -2,7 +2,7 @@
 //
 // `@MainActor @Observable` conductor that owns every in-flight `Job`. UI
 // views bind to `jobs` directly; service actors dispatch work here rather
-// than spawning subprocesses themselves. See docs/ARCHITECTURE.md §11.
+// than spawning subprocesses themselves. See docs/reference/architecture.md.
 //
 // v0.3 (v0.3-plan.md "Hard decisions"): per-`JobKind` timeout policy.
 // install/upgrade jobs are timeout-exempt (cancellable only); advisory

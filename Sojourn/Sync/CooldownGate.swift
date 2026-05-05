@@ -2,7 +2,7 @@
 //
 // Gates whether a package update can be auto-applied right now based on
 // its ecosystem tier, the package's release age, and any active OSV
-// advisory. See docs/ARCHITECTURE.md §7 and docs/SECURITY.md (Supply-chain
+// advisory. See docs/reference/architecture.md and SECURITY.md (Supply-chain
 // cooldown).
 
 import Foundation

@@ -1,7 +1,7 @@
 // Sojourn — ToolLocator
 //
 // App-context `PATH` is LaunchServices-minimal; `which(1)` fails for brew on
-// Apple Silicon. Per docs/BOOTSTRAP.md, we probe a hard-coded candidate list
+// Apple Silicon. Per docs/explain/bootstrap-state-machine.md, we probe a hard-coded candidate list
 // instead, first-hit wins, and cache the resolution in `Settings.toolLocations`
 // (wired in Phase 2).
 
@@ -23,7 +23,7 @@ internal struct ToolResolution: Sendable, Hashable, Codable {
 }
 
 internal actor ToolLocator {
-  /// Ordered candidate directories. See docs/BOOTSTRAP.md Detection section.
+  /// Ordered candidate directories. See docs/explain/bootstrap-state-machine.md Detection section.
   internal static let candidateDirectories: [String] = [
     "/opt/homebrew/bin",
     "/opt/homebrew/sbin",

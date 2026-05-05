@@ -14,7 +14,7 @@
 //
 // Not supported: datetimes, floats, multiline strings, nested inline
 // tables, dotted keys. If a future Sojourn feature needs those, extend
-// deliberately. See docs/ARCHITECTURE.md §17 (testing).
+// deliberately. See docs/reference/architecture.md (testing).
 
 import Foundation
 

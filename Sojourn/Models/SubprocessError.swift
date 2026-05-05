@@ -1,6 +1,6 @@
 // Sojourn — SubprocessError
 //
-// Typed errors emitted by `SubprocessRunner`. See docs/ARCHITECTURE.md §11
+// Typed errors emitted by `SubprocessRunner`. See docs/reference/architecture.md
 // and CLAUDE.md ("Errors are typed enum per service. Surface causes.").
 
 import Foundation

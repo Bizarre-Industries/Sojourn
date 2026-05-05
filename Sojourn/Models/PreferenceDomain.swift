@@ -2,7 +2,7 @@
 //
 // Per-app plist domain metadata. Populated from
 // `Sojourn/Resources/data/applications/*.toml` (Phase 5) and referenced by
-// PrefService for `defaults export/import`. See docs/ARCHITECTURE.md §8
+// PrefService for `defaults export/import`. See docs/reference/architecture.md
 // (plist app preference sync strategy).
 
 import Foundation

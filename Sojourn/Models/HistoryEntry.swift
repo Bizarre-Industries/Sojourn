@@ -1,7 +1,7 @@
 // Sojourn — HistoryEntry
 //
 // Chronological audit log row. Surfaces in the History pane per
-// docs/ARCHITECTURE.md §11. Persisted via Settings; also referenced by
+// docs/reference/architecture.md. Persisted via Settings; also referenced by
 // SyncCoordinator for rollback affordances (Phase 4).
 
 import Foundation

@@ -1,7 +1,7 @@
 // Sojourn — GitHubDeviceAuth
 //
-// OAuth 2.0 Device Flow for GitHub. See docs/ARCHITECTURE.md §14 risk 7
-// and docs/SECURITY.md ("Does not embed any API secret"). We use only a
+// OAuth 2.0 Device Flow for GitHub. See docs/reference/architecture.md
+// and SECURITY.md ("Does not embed any API secret"). We use only a
 // `client_id`; GitHub's device flow does not require a secret. The
 // resulting access token is stored in the macOS Keychain.
 //

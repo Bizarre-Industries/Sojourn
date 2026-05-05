@@ -1,7 +1,7 @@
 // Sojourn — BootstrapService
 //
-// State machine for first-run bootstrap per docs/BOOTSTRAP.md and
-// docs/ARCHITECTURE.md §9:
+// State machine for first-run bootstrap per docs/explain/bootstrap-state-machine.md and
+// docs/reference/architecture.md:
 //
 //   .unknown
 //     → .probingSystem          // parallel locate brew/git/chezmoi/age/gitleaks/CLT

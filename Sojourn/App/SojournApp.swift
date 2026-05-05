@@ -2,7 +2,7 @@
 //
 // @main. Owns the root AppStore. Injects it into the environment for the
 // MainWindow scene, the MenuBarExtra, and the Settings scene. See
-// docs/ARCHITECTURE.md §11 and CLAUDE.md ("Do not use @State to hold the
+// docs/reference/architecture.md and CLAUDE.md ("Do not use @State to hold the
 // root AppStore").
 
 import SwiftUI

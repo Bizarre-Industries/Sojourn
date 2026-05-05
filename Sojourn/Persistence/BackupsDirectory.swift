@@ -3,7 +3,7 @@
 // Owns the `~/Library/Application Support/Sojourn/backups/` subtree:
 // creates dated snapshot dirs, enumerates existing snapshots, and GCs
 // entries older than the retention window. Never `rm -rf` — always
-// `NSFileManager.trashItem`. See docs/ARCHITECTURE.md §6.
+// `NSFileManager.trashItem`. See docs/reference/architecture.md.
 
 import Foundation
 

@@ -1,7 +1,7 @@
 // Sojourn — SettingsScene
 //
 // The macOS-standard Settings tab set. General / Sync / Security / About.
-// See docs/ARCHITECTURE.md §11.
+// See docs/reference/architecture.md.
 
 import SwiftUI
 

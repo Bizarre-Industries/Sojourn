@@ -3,7 +3,7 @@
 // Pre-commit secret scanning via bundled gitleaks at
 // `Contents/Resources/bin/gitleaks` (inside the .app) or
 // `Sojourn/Resources/bin/gitleaks` (when run from source). Flow + tiers
-// are specified in docs/SECURITY.md (Pre-commit secret scanning).
+// are specified in SECURITY.md (Pre-commit secret scanning).
 
 import Foundation
 
@@ -32,7 +32,7 @@ internal struct SecretFinding: Sendable, Hashable, Codable, Identifiable {
   }
 
   /// High-confidence provider-key rules that must block the user for 5s
-  /// per docs/SECURITY.md.
+  /// per SECURITY.md.
   internal var isHighConfidence: Bool {
     let blocking: Set<String> = [
       "aws-access-token",

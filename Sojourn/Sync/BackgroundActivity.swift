@@ -2,7 +2,7 @@
 //
 // Wrap NSBackgroundActivityScheduler so Phase 4 can schedule a daily
 // refresh of outdated-package advisories + OSV bypass checks. See
-// docs/ARCHITECTURE.md §6.
+// docs/reference/architecture.md.
 
 import Foundation
 

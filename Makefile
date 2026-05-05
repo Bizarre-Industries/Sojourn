@@ -1,5 +1,5 @@
 # Sojourn — dev DX
-# See docs/IMPLEMENTATION_PLAN.md for the build/test contract.
+# See docs/process/implementation-plan.md for the build/test contract.
 
 SWIFT_FORMAT ?= $(shell command -v swift-format 2>/dev/null || xcrun --find swift-format 2>/dev/null)
 

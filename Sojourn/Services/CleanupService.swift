@@ -3,7 +3,7 @@
 // Scans ~/.* (dotfiles) and ~/Library/** (Application Support, Caches,
 // Preferences, Saved Application State, HTTPStorages) to find orphan
 // candidates — files owned by apps no longer installed. See
-// docs/ARCHITECTURE.md §10. Never `rm`; uses NSFileManager.trashItem with
+// docs/reference/architecture.md. Never `rm`; uses NSFileManager.trashItem with
 // a DeletionsDB audit trail.
 
 import Foundation

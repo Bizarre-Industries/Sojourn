@@ -4,7 +4,7 @@
 // orphan-able because its owning app is no longer installed. Classified
 // safe/review/risky by CleanupService (Phase 5). Never `rm`-d: the user
 // moves via NSFileManager.trashItem through DeletionsDB. See
-// docs/ARCHITECTURE.md §10.
+// docs/reference/architecture.md.
 
 import Foundation
 

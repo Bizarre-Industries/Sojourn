@@ -12,7 +12,7 @@
 // SPM does not provide an AppKit app bundle context. The `Sojourn` target
 // below is declared as a library; the app executable is built only via Xcode.
 //
-// Dependencies are pinned to minor versions per `docs/ARCHITECTURE.md` §11.
+// Dependencies are pinned to minor versions per `docs/reference/architecture.md`.
 
 import PackageDescription
 

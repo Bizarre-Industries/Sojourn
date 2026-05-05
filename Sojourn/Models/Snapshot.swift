@@ -4,7 +4,7 @@
 // `~/Library/Application Support/Sojourn/backups/<iso8601>-<op>/`.
 // Created by SnapshotService (Phase 4) before every destructive sync or
 // apply. 30-day retention, GC'd by BackupsDirectory (Phase 2).
-// See docs/ARCHITECTURE.md §6.
+// See docs/reference/architecture.md.
 
 import Foundation
 

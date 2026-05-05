@@ -3,7 +3,7 @@
 // Per-Mac identity + override map. Stored in the sync repo at
 // `.sojourn/machines/<hostname>.toml`; Sojourn uses chezmoi's Go template
 // engine to conditionally render per-machine variants. See
-// docs/ARCHITECTURE.md §6 and §15.
+// docs/reference/architecture.md.
 
 import Foundation
 

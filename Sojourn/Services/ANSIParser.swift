@@ -2,7 +2,7 @@
 //
 // Minimal ANSI SGR (Select Graphic Rendition) state machine. Consumes a
 // stream of characters, yields (attrs, text) runs suitable for
-// AttributedString rendering in LogConsoleView. See docs/ARCHITECTURE.md §11.
+// AttributedString rendering in LogConsoleView. See docs/reference/architecture.md.
 //
 // Only SGR (ESC [ ... m) is retained. Cursor, erase, scroll, and other
 // sequences are stripped so a chatty progress bar doesn't break layout.

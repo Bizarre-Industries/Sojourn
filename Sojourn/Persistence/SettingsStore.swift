@@ -4,7 +4,7 @@
 // `~/Library/Application Support/Sojourn/config/settings.json`. Keeps
 // `UserDefaults` untouched except for small sentinel flags (e.g.,
 // onboardingComplete) to avoid polluting `defaults read` output.
-// See docs/ARCHITECTURE.md §11.
+// See docs/reference/architecture.md.
 
 import Foundation
 

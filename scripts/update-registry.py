@@ -15,7 +15,7 @@ Each Mackup entry looks like:
     Library/Preferences/com.apple.Terminal.plist
     Library/Preferences/com.apple.Terminal.LSSharedFileList.plist
 
-Sojourn's plist-layer model (docs/ARCHITECTURE.md §8) classifies the first
+Sojourn's plist-layer model (docs/reference/architecture.md) classifies the first
 prefs path's domain as the canonical one; anything under the user's
 sandboxed container is marked `sandboxed` (deferred to v2).
 
@@ -35,7 +35,7 @@ from pathlib import Path
 REGISTRY_HEADER = """# Sojourn — application preference registry entry
 # Upstream source: Mackup (GPL-3.0-or-later),
 # https://github.com/lra/mackup/blob/{ref}/mackup/applications/{source}
-# Re-classified for Sojourn's plist-layer model per docs/ARCHITECTURE.md §8.
+# Re-classified for Sojourn's plist-layer model per docs/reference/architecture.md.
 
 """
 

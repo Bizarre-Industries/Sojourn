@@ -2,7 +2,7 @@ import Foundation
 @testable import Sojourn
 import Testing
 
-/// Unit tests for SubprocessRunner. See docs/ARCHITECTURE.md §11.
+/// Unit tests for SubprocessRunner. See docs/reference/architecture.md.
 ///
 /// These tests invoke real system binaries (/bin/echo, /bin/sh, /usr/bin/true,
 /// /usr/bin/false) that are guaranteed to exist on macOS. No network,

@@ -1,7 +1,7 @@
 // Sojourn — Logging
 //
 // Thin wrapper over `os.Logger` with the six category namespaces declared
-// in docs/ARCHITECTURE.md §18. Every service uses these categories so
+// in docs/reference/architecture.md. Every service uses these categories so
 // Console.app / Instruments filter cleanly.
 
 import Foundation

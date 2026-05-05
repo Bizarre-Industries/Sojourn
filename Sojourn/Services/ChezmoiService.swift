@@ -1,9 +1,9 @@
 // Sojourn — ChezmoiService
 //
-// Subprocess wrapper over `chezmoi`. See docs/ARCHITECTURE.md §3c. Uses
+// Subprocess wrapper over `chezmoi`. See docs/reference/architecture.md. Uses
 // `--no-pager --color=false` on every invocation for stable machine
 // parsing. No libgit2, no in-process chezmoi — arm's-length subprocess
-// per docs/LICENSING.md §1.
+// per docs/reference/licensing.md.
 
 import Foundation
 

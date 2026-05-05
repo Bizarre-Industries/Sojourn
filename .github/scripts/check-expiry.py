@@ -37,8 +37,6 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-import jwt
-import requests
 import yaml
 
 
@@ -192,6 +190,8 @@ def appstore_jwt() -> str:
         "exp": now + 60 * 19,  # max 20m per Apple; use 19 for clock skew
         "aud": "appstoreconnect-v1",
     }
+    import jwt
+
     return jwt.encode(
         payload,
         p8_pem,
@@ -209,6 +209,8 @@ def appstore_query_cert_expiry(cert_type: str) -> dt.date:
         "limit": 200,
         "sort": "-expirationDate",
     }
+    import requests
+
     resp = requests.get(
         url, params=params, headers={"Authorization": f"Bearer {token}"}, timeout=30
     )
@@ -234,6 +236,8 @@ def github_pat_expiry(token: str) -> dt.date:
     `github-authentication-token-expiration` response header.
     Available for fine-grained PATs since 2022.
     """
+    import requests
+
     resp = requests.get(
         f"{GITHUB_BASE}/user",
         headers={
@@ -290,6 +294,8 @@ def resolve(item: Item, today: dt.date) -> Result:
 
 
 def gh_session() -> requests.Session:
+    import requests
+
     sess = requests.Session()
     sess.headers.update(
         {

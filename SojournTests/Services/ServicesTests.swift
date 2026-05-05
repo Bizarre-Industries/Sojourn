@@ -1,11 +1,13 @@
 import Foundation
-@testable import Sojourn
 import Testing
+
+@testable import Sojourn
 
 struct GitServiceTests {
   @Test func parsesPorcelainV2Status() {
-    let raw = "1 .M N... 100644 100644 100644 0000 0000 README.md\u{0}"
-            + "1 A. N... 000000 100644 100644 0000 0000 NEW.txt\u{0}"
+    let raw =
+      "1 .M N... 100644 100644 100644 0000 0000 README.md\u{0}"
+      + "1 A. N... 000000 100644 100644 0000 0000 NEW.txt\u{0}"
     let entries = GitService.parseStatusPorcelain(raw)
     #expect(entries.count == 2)
     #expect(entries[0].path == "README.md")
@@ -251,15 +253,75 @@ struct BootstrapServiceTests {
   }
 }
 
+struct ToolInstallerTests {
+  @Test func installHomebrewPostVerifiesBrewExecutable() async throws {
+    let root = FileManager.default.temporaryDirectory
+      .appendingPathComponent(UUID().uuidString, isDirectory: true)
+    try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+    defer { try? FileManager.default.removeItem(at: root) }
+
+    let brewURL = root.appendingPathComponent("brew")
+    try "#!/bin/sh\necho Homebrew\n".write(to: brewURL, atomically: true, encoding: .utf8)
+    try FileManager.default.setAttributes(
+      [.posixPermissions: 0o755],
+      ofItemAtPath: brewURL.path
+    )
+
+    let events = ServiceEventRecorder()
+    let releaseJSON = """
+      {
+        "tag_name": "4.5.6",
+        "assets": [
+          {
+            "name": "Homebrew-4.5.6.pkg",
+            "browser_download_url": "https://example.invalid/Homebrew.pkg"
+          }
+        ]
+      }
+      """
+    let signatureOutput = """
+      Package "Homebrew.pkg":
+         Status: signed by a developer certificate issued by Apple for distribution
+         Notarization: trusted by the Apple notary service
+         Certificate Chain:
+          1. Developer ID Installer: Patrick Linnane (927JGANW46)
+      """
+    let brew = BrewService(
+      brewCandidateURLs: [brewURL],
+      runCommand: { tool, args, _ in
+        await events.record("run:\(tool.lastPathComponent):\(args.joined(separator: " "))")
+        if tool.lastPathComponent == "pkgutil" {
+          return SubprocessResult(exitCode: 0, stdout: Data(signatureOutput.utf8), stderr: Data())
+        }
+        return SubprocessResult(exitCode: 0, stdout: Data("ok".utf8), stderr: Data())
+      },
+      fetch: { url in
+        await events.record("fetch:\(url.absoluteString)")
+        if url.host == "api.github.com" {
+          return (Data(releaseJSON.utf8), URLResponse())
+        }
+        return (Data("pkg".utf8), URLResponse())
+      }
+    )
+    let installer = ToolInstaller(brew: brew)
+
+    try await installer.installHomebrew()
+
+    let values = await events.values
+    #expect(values.contains("run:\(brewURL.lastPathComponent):--version"))
+    #expect(values.last == "run:\(brewURL.lastPathComponent):--version")
+  }
+}
+
 struct BrewServiceSignatureTests {
   @Test func verifySignatureAcceptsHomebrewInstallerTeam() async throws {
     let output = """
-    Package "Homebrew.pkg":
-       Status: signed by a developer certificate issued by Apple for distribution
-       Notarization: trusted by the Apple notary service
-       Certificate Chain:
-        1. Developer ID Installer: Patrick Linnane (927JGANW46)
-    """
+      Package "Homebrew.pkg":
+         Status: signed by a developer certificate issued by Apple for distribution
+         Notarization: trusted by the Apple notary service
+         Certificate Chain:
+          1. Developer ID Installer: Patrick Linnane (927JGANW46)
+      """
     let brew = BrewService(
       runCommand: { _, _, _ in
         SubprocessResult(exitCode: 0, stdout: Data(output.utf8), stderr: Data())
@@ -272,12 +334,12 @@ struct BrewServiceSignatureTests {
 
   @Test func verifySignatureRejectsDifferentDeveloperIDInstallerTeam() async throws {
     let output = """
-    Package "Homebrew.pkg":
-       Status: signed by a developer certificate issued by Apple for distribution
-       Notarization: trusted by the Apple notary service
-       Certificate Chain:
-        1. Developer ID Installer: Example Corp (ABCDE12345)
-    """
+      Package "Homebrew.pkg":
+         Status: signed by a developer certificate issued by Apple for distribution
+         Notarization: trusted by the Apple notary service
+         Certificate Chain:
+          1. Developer ID Installer: Example Corp (ABCDE12345)
+      """
     let brew = BrewService(
       runCommand: { _, _, _ in
         SubprocessResult(exitCode: 0, stdout: Data(output.utf8), stderr: Data())

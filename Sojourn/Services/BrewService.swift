@@ -35,15 +35,21 @@ internal actor BrewService {
   private let fetch: Fetcher
   internal let installerURL: URL
   internal let pkgutilURL: URL
+  internal let brewCandidateURLs: [URL]
 
   internal init(
     installerURL: URL = URL(fileURLWithPath: "/usr/sbin/installer"),
     pkgutilURL: URL = URL(fileURLWithPath: "/usr/sbin/pkgutil"),
+    brewCandidateURLs: [URL] = [
+      URL(fileURLWithPath: "/opt/homebrew/bin/brew"),
+      URL(fileURLWithPath: "/usr/local/bin/brew")
+    ],
     runCommand: @escaping Runner,
     fetch: @escaping Fetcher
   ) {
     self.installerURL = installerURL
     self.pkgutilURL = pkgutilURL
+    self.brewCandidateURLs = brewCandidateURLs
     self.runCommand = runCommand
     self.fetch = fetch
   }
@@ -62,7 +68,10 @@ internal actor BrewService {
   // MARK: - Public
 
   internal func resolveLatestRelease() async throws -> BrewRelease {
-    let apiURL = URL(string: "https://api.github.com/repos/Homebrew/brew/releases/latest")!
+    guard let apiURL = URL(string: "https://api.github.com/repos/Homebrew/brew/releases/latest")
+    else {
+      throw BrewError.releaseLookupFailed("invalid release API URL")
+    }
     let (data, _) = try await fetch(apiURL)
     struct Release: Decodable {
       struct Asset: Decodable { let name: String; let browser_download_url: String }
@@ -73,7 +82,8 @@ internal actor BrewService {
       throw BrewError.releaseLookupFailed("decode failed")
     }
     guard let asset = release.assets.first(where: { $0.name.hasSuffix(".pkg") }),
-          let pkgURL = URL(string: asset.browser_download_url) else {
+      let pkgURL = URL(string: asset.browser_download_url)
+    else {
       throw BrewError.releaseLookupFailed("no .pkg asset in latest release")
     }
     return BrewRelease(tagName: release.tag_name, pkgURL: pkgURL)
@@ -110,17 +120,13 @@ internal actor BrewService {
   }
 
   internal func postVerify() async throws -> URL {
-    for candidate in [
-      URL(fileURLWithPath: "/opt/homebrew/bin/brew"),
-      URL(fileURLWithPath: "/usr/local/bin/brew")
-    ] {
-      if FileManager.default.isExecutableFile(atPath: candidate.path) {
-        do {
-          _ = try await runCommand(candidate, ["--version"], nil)
-          return candidate
-        } catch {
-          continue
-        }
+    for candidate in brewCandidateURLs
+    where FileManager.default.isExecutableFile(atPath: candidate.path) {
+      do {
+        _ = try await runCommand(candidate, ["--version"], nil)
+        return candidate
+      } catch {
+        continue
       }
     }
     throw BrewError.postVerifyFailed

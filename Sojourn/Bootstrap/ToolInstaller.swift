@@ -25,5 +25,6 @@ internal actor ToolInstaller {
     try await brew.downloadPkg(release, to: dest)
     try await brew.verifySignature(at: dest)
     try await brew.install(pkg: dest)
+    _ = try await brew.postVerify()
   }
 }

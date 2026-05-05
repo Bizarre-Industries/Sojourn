@@ -33,6 +33,14 @@ All notable changes to Sojourn. Follows
   markers for package/container panes, and removal of visible legacy
   MPM bootstrap copy.
 
+### Fixed
+
+- Homebrew bootstrap now post-verifies the installed `brew --version`
+  executable after the signed installer completes.
+- Local expiry-config validation no longer requires live-run Python
+  dependencies such as PyJWT unless the script is actually querying
+  external services.
+
 ### Planned (post-v0.3.0)
 
 (See `docs/process/plans/v0.4-plan.md` for the active native UI reset plan.)

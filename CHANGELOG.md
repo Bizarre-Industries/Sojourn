@@ -25,6 +25,10 @@ All notable changes to Sojourn. Follows
 - v0.4 stage 5 lint cleanup: SwiftFormat config compatibility,
   touched UI formatting, package summary extraction, and strict
   SwiftLint cleanup for Stage 4 UI surfaces.
+- v0.4 stage 6 release hardening: build 34, versioned Sparkle DMG
+  upload, corrected Sparkle fallback assumptions, refreshed
+  Sparkle/cask runbook checks, and v0.4 install-source detection
+  coverage.
 
 ### Planned (post-v0.3.0)
 

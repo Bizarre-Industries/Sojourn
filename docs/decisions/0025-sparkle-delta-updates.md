@@ -26,8 +26,9 @@ public key, and verification path are already established.
 `notarize.yml` adds a `generate_appcast` step that runs after
 notarization and DMG creation. The step:
 
-1. Uses `actions/cache` keyed on the prior release tag to fetch the
-   previous Sojourn.dmg into a local archive directory.
+1. Uses `actions/cache` saved under the current release tag and restored
+   by prefix to fetch the retained prior Sojourn DMGs into a local
+   archive directory.
 2. Reads the EdDSA signing key from
    `op://Bizarre-Industries/sojourn-sparkle-eddsa/private` via the
    1Password release environment, then pipes it on stdin to Sparkle's
@@ -44,16 +45,12 @@ notarization and DMG creation. The step:
 path. Sparkle 2.x handles delta-apply transparently; no special code
 needed in Sojourn beyond standard installer initialization.
 
-Apply-failure fallback is delegate-callback-based, not framework-
-automatic. SparkleService implements
-`SPUUpdaterDelegate.updater(_:didAbortWithError:)` and inspects the
-`SUErrorCode` for `deltaUpdateFailed`. On that code, SparkleService
-re-invokes the updater with the full-DMG entry from the same appcast
-item. Council 2026-05-03 weakened the original "framework-automatic"
-claim after security review flagged it as unverified. Step 6 smoke
-test must intentionally corrupt one byte of a delta archive on a
-clean Tahoe VM and confirm the explicit fallback re-fetches the full
-DMG before tagging v0.3.0.
+v0.4 Stage 6 correction: Sparkle 2.9.1 already falls back from delta
+download/apply failure to the regular update item before reporting a
+terminal abort to the host app. Sojourn does not own a retry loop. The
+delegate records terminal abort diagnostics only. Stage 6 also verified
+that Sparkle 2.9.1 `SUErrors.h` code `4002` is `SUMissingUpdateError`,
+not a delta-specific error code.
 
 `project.yml` adds Sparkle to the Xcode-built Sojourn app target. The
 SwiftPM library manifest intentionally does not depend on Sparkle:
@@ -69,9 +66,8 @@ unconditionally and fail if the package dependency regresses.
   (4-8 MB vs 30-80 MB).
 - Lower CDN cost (single GitHub Releases asset still serves both
   full and delta on demand).
-- Sparkle 2 handles delta archive generation and signing; Sojourn owns
-  the one-shot full-DMG retry when the delegate reports a delta apply
-  failure.
+- Sparkle 2 handles delta archive generation, signing, and
+  delta-to-regular fallback before terminal errors reach Sojourn.
 - Delta generation is a CI-side step; nothing in the running app
   changes day-to-day beyond initialization.
 
@@ -85,9 +81,8 @@ unconditionally and fail if the package dependency regresses.
 - Delta generation requires the prior DMG to be present in CI; cache
   miss on the first delta release after long quiet period falls back
   to full-DMG-only (acceptable degradation).
-- Delta math errors corrupt the bundle if the framework's fallback
-  fails; mitigated by end-to-end smoke test on a clean Tahoe VM
-  before tagging v0.3.0.
+- Delta math errors still need clean-VM smoke coverage, but the
+  fallback path is Sparkle-owned rather than a Sojourn retry loop.
 
 ### Neutral
 
@@ -114,14 +109,12 @@ unconditionally and fail if the package dependency regresses.
 
 ## Council 2026-05-03 amendments
 
-### User-visible behavior (delta-apply fallback)
+### User-visible behavior (update diagnostics)
 
-When delta apply fails and SparkleService falls back to full DMG, the
-updater UI surfaces "Update download restarting (delta unavailable)"
-in the progress label so the user understands why the size jumped
-from ~6 MB to ~80 MB. Implemented via SparkleService's
-`SPUUpdaterDelegate` hook setting the user-facing string before
-re-invoking the updater with the full-DMG enclosure.
+Sparkle handles delta-to-regular fallback internally. Sojourn's
+`SPUUpdaterDelegate` hook records terminal abort diagnostics for the
+menu bar status surface and clears them after a successful update
+cycle.
 
 ### Sparkle launch sequencing
 

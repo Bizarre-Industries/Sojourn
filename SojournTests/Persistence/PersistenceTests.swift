@@ -235,12 +235,12 @@ struct SettingsStoreTests {
     let caskVersion = tmp
       .appendingPathComponent("Caskroom", isDirectory: true)
       .appendingPathComponent("sojourn", isDirectory: true)
-      .appendingPathComponent("0.3.0", isDirectory: true)
+      .appendingPathComponent("0.4.0", isDirectory: true)
     try FileManager.default.createDirectory(at: caskVersion, withIntermediateDirectories: true)
 
     let source = InstallSourceDetector.detect(
       bundleURL: URL(fileURLWithPath: "/Applications/Sojourn.app"),
-      bundleVersion: "0.3.0",
+      bundleVersion: "0.4.0",
       environment: ["HOMEBREW_PREFIX": tmp.path],
       caskroomRoots: [tmp.appendingPathComponent("Caskroom", isDirectory: true)]
     )
@@ -260,7 +260,7 @@ struct SettingsStoreTests {
 
     let source = InstallSourceDetector.detect(
       bundleURL: URL(fileURLWithPath: "/Applications/Sojourn.app"),
-      bundleVersion: "0.3.0",
+      bundleVersion: "0.4.0",
       environment: ["HOMEBREW_PREFIX": tmp.path],
       caskroomRoots: [tmp.appendingPathComponent("Caskroom", isDirectory: true)]
     )
@@ -273,7 +273,7 @@ struct SettingsStoreTests {
 
     let source = InstallSourceDetector.detect(
       bundleURL: URL(fileURLWithPath: "/Applications/Sojourn.app"),
-      bundleVersion: "0.3.0",
+      bundleVersion: "0.4.0",
       environment: ["HOMEBREW_PREFIX": tmp.path],
       caskroomRoots: [tmp.appendingPathComponent("Caskroom", isDirectory: true)]
     )
@@ -286,7 +286,7 @@ struct SettingsStoreTests {
 
     let source = InstallSourceDetector.detect(
       bundleURL: tmp.appendingPathComponent("DerivedData/Build/Products/Debug/Sojourn.app"),
-      bundleVersion: "0.3.0",
+      bundleVersion: "0.4.0",
       environment: ["HOMEBREW_PREFIX": tmp.path],
       caskroomRoots: [tmp.appendingPathComponent("Caskroom", isDirectory: true)]
     )

@@ -12,8 +12,9 @@
       existing v0.2 installs.
 
       Per ADR-0025 council 2026-05-03 amendments:
-        - Delta retention: 10 prior versions (--maximum-versions=10).
-        - Delta-apply failure fallback handled by SparkleService delegate.
+        - Delta retention: 10 prior versions.
+        - Sparkle handles delta-to-full fallback; Sojourn records
+          terminal update errors.
     -->
   </channel>
 </rss>

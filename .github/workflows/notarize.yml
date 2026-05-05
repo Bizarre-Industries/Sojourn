@@ -148,9 +148,9 @@ jobs:
 
       # ─── Sparkle delta updates (ADR-0025) ───────────────────────────
       # Steps below build appcast.xml + delta archives against the
-      # prior 10 releases. Cache key uses the prior release tag so a
-      # cache miss (first delta run after a long quiet period) falls
-      # back to full-DMG-only — acceptable degradation.
+      # prior 10 releases. The current release is saved under its tag;
+      # restore-keys load the most recent retained archive so a cache
+      # miss falls back to full-DMG-only — acceptable degradation.
       - name: Restore prior DMGs for delta generation
         if: "!contains(github.ref, '-')"
         id: prior-dmgs-cache
@@ -212,13 +212,23 @@ jobs:
           # copy it back to repo root for the upload step.
           cp prior-dmgs/appcast.xml appcast.xml
 
-      - name: Upload appcast.xml + delta archives to release
+      - name: Upload required Sparkle assets to release
         if: "!contains(github.ref, '-')"
         # zizmor: ignore[superfluous-actions]
         uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda # v3.0.0
         with:
+          fail_on_unmatched_files: true
           files: |
             appcast.xml
+            prior-dmgs/Sojourn-${{ github.ref_name }}.dmg
+
+      - name: Upload optional Sparkle delta archives to release
+        if: "!contains(github.ref, '-') && hashFiles('prior-dmgs/*.delta') != ''"
+        # zizmor: ignore[superfluous-actions]
+        uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda # v3.0.0
+        with:
+          fail_on_unmatched_files: true
+          files: |
             prior-dmgs/*.delta
 
       - name: Upload release artifact
@@ -230,6 +240,54 @@ jobs:
         with:
           files: Sojourn.dmg
           generate_release_notes: true
+
+      - name: Verify Sparkle appcast assets
+        if: "!contains(github.ref, '-')"
+        timeout-minutes: 5
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+          RELEASE_REPOSITORY: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          if ! grep -q 'sparkle:edSignature=' appcast.xml; then
+            echo "FATAL: generated appcast.xml has no Sparkle EdDSA signature." >&2
+            exit 1
+          fi
+          head_url() {
+            local url="$1"
+            local delay
+            for delay in 0 5 5 5 5 5; do
+              if [ "$delay" -gt 0 ]; then
+                sleep "$delay"
+              fi
+              if curl -fsSLI --max-time 10 "$url" >/dev/null; then
+                return 0
+              fi
+            done
+            echo "FATAL: release asset URL did not resolve: $url" >&2
+            return 1
+          }
+          versioned_dmg="https://github.com/${RELEASE_REPOSITORY}/releases/download/${RELEASE_TAG}/Sojourn-${RELEASE_TAG}.dmg"
+          head_url "$versioned_dmg"
+          /usr/bin/python3 - <<'PY' > /tmp/sojourn-appcast-urls.txt
+          import xml.etree.ElementTree as ET
+
+          root = ET.parse("appcast.xml").getroot()
+          urls = []
+          for enclosure in root.findall(".//enclosure"):
+            url = enclosure.attrib.get("url", "")
+            if url:
+              urls.append(url)
+          if not urls:
+            raise SystemExit("FATAL: generated appcast.xml has no enclosure URLs.")
+          if len(urls) > 11:
+            raise SystemExit(f"FATAL: generated appcast.xml has {len(urls)} enclosure URLs; expected at most 11.")
+          for url in urls:
+            print(url)
+          PY
+          while IFS= read -r url; do
+            head_url "$url"
+          done < /tmp/sojourn-appcast-urls.txt
 
       - name: Verify Homebrew
         if: "!contains(github.ref, '-')"

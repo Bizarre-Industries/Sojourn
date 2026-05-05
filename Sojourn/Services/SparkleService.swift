@@ -9,19 +9,13 @@
 // Per ADR-0025 council 2026-05-03 amendments:
 //   - Appcast `URLSession` timeout pinned to 30s via
 //     `feedURLSession(for:)` delegate hook (Foundation default 60s).
-//   - Delta-apply failure fallback is delegate-callback-based, not
-//     framework-automatic. SparkleService.updater(_:didAbortWithError:)
-//     inspects `(error as NSError).code` for
-//     `SUDeltaUpdateError = 4002`. On that code, the updater is
-//     re-invoked with the full DMG enclosure and diagnostic status
-//     "Update download restarting (delta unavailable)" is set.
-//   - Council 2026-05-04 stage6 architect condition: fallback-loop
-//     guard prevents recursing if the fallback also fails.
+//   - Sparkle 2.9.1 falls back internally from delta download/apply
+//     failure to the regular update item. Sojourn records only terminal
+//     updater abort diagnostics.
 //
-// CORRUPT-DELTA SMOKE TEST DEFERRED: ADR-0025 hard-requires a clean
-// Tahoe VM smoke before tagging v0.3.0. Council 2026-05-04 stage6
-// approved deferral to tag pre-flight per maintainer decision. Logged
-// in `.Codex/council-logs/2026-05-04-stage6-sparkle-delta.md`.
+// RELEASE SMOKE: before tagging, verify generated appcast enclosure URLs
+// download successfully and run clean Tahoe direct-DMG + cask update
+// smoke checks.
 
 import Foundation
 import Observation
@@ -37,22 +31,6 @@ internal final class SparkleService: NSObject, SPUUpdaterDelegate {
   /// Diagnostic status string updated by the delegate.
   internal private(set) var statusMessage: String = ""
 
-  /// True after a delta-failure fallback has been triggered in this
-  /// process session. Prevents recursion if the full-DMG re-fetch
-  /// also returns the same error code.
-  /// `nonisolated(unsafe)` — only read/written from delegate Task
-  /// hops which always re-enter @MainActor; the flag itself is a
-  /// race-free Bool whose first-write wins.
-  nonisolated(unsafe) private var hasFallenBackThisSession: Bool = false
-
-  /// Sparkle's error code for "delta update could not be applied".
-  /// Source: Sparkle 2.9 SUErrors.h `SUDeltaUpdateError = 4002`.
-  /// Inlined so we don't need the Sparkle ObjC enum exported into
-  /// Swift, which is gated on Sparkle build flavors. Domain checked
-  /// alongside (council 2026-05-04 stage6 architect condition).
-  nonisolated private static let deltaUpdateFailedCode: Int = 4002
-  nonisolated private static let sparkleErrorDomain: String = "SUSparkleErrorDomain"
-
   private var controller: SPUStandardUpdaterController?
 
   internal override init() {
@@ -65,9 +43,10 @@ internal final class SparkleService: NSObject, SPUUpdaterDelegate {
       try updaterController().updater.start()
       statusMessage = ""
     } catch {
-      statusMessage = String(
-        localized: "Update checker failed: \(error.localizedDescription). Try Check for Updates again."
-      )
+      statusMessage =
+        String(localized: "Update checker failed: \(error.localizedDescription).")
+        + " "
+        + Self.updateRecoveryMessage
     }
   }
 
@@ -104,6 +83,14 @@ internal final class SparkleService: NSObject, SPUUpdaterDelegate {
     return controller
   }
 
+  private static var updateRecoveryMessage: String {
+    String(localized: "Try Check for Updates again.")
+      + " "
+      + String(
+        localized: "If it keeps failing, install the latest DMG from GitHub Releases."
+      )
+  }
+
   // MARK: - SPUUpdaterDelegate
 
   /// Pin appcast fetch timeout to 30s. Foundation default is 60s
@@ -116,56 +103,25 @@ internal final class SparkleService: NSObject, SPUUpdaterDelegate {
     return URLSession(configuration: config)
   }
 
-  /// Fall back to full DMG when Sparkle's delta apply fails. Council
-  /// 2026-05-03 amendment requires this to be delegate-callback-based,
-  /// not framework-automatic. Council 2026-05-04 stage6 architect
-  /// condition: only retry once; do not loop.
+  /// Surface terminal updater errors. Sparkle handles delta-to-regular
+  /// update fallback internally before this delegate is called.
   nonisolated func updater(_ updater: SPUUpdater, didAbortWithError error: any Error) {
-    let nsError = error as NSError
-    let isDeltaFailure =
-      nsError.code == Self.deltaUpdateFailedCode
-      && nsError.domain == Self.sparkleErrorDomain
-    guard isDeltaFailure else {
-      Task { @MainActor [weak self] in
-        self?.statusMessage = String(
-          localized: "Update stopped: \(error.localizedDescription). Try Check for Updates again."
-        )
-      }
-      return
-    }
     Task { @MainActor [weak self] in
-      guard let self else { return }
-      if self.hasFallenBackThisSession {
-        self.statusMessage = String(
-          localized: "Delta and full update both failed. Check your connection, then try Check for Updates."
-        )
-        return
-      }
-      self.hasFallenBackThisSession = true
-      self.statusMessage = String(localized: "Delta failed. Restarting with full download.")
-      // Re-invoke the updater. Sparkle 2 will re-fetch the appcast and
-      // pick the full DMG enclosure since the delta path is now poisoned
-      // for this session.
-      self.updaterController().checkForUpdates(nil)
+      self?.statusMessage =
+        String(localized: "Update stopped: \(error.localizedDescription).")
+        + " "
+        + Self.updateRecoveryMessage
     }
   }
 
-  /// Record diagnostics for delta failures inside the cycle callback.
-  /// Distinct from `didAbortWithError` which fires on terminal errors.
+  /// Clear diagnostics after a successful cycle. Terminal errors are
+  /// recorded by `didAbortWithError`.
   nonisolated func updater(
     _ updater: SPUUpdater,
     didFinishUpdateCycleFor updateCheck: SPUUpdateCheck,
     error: (any Error)?
   ) {
-    if let error,
-       (error as NSError).code == Self.deltaUpdateFailedCode,
-       (error as NSError).domain == Self.sparkleErrorDomain {
-      Task { @MainActor [weak self] in
-        self?.statusMessage = String(
-          localized: "Delta failed. Use Check for Updates to retry with a full download."
-        )
-      }
-    } else if error == nil {
+    if error == nil {
       Task { @MainActor [weak self] in
         self?.statusMessage = ""
       }

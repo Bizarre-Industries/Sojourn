@@ -44,24 +44,9 @@ final class SojournUITests: XCTestCase {
     ]
 
     for (sidebarID, paneID) in entries {
-      let row = sidebarEntry(app, sidebarID)
-      if !row.waitForExistence(timeout: 4) {
-        XCTFail("Sidebar entry \(sidebarID) not found")
-        continue
-      }
-      row.click()
-      let pane = app.scrollViews[paneID]
-      let other = app.otherElements[paneID]
-      let visiblePane: XCUIElement?
-      if pane.waitForExistence(timeout: 4) {
-        visiblePane = pane
-      } else if other.waitForExistence(timeout: 1) {
-        visiblePane = other
-      } else {
-        visiblePane = nil
-      }
-      XCTAssertNotNil(
-        visiblePane,
+      clickSidebarEntry(app, sidebarID)
+      XCTAssertTrue(
+        pane(app, paneID).waitForExistence(timeout: 4),
         "Pane \(paneID) did not load after clicking \(sidebarID)"
       )
     }
@@ -74,10 +59,10 @@ final class SojournUITests: XCTestCase {
 
     let row = sidebarEntry(app, "sidebar.packages")
     XCTAssertTrue(row.waitForExistence(timeout: 4))
-    row.click()
+    clickSidebarEntry(app, "sidebar.packages")
 
     XCTAssertTrue(pane(app, "pane.packages").waitForExistence(timeout: 4))
-    XCTAssertTrue(app.otherElements["packages.inventory"].waitForExistence(timeout: 4))
+    XCTAssertTrue(identifierElement(app, "packages.inventory").waitForExistence(timeout: 4))
     XCTAssertFalse(app.staticTexts["Outdated scan unavailable"].exists)
   }
 
@@ -120,9 +105,7 @@ final class SojournUITests: XCTestCase {
     ]
 
     for action in paneActions {
-      let row = sidebarEntry(app, action.sidebarID)
-      XCTAssertTrue(row.waitForExistence(timeout: 4), "Missing \(action.sidebarID)")
-      row.click()
+      clickSidebarEntry(app, action.sidebarID)
       let button = toolbarButton(app, action.actionID)
       XCTAssertTrue(button.waitForExistence(timeout: 4), "Missing \(action.actionID)")
       XCTAssertEqual(button.label, action.label, "Unexpected label for \(action.actionID)")
@@ -131,12 +114,16 @@ final class SojournUITests: XCTestCase {
 
   private func launchAgentApp(_ app: XCUIApplication) {
     app.launch()
+    app.activate()
 
     let deadline = Date().addingTimeInterval(10)
     while Date() < deadline {
       switch app.state {
-      case .runningForeground, .runningBackground:
+      case .runningForeground:
         return
+      case .runningBackground:
+        app.activate()
+        RunLoop.current.run(until: Date().addingTimeInterval(0.1))
       case .unknown, .notRunning:
         RunLoop.current.run(until: Date().addingTimeInterval(0.1))
       @unknown default:
@@ -148,23 +135,80 @@ final class SojournUITests: XCTestCase {
   }
 
   private func pane(_ app: XCUIApplication, _ identifier: String) -> XCUIElement {
-    let scrollView = app.scrollViews[identifier]
-    if scrollView.exists { return scrollView }
-    return app.otherElements[identifier]
+    identifierElement(app, identifier)
   }
 
   private func sidebarEntry(_ app: XCUIApplication, _ identifier: String) -> XCUIElement {
-    let label = app.staticTexts[identifier]
-    if label.exists { return label }
-    return app.buttons[identifier]
+    identifierElement(app, identifier)
+  }
+
+  private func clickSidebarEntry(
+    _ app: XCUIApplication,
+    _ identifier: String,
+    file: StaticString = #filePath,
+    line: UInt = #line
+  ) {
+    app.activate()
+    RunLoop.current.run(until: Date().addingTimeInterval(0.1))
+
+    let row = sidebarEntry(app, identifier)
+    XCTAssertTrue(row.waitForExistence(timeout: 4), "Missing \(identifier)", file: file, line: line)
+
+    if row.isHittable {
+      row.click()
+      waitForSidebarDestinationIfNeeded(app, identifier)
+      return
+    }
+
+    app.activate()
+    RunLoop.current.run(until: Date().addingTimeInterval(0.2))
+    if row.isHittable {
+      row.click()
+    } else {
+      row.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).click()
+    }
+    waitForSidebarDestinationIfNeeded(app, identifier)
   }
 
   private func toolbarButton(_ app: XCUIApplication, _ identifier: String) -> XCUIElement {
-    let button = app.buttons[identifier]
-    if button.exists { return button }
-    let staticText = app.staticTexts[identifier]
-    if staticText.exists { return staticText }
-    return app.otherElements[identifier]
+    identifierElement(app, identifier)
+  }
+
+  private func waitForSidebarDestinationIfNeeded(_ app: XCUIApplication, _ identifier: String) {
+    guard identifier == "sidebar.containers" else { return }
+    let probedAt = identifierElement(app, "containers.probed-at")
+    guard probedAt.waitForExistence(timeout: 4) else { return }
+
+    let deadline = Date().addingTimeInterval(8)
+    while Date() < deadline {
+      if !probedAt.label.localizedCaseInsensitiveContains("never") {
+        return
+      }
+      RunLoop.current.run(until: Date().addingTimeInterval(0.1))
+    }
+  }
+
+  private func identifierElement(
+    _ app: XCUIApplication,
+    _ identifier: String
+  ) -> XCUIElement {
+    let candidates = [
+      app.buttons.matching(identifier: identifier),
+      app.staticTexts.matching(identifier: identifier),
+      app.scrollViews.matching(identifier: identifier),
+      app.groups.matching(identifier: identifier),
+      app.otherElements.matching(identifier: identifier),
+      app.descendants(matching: .any).matching(identifier: identifier)
+    ]
+    .flatMap(\.allElementsBoundByIndex)
+
+    if let hittable = candidates.first(where: { $0.exists && $0.isHittable }) {
+      return hittable
+    }
+    if let existing = candidates.first(where: { $0.exists }) {
+      return existing
+    }
+    return app.descendants(matching: .any)[identifier]
   }
 }
 

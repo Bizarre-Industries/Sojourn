@@ -22,6 +22,7 @@
 		19015140F1CC02CD00D3BFF8 /* AdvisoriesPane.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B75E2CD72BA992F32BCEB9C /* AdvisoriesPane.swift */; };
 		191866534A9570E447AEA969 /* MacOSFeaturesService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF0F7E5B022F32A9CF6BF028 /* MacOSFeaturesService.swift */; };
 		19ED9BB99FD79A3F00DE09A4 /* SyncCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 197100C16F14E6EF4B75D6E3 /* SyncCoordinator.swift */; };
+		1AC66B55A03741440AA97840 /* MasExecutableValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 281D14573DB2FA7953B5A7BD /* MasExecutableValidator.swift */; };
 		1B511F22B7852AF15BAE3CE2 /* Bundle+Fixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = A64D32536414511C9E9911C6 /* Bundle+Fixtures.swift */; };
 		1D1AFC6E3F699596754D80BE /* Snapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = B17DA112F156FC13EBFD8B18 /* Snapshot.swift */; };
 		1D1E0ECF892F0FA35A6CCADF /* HistoryEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E64BDF45BE87A78922A385 /* HistoryEntry.swift */; };
@@ -126,6 +127,7 @@
 		C44DB6B79B4C736DEC87106E /* MachineMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDF057685B19AB3503933B08 /* MachineMetadata.swift */; };
 		C63650F6F57BDB8D36CDC7E9 /* OrphanCandidate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA82E2DC35BD66C0CCB3D31C /* OrphanCandidate.swift */; };
 		C6E76168AC77E5F2B66C1A00 /* ToolLocatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3631080B96D92DFD843F72AE /* ToolLocatorTests.swift */; };
+		C980A3B327D62468DB094D24 /* MasExecutableValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 281D14573DB2FA7953B5A7BD /* MasExecutableValidator.swift */; };
 		C9B5636F619F4D29C1EC1E72 /* MasService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E429313D0E0FB1D51FABD2F /* MasService.swift */; };
 		CECA18FC532B5949256AC8AD /* Pane.swift in Sources */ = {isa = PBXBuildFile; fileRef = 490214C4A2B5FAA45DAA370F /* Pane.swift */; };
 		D7151A2078906FDB7B990AD6 /* GenerationsPane.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DFAB02C29720FAB30864DCB /* GenerationsPane.swift */; };
@@ -196,6 +198,7 @@
 		26AC85D34AC1D8A31E0EC1C3 /* RedactorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RedactorTests.swift; sourceTree = "<group>"; };
 		27657F22347EC0CCD4B14D5C /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
 		277FC75194E246A84AB1A2A9 /* HistoryDB.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryDB.swift; sourceTree = "<group>"; };
+		281D14573DB2FA7953B5A7BD /* MasExecutableValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MasExecutableValidator.swift; sourceTree = "<group>"; };
 		2A07B987FC38D4FE488E8704 /* ToolProbe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolProbe.swift; sourceTree = "<group>"; };
 		2A4824F5864A9EC3B55E6600 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		2DD4943AD10D37C3DB9CFBC9 /* LogBufferTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogBufferTests.swift; sourceTree = "<group>"; };
@@ -583,6 +586,7 @@
 				F4207776C9EC0D4B31D82E91 /* JobRunner.swift */,
 				75102F527B8749FB644C0444 /* LogBuffer.swift */,
 				BF0F7E5B022F32A9CF6BF028 /* MacOSFeaturesService.swift */,
+				281D14573DB2FA7953B5A7BD /* MasExecutableValidator.swift */,
 				AC16F379586B175695E71BF2 /* MasHelperClient.swift */,
 				EB4FE8184AADB56514189B5D /* MasHelperProtocol.swift */,
 				4E429313D0E0FB1D51FABD2F /* MasService.swift */,
@@ -938,6 +942,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C980A3B327D62468DB094D24 /* MasExecutableValidator.swift in Sources */,
 				611FBB090546801CDE52B8A7 /* MasHelperProtocol.swift in Sources */,
 				A9A1ACC2E910BABFA68FCDA2 /* MasHelperService.swift in Sources */,
 				E83D3436EED0F981FD480712 /* main.swift in Sources */,
@@ -1008,6 +1013,7 @@
 				368EF18A0521C70C0CFA7796 /* MachinesPane.swift in Sources */,
 				E72C0687340E4387E829A79E /* MainWindowView.swift in Sources */,
 				F40C659088BA7D50CF171576 /* ManagerSnapshot.swift in Sources */,
+				1AC66B55A03741440AA97840 /* MasExecutableValidator.swift in Sources */,
 				AB65C0850E45096716071226 /* MasHelperClient.swift in Sources */,
 				AA33BC82E753FD68DFD4B771 /* MasHelperProtocol.swift in Sources */,
 				C9B5636F619F4D29C1EC1E72 /* MasService.swift in Sources */,
@@ -1211,7 +1217,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Sojourn/SojournDebug.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 30;
+				CURRENT_PROJECT_VERSION = 31;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Sojourn/Info.plist;
@@ -1252,7 +1258,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Sojourn/Sojourn.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 30;
+				CURRENT_PROJECT_VERSION = 31;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Sojourn/Info.plist;
@@ -1275,7 +1281,7 @@
 				CODE_SIGN_ENTITLEMENTS = MasHelper/MasHelper.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
 				CREATE_INFOPLIST_SECTION_IN_BINARY = YES;
-				CURRENT_PROJECT_VERSION = 30;
+				CURRENT_PROJECT_VERSION = 31;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = MasHelper/Info.plist;
@@ -1336,7 +1342,7 @@
 				CODE_SIGN_ENTITLEMENTS = MasHelper/MasHelper.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
 				CREATE_INFOPLIST_SECTION_IN_BINARY = YES;
-				CURRENT_PROJECT_VERSION = 30;
+				CURRENT_PROJECT_VERSION = 31;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = MasHelper/Info.plist;

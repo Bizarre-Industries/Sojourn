@@ -173,7 +173,12 @@ internal final class AppStore {
     let locator = ToolLocator()
     let brewURL = (await locator.locate("brew"))?.url
       ?? URL(fileURLWithPath: "/opt/homebrew/bin/brew")
-    let brewBundle = BrewBundleService(runner: runner, brewURL: brewURL)
+    let sourceRoot = paths.config.appendingPathComponent("sojourn-data", isDirectory: true)
+    let brewBundle = BrewBundleService(
+      runner: runner,
+      brewURL: brewURL,
+      chezmoiSourceRoot: sourceRoot
+    )
     let git = await GitService.live(runner: runner, locator: locator)
     let chezmoi = await ChezmoiService.live(runner: runner, locator: locator)
     let secrets = SecretScanService.live(runner: runner)
@@ -269,6 +274,14 @@ internal final class AppStore {
 
   internal func pullSync() async {
     await sync?.pull()
+  }
+
+  internal func applyReviewedPull() async {
+    await sync?.applyReviewedPull()
+  }
+
+  internal func cancelSyncOperation() {
+    sync?.cancelActiveOperation()
   }
 
   internal func pushSync(message: String = "sojourn: sync") async {

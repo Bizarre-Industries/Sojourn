@@ -24,7 +24,7 @@ The candidate scanners:
 Bundle **gitleaks v8.30.1+** at `Contents/Resources/bin/gitleaks`.
 Re-sign with Sojourn's Developer ID under `--options=runtime`; staple as
 part of outer notarization. Invoke via
-`gitleaks dir --staged --no-git --report-format json` before every
+`gitleaks git --staged --report-format json --report-path -` before every
 auto-commit.
 
 ## Consequences

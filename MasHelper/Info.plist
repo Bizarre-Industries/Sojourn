@@ -14,14 +14,17 @@
   <string>$(MARKETING_VERSION)</string>
   <key>CFBundleVersion</key>
   <string>$(CURRENT_PROJECT_VERSION)</string>
+  <key>SojournDevelopmentTeam</key>
+  <string>$(DEVELOPMENT_TEAM)</string>
   <!-- SMAuthorizedClients pins the Sojourn app identity that's
        allowed to install / unregister this helper via SMAppService.
        Per council 2026-05-03 amendment to ADR-0024: identifier pin
        binds the helper to one app bundle id; certificate clauses
-       restrict to Apple-signed Developer ID Application leaf. -->
+       restrict to Apple-signed Developer ID Application leaf and the
+       Sojourn maintainer Team ID. -->
   <key>SMAuthorizedClients</key>
   <array>
-    <string>anchor apple generic and identifier "app.bizarre.sojourn" and certificate 1[field.1.2.840.113635.100.6.2.6] and certificate leaf[field.1.2.840.113635.100.6.1.13]</string>
+    <string>anchor apple generic and identifier "app.bizarre.sojourn" and certificate 1[field.1.2.840.113635.100.6.2.6] and certificate leaf[field.1.2.840.113635.100.6.1.13] and certificate leaf[subject.OU] = "$(DEVELOPMENT_TEAM)"</string>
   </array>
 </dict>
 </plist>

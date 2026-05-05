@@ -76,7 +76,7 @@ Mitigations:
 - **Tier E (global npm) never silent-updates**: 14-day cooldown plus
   per-version user approval.
 - **Pre-commit secret scan**: every auto-commit runs
-  `gitleaks dir --staged` first ([decisions/0006-gitleaks-bundled.md](../decisions/0006-gitleaks-bundled.md)).
+  `gitleaks git --staged` first ([decisions/0006-gitleaks-bundled.md](../decisions/0006-gitleaks-bundled.md)).
   High-confidence provider-key findings (AWS, GitHub PAT, OpenAI, Stripe
   live, Anthropic, Slack token) lock the *Commit anyway* button for 5
   seconds — forces the user to read the match before bypassing.

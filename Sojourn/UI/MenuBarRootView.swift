@@ -68,11 +68,11 @@ struct MenuBarRootView: View {
         Button {
           NSApp.activate(ignoringOtherApps: true)
         } label: {
-          menuButtonLabel("Open Sojourn", systemImage: "arrow.triangle.2.circlepath")
+          menuButtonLabel(String(localized: "Open Sojourn"), systemImage: "arrow.triangle.2.circlepath")
         }
         .buttonStyle(GlassPrimaryButtonStyle())
         .accessibilityIdentifier("menubar.review-sync")
-        .accessibilityHint("Opens Sojourn so pull, push, and conflict details can be reviewed in the main window.")
+        .accessibilityHint(openSojournHint)
 
         if !store.sparkleService.statusMessage.isEmpty {
           HStack(alignment: .top, spacing: 6) {
@@ -163,6 +163,16 @@ struct MenuBarRootView: View {
     )
   }
 
+  private var openSojournHint: String {
+    if case .awaitingPullApplyReview = store.sync?.phase {
+      return String(localized: "Opens Sojourn so pulled scripts, templates, and packages can be reviewed before applying.")
+    }
+    if case .applyingReviewedPull = store.sync?.phase {
+      return String(localized: "Opens Sojourn so the reviewed apply progress can be monitored or cancelled.")
+    }
+    return String(localized: "Opens Sojourn so pull, push, and conflict details can be reviewed in the main window.")
+  }
+
   private func syncButton(_ action: MenuBarSyncAction) -> some View {
     Button {
       pendingSyncAction = action
@@ -185,6 +195,9 @@ struct MenuBarRootView: View {
   }
 
   private func actionDisabled(_ action: MenuBarSyncAction) -> Bool {
+    if case .awaitingPullApplyReview = store.sync?.phase {
+      return true
+    }
     if store.sync?.isOperationActive == true {
       return true
     }
@@ -218,6 +231,12 @@ struct MenuBarRootView: View {
       return true
     }
     if case .awaitingPullDecision = store.sync?.phase {
+      return true
+    }
+    if case .awaitingPullApplyReview = store.sync?.phase {
+      return true
+    }
+    if case .applyingReviewedPull = store.sync?.phase {
       return true
     }
     return store.conflictResolver?.canPush == false
@@ -260,11 +279,11 @@ private enum MenuBarSyncAction: Identifiable {
   var confirmationMessage: String {
     switch self {
     case .pull:
-      return "Pull creates a pre-operation generation, fetches remote changes, may apply chezmoi dotfiles, and may run brew bundle install for Brewfiles. A rollback snapshot will appear in Generations."
+      return "Pull fetches remote changes, then either pauses for review or creates a generation before applying dotfiles and Brewfiles. Review appears when pulled scripts, templates, or packages need a second gesture."
     case .push:
       return "Push stages sync files, scans staged content with gitleaks, captures a generation only after the scan passes, commits clean sync paths, and pushes to origin. Blocked scans stop before snapshot capture."
     case .sync:
-      return "Sync runs Pull and Apply first. If no conflict needs review, it stages sync files, scans staged content, captures a generation only after the scan passes, commits clean sync paths, and pushes to origin."
+      return "Sync runs Pull and Apply first. If pull does not pause for conflict or apply review, it stages sync files, scans staged content, captures a generation only after the scan passes, commits clean sync paths, and pushes to origin."
     }
   }
 
@@ -306,6 +325,10 @@ private struct MenuBarSyncStatus {
       self.init(dot: .warn, label: "Resolving conflicts")
     case .awaitingPullDecision(let commits):
       self.init(dot: .warn, label: "\(commits.count) inbound commit(s)")
+    case .awaitingPullApplyReview:
+      self.init(dot: .warn, label: String(localized: "Apply review waiting"))
+    case .applyingReviewedPull(let step):
+      self.init(dot: .lime, label: String(localized: "Applying \(step)"))
     case .scanningSecrets:
       self.init(dot: .warn, label: "Scanning staged files")
     case .pushing:

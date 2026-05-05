@@ -6,6 +6,7 @@
 # the high-confidence provider-key rules Sojourn explicitly blocks for
 # 5s in the UI.
 
+[extend]
 useDefault = true
 
 [allowlist]
@@ -26,9 +27,10 @@ regexes = [
 [[rules]]
 id = "sojourn-aws-access-key"
 description = "AWS access key (AKIA/ASIA prefix)"
-regex = '''(?i)(AKIA|ASIA)[A-Z0-9]{16}'''
+regex = '''(?i)((?:AKIA|ASIA)[A-Z0-9]{16})'''
 entropy = 3.0
-secretGroup = 0
+secretGroup = 1
+keywords = ["AKIA", "ASIA"]
 tags = ["aws", "sojourn"]
 
 [[rules]]

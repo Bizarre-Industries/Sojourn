@@ -15,6 +15,10 @@ All notable changes to Sojourn. Follows
 - v0.4 stage 2 pane data completion: real Brewfile package inventory
   rows, expanded generation/advisory/container/preference metadata,
   and Swift/UI smoke coverage for the package inventory surface.
+- v0.4 stage 3 security blocker remediation: pinned gitleaks JSON/config
+  scanning, pull-apply review gates, MAS helper Team-ID and executable
+  trust checks, Homebrew installer signer pinning, and SIGKILL
+  escalation for cancelled subprocesses.
 
 ### Planned (post-v0.3.0)
 

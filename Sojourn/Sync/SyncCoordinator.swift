@@ -9,6 +9,7 @@
 
 import Foundation
 import Observation
+import CryptoKit
 
 internal enum SyncPhase: Sendable, Equatable {
   case idle
@@ -18,22 +19,111 @@ internal enum SyncPhase: Sendable, Equatable {
   /// modal listing inbound commits + 3-button choice (rebase / merge /
   /// abort). Per ADR-0026 refuse-and-show-diff state machine.
   case awaitingPullDecision([InboundCommit])
+  /// Remote state has been pulled but contains executable apply risk
+  /// requiring an explicit second user gesture before chezmoi or brew
+  /// mutate the machine.
+  case awaitingPullApplyReview(PullApplyReview)
+  /// User approved the pulled scripts/packages and Sojourn is now
+  /// applying them. Carries the current user-visible step.
+  case applyingReviewedPull(String)
   case scanningSecrets
   case pushing
   case done(HistoryEntry.Kind)
   case failed(String)
 }
 
+internal struct PullApplyReview: Sendable, Equatable {
+  internal static let previewLimit = 500
+
+  internal let chezmoiScripts: [String]
+  internal let chezmoiTemplates: [String]
+  internal let packageReviews: [PullPackageReview]
+  internal let omittedChezmoiScriptCount: Int
+  internal let omittedChezmoiTemplateCount: Int
+  internal let omittedPackageReviewCount: Int
+  internal let contentFingerprint: String
+
+  internal init(
+    chezmoiScripts: [String],
+    chezmoiTemplates: [String] = [],
+    packageReviews: [PullPackageReview],
+    omittedChezmoiScriptCount: Int = 0,
+    omittedChezmoiTemplateCount: Int = 0,
+    omittedPackageReviewCount: Int = 0,
+    contentFingerprint: String = ""
+  ) {
+    self.chezmoiScripts = chezmoiScripts
+    self.chezmoiTemplates = chezmoiTemplates
+    self.packageReviews = packageReviews
+    self.omittedChezmoiScriptCount = omittedChezmoiScriptCount
+    self.omittedChezmoiTemplateCount = omittedChezmoiTemplateCount
+    self.omittedPackageReviewCount = omittedPackageReviewCount
+    self.contentFingerprint = contentFingerprint
+  }
+
+  internal var requiresConsent: Bool {
+    totalChezmoiScriptCount > 0
+      || totalChezmoiTemplateCount > 0
+      || totalPackageReviewCount > 0
+  }
+
+  internal var totalChezmoiScriptCount: Int {
+    chezmoiScripts.count + omittedChezmoiScriptCount
+  }
+
+  internal var totalChezmoiTemplateCount: Int {
+    chezmoiTemplates.count + omittedChezmoiTemplateCount
+  }
+
+  internal var totalPackageReviewCount: Int {
+    packageReviews.count + omittedPackageReviewCount
+  }
+
+  internal var summary: String {
+    var parts: [String] = []
+    if totalChezmoiScriptCount > 0 {
+      parts.append("\(totalChezmoiScriptCount) chezmoi script(s)")
+    }
+    if totalChezmoiTemplateCount > 0 {
+      parts.append("\(totalChezmoiTemplateCount) chezmoi template(s)")
+    }
+    if totalPackageReviewCount > 0 {
+      parts.append("\(totalPackageReviewCount) Brewfile entr\(totalPackageReviewCount == 1 ? "y" : "ies")")
+    }
+    return parts.isEmpty ? "No executable pull-apply changes need review." : parts.joined(separator: ", ")
+  }
+
+  internal var accessibilitySummary: String {
+    if requiresConsent {
+      return "Pull apply review required for \(summary)."
+    }
+    return summary
+  }
+}
+
+internal struct PullPackageReview: Sendable, Equatable, Identifiable {
+  internal var id: String { "\(brewfile):\(manager):\(package)" }
+  internal let brewfile: String
+  internal let manager: String
+  internal let package: String
+  internal let reason: String
+
+  internal var accessibilityLabel: String {
+    "\(manager) \(package) in \(brewfile). \(reason)"
+  }
+}
+
 @Observable
 @MainActor
 internal final class SyncCoordinator {
   internal private(set) var phase: SyncPhase = .idle
+  @ObservationIgnored private var reviewedApplyTask: Task<Void, Never>?
 
   internal var isOperationActive: Bool {
     switch phase {
-    case .pulling, .resolvingConflicts, .scanningSecrets, .pushing:
+    case .pulling, .resolvingConflicts, .applyingReviewedPull, .scanningSecrets, .pushing:
       return true
-    case .idle, .awaitingPullDecision, .done, .failed:
+    case .idle, .awaitingPullDecision, .awaitingPullApplyReview, .done, .failed:
       return false
     }
   }
@@ -77,6 +167,10 @@ internal final class SyncCoordinator {
       SojournLog.sync.error("pull ignored: sync operation already in progress")
       return
     }
+    guard !hasPendingPullApplyReview else {
+      SojournLog.sync.error("pull ignored: pulled changes are waiting for apply review")
+      return
+    }
 
     let signpost = SojournSignpost.sync
     let state = signpost.beginInterval("pull", id: signpost.makeSignpostID())
@@ -117,35 +211,16 @@ internal final class SyncCoordinator {
     }
 
     do {
-      _ = try await snapshots.capture(operation: .syncPull, sources: [repoURL])
       try await git.pull(remote: "origin", branch: branch, cwd: repoURL)
-      if let chezmoi {
-        // Three-way merge text dotfiles via the user's configured
-        // `merge.command` before falling back to `apply`. Binaries /
-        // plists keep the apply path because chezmoi merge doesn't
-        // handle them.
-        let status = (try? await chezmoi.status(cwd: nil)) ?? ""
-        for target in Self.textMergeTargets(fromStatus: status) {
-          do {
-            try await chezmoi.merge(target: target, cwd: nil)
-          } catch {
-            SojournLog.sync.error(
-              "merge failed for \(target, privacy: .public): \(String(describing: error), privacy: .public)"
-            )
-          }
-        }
-        try await chezmoi.apply(dryRun: false, cwd: nil)
+      let review = try await pullApplyReview()
+      if review.requiresConsent {
+        phase = .awaitingPullApplyReview(review)
+        SojournLog.sync.info("pull paused for apply review: \(review.summary, privacy: .public)")
+        signpost.endInterval("pull", state)
+        return
       }
-      // Apply Brewfile.common then Brewfile.<host>. Either may be
-      // absent (single-machine setup) — skip silently.
-      let host = Self.hostname()
-      let candidates = [
-        repoURL.appendingPathComponent("Brewfile.common"),
-        repoURL.appendingPathComponent("Brewfile.\(host)")
-      ].filter { FileManager.default.fileExists(atPath: $0.path) }
-      for brewfile in candidates {
-        _ = try await brewBundle.install(file: brewfile, upgrade: false, cleanup: false)
-      }
+      _ = try await snapshots.capture(operation: .syncPull, sources: [repoURL])
+      try await applyPulledState()
       phase = .done(.syncPull)
       SojournLog.sync.info("pull done")
     } catch {
@@ -155,11 +230,63 @@ internal final class SyncCoordinator {
     signpost.endInterval("pull", state)
   }
 
+  internal func applyReviewedPull() async {
+    guard case .awaitingPullApplyReview(let review) = phase else {
+      phase = .failed("No reviewed pull is waiting to apply.")
+      return
+    }
+
+    let task = Task { @MainActor in
+      await runReviewedPullApply(review: review)
+    }
+    reviewedApplyTask = task
+    await task.value
+  }
+
+  internal func cancelActiveOperation() {
+    reviewedApplyTask?.cancel()
+  }
+
+  internal func discardPullApplyReview() {
+    guard case .awaitingPullApplyReview = phase else { return }
+    phase = .failed(String(localized: "Pulled changes were left unapplied. Rerun Pull and Apply to review them again."))
+  }
+
+  private func runReviewedPullApply(review: PullApplyReview) async {
+    phase = .applyingReviewedPull(String(localized: "Verifying reviewed content"))
+    do {
+      try Task.checkCancellation()
+      let currentReview = try await pullApplyReview()
+      guard currentReview.contentFingerprint == review.contentFingerprint else {
+        phase = .failed(String(localized: "Pulled content changed after review. Rerun Pull and Apply so Sojourn can rebuild the script and package review before applying."))
+        return
+      }
+
+      phase = .applyingReviewedPull(String(localized: "Creating generation"))
+      _ = try await snapshots.capture(operation: .syncPull, sources: [repoURL])
+      try Task.checkCancellation()
+      try await applyPulledState(reportReviewedApplyStep: true)
+      phase = .done(.syncPull)
+      SojournLog.sync.info("reviewed pull apply done")
+    } catch is CancellationError {
+      phase = .failed(String(localized: "Reviewed pull apply cancelled before completion. Pull remains fetched; rerun Pull and Apply to review again."))
+      SojournLog.sync.info("reviewed pull apply cancelled")
+    } catch {
+      phase = .failed("reviewed pull apply failed: \(error)")
+      SojournLog.sync.error("reviewed pull apply failed: \(String(describing: error), privacy: .public)")
+    }
+    reviewedApplyTask = nil
+  }
+
   // MARK: - Push
 
   internal func push(branch: String = "main", message: String) async {
     guard !isOperationActive else {
       SojournLog.sync.error("push ignored: sync operation already in progress")
+      return
+    }
+    guard !hasPendingPullApplyReview else {
+      SojournLog.sync.error("push ignored: pulled changes are waiting for apply review")
       return
     }
 
@@ -285,6 +412,293 @@ internal final class SyncCoordinator {
 
   internal func reset() {
     phase = .idle
+  }
+
+  private var hasPendingPullApplyReview: Bool {
+    if case .awaitingPullApplyReview = phase {
+      return true
+    }
+    return false
+  }
+
+  // MARK: - Pull apply review
+
+  private func applyPulledState(reportReviewedApplyStep: Bool = false) async throws {
+    if let chezmoi {
+      if reportReviewedApplyStep {
+        phase = .applyingReviewedPull(String(localized: "Checking dotfile changes"))
+      }
+      try Task.checkCancellation()
+      // Three-way merge text dotfiles via the user's configured
+      // `merge.command` before falling back to `apply`. Binaries /
+      // plists keep the apply path because chezmoi merge doesn't
+      // handle them.
+      let status = (try? await chezmoi.status(cwd: nil)) ?? ""
+      for target in Self.textMergeTargets(fromStatus: status) {
+        try Task.checkCancellation()
+        do {
+          if reportReviewedApplyStep {
+            phase = .applyingReviewedPull(String(localized: "Merging \(target)"))
+          }
+          try await chezmoi.merge(target: target, cwd: nil)
+        } catch {
+          SojournLog.sync.error(
+            "merge failed for \(target, privacy: .public): \(String(describing: error), privacy: .public)"
+          )
+        }
+      }
+      if reportReviewedApplyStep {
+        phase = .applyingReviewedPull(String(localized: "Applying dotfiles"))
+      }
+      try Task.checkCancellation()
+      try await chezmoi.apply(dryRun: false, cwd: nil)
+    }
+
+    for brewfile in brewfileCandidates() {
+      if reportReviewedApplyStep {
+        phase = .applyingReviewedPull(String(localized: "Installing \(brewfile.lastPathComponent)"))
+      }
+      try Task.checkCancellation()
+      _ = try await brewBundle.install(file: brewfile, upgrade: false, cleanup: false)
+    }
+  }
+
+  private func pullApplyReview() async throws -> PullApplyReview {
+    let task = Task.detached(priority: .userInitiated) { [repoURL, cooldown] in
+      try await Self.pullApplyReview(repoURL: repoURL, cooldown: cooldown)
+    }
+    return try await withTaskCancellationHandler {
+      try await task.value
+    } onCancel: {
+      task.cancel()
+    }
+  }
+
+  private nonisolated static func pullApplyReview(
+    repoURL: URL,
+    cooldown: CooldownGate
+  ) async throws -> PullApplyReview {
+    var packageReviews: [PullPackageReview] = []
+    var omittedPackages = 0
+    for brewfile in brewfileCandidates(repoURL: repoURL) {
+      try Task.checkCancellation()
+      guard let text = try? String(contentsOf: brewfile, encoding: .utf8) else {
+        continue
+      }
+      let ast = BrewfileParser.parse(text)
+      let lines = text.split(separator: "\n", omittingEmptySubsequences: false).map(String.init)
+      for (lineNumber, entry) in ast.entries.enumerated() {
+        try Task.checkCancellation()
+        guard let package = entry.packageID else {
+          if let rawRuby = brewfileRubyReview(
+            line: lines.indices.contains(lineNumber) ? lines[lineNumber] : "",
+            lineNumber: lineNumber + 1,
+            brewfile: brewfile.lastPathComponent
+          ) {
+            if packageReviews.count < PullApplyReview.previewLimit {
+              packageReviews.append(rawRuby)
+            } else {
+              omittedPackages += 1
+            }
+          }
+          continue
+        }
+        let manager = Self.managerID(for: entry)
+        let decision = await cooldown.evaluate(
+          package: package,
+          manager: manager,
+          ecosystem: Self.osvEcosystem(for: manager),
+          installedVersion: nil,
+          candidateVersion: nil,
+          releasedAt: nil
+        )
+        if packageReviews.count < PullApplyReview.previewLimit {
+          packageReviews.append(PullPackageReview(
+            brewfile: brewfile.lastPathComponent,
+            manager: manager,
+            package: package,
+            reason: Self.pullApplyReviewReason(for: entry, manager: manager, decision: decision)
+          ))
+        } else {
+          omittedPackages += 1
+        }
+      }
+    }
+    let allScripts = try Self.chezmoiScriptPaths(under: repoURL)
+    let allTemplates = try Self.chezmoiTemplatePaths(under: repoURL)
+    let shownScripts = Array(allScripts.prefix(PullApplyReview.previewLimit))
+    let shownTemplates = Array(allTemplates.prefix(PullApplyReview.previewLimit))
+    return PullApplyReview(
+      chezmoiScripts: shownScripts,
+      chezmoiTemplates: shownTemplates,
+      packageReviews: packageReviews,
+      omittedChezmoiScriptCount: max(0, allScripts.count - shownScripts.count),
+      omittedChezmoiTemplateCount: max(0, allTemplates.count - shownTemplates.count),
+      omittedPackageReviewCount: omittedPackages,
+      contentFingerprint: Self.pullApplyFingerprint(
+        repoURL: repoURL,
+        brewfiles: brewfileCandidates(repoURL: repoURL),
+        scripts: allScripts + allTemplates
+      )
+    )
+  }
+
+  private nonisolated static func brewfileRubyReview(
+    line: String,
+    lineNumber: Int,
+    brewfile: String
+  ) -> PullPackageReview? {
+    let trimmed = line.trimmingCharacters(in: .whitespaces)
+    guard !trimmed.isEmpty && !trimmed.hasPrefix("#") else { return nil }
+    return PullPackageReview(
+      brewfile: brewfile,
+      manager: "ruby",
+      package: "line \(lineNumber)",
+      reason: "Brewfiles are evaluated as Ruby by Homebrew; this unparsed line must be reviewed before brew bundle install."
+    )
+  }
+
+  private nonisolated static func pullApplyFingerprint(
+    repoURL: URL,
+    brewfiles: [URL],
+    scripts: [String]
+  ) -> String {
+    var hasher = SHA256()
+    for brewfile in brewfiles.sorted(by: { $0.path < $1.path }) {
+      update(&hasher, string: "brewfile:\(brewfile.lastPathComponent)\n")
+      if let data = try? Data(contentsOf: brewfile) {
+        hasher.update(data: data)
+      }
+      update(&hasher, string: "\n")
+    }
+    for script in scripts.sorted() {
+      update(&hasher, string: "script:\(script)\n")
+      let url = repoURL.appendingPathComponent(script)
+      if let data = try? Data(contentsOf: url) {
+        hasher.update(data: data)
+      }
+      update(&hasher, string: "\n")
+    }
+    return hasher.finalize().map { String(format: "%02x", $0) }.joined()
+  }
+
+  private nonisolated static func update(_ hasher: inout SHA256, string: String) {
+    hasher.update(data: Data(string.utf8))
+  }
+
+  private func brewfileCandidates() -> [URL] {
+    Self.brewfileCandidates(repoURL: repoURL)
+  }
+
+  private nonisolated static func brewfileCandidates(repoURL: URL) -> [URL] {
+    let host = Self.hostname()
+    return [
+      repoURL.appendingPathComponent("Brewfile.common"),
+      repoURL.appendingPathComponent("Brewfile.\(host)")
+    ].filter { FileManager.default.fileExists(atPath: $0.path) }
+  }
+
+  internal nonisolated static func chezmoiScriptPaths(under root: URL) throws -> [String] {
+    try chezmoiReviewPaths(under: root) { url in
+      let name = url.lastPathComponent
+      return name.hasPrefix("run_")
+        || name.hasPrefix("run_once_")
+        || name.hasPrefix("run_onchange_")
+    }
+  }
+
+  internal nonisolated static func chezmoiTemplatePaths(under root: URL) throws -> [String] {
+    try chezmoiReviewPaths(under: root) { url in
+      url.lastPathComponent.hasSuffix(".tmpl")
+        || url.pathComponents.contains(".chezmoitemplates")
+    }
+  }
+
+  private nonisolated static func chezmoiReviewPaths(
+    under root: URL,
+    matching shouldInclude: (URL) -> Bool
+  ) throws -> [String] {
+    let rootPath = root.resolvingSymlinksInPath().path
+    guard let enumerator = FileManager.default.enumerator(
+      at: root,
+      includingPropertiesForKeys: [.isRegularFileKey],
+      options: []
+    ) else {
+      return []
+    }
+    var paths: [String] = []
+    for case let url as URL in enumerator {
+      try Task.checkCancellation()
+      if url.pathComponents.contains(".git") {
+        enumerator.skipDescendants()
+        continue
+      }
+      guard shouldInclude(url) else {
+        continue
+      }
+      let urlPath = url.resolvingSymlinksInPath().path
+      let rel = urlPath.hasPrefix(rootPath + "/")
+        ? String(urlPath.dropFirst(rootPath.count + 1))
+        : url.lastPathComponent
+      paths.append(rel)
+    }
+    return paths.sorted()
+  }
+
+  private nonisolated static func managerID(for entry: BrewfileEntry) -> String {
+    switch entry {
+    case .tap:     return "tap"
+    case .brew:    return "brew"
+    case .cask:    return "cask"
+    case .mas:     return "mas"
+    case .vscode:  return "vscode"
+    case .go:      return "go"
+    case .cargo:   return "cargo"
+    case .uv:      return "uv"
+    case .krew:    return "krew"
+    case .npm:     return "npm"
+    case .flatpak: return "flatpak"
+    case .comment, .blank:
+      return "unknown"
+    }
+  }
+
+  private nonisolated static func pullApplyReviewReason(
+    for entry: BrewfileEntry,
+    manager: String,
+    decision: CooldownDecision
+  ) -> String {
+    let base: String
+    switch entry {
+    case .tap:
+      base = "Tap changes package source trust and must be reviewed before brew bundle install."
+    case .brew, .cask:
+      base = "Homebrew entries can run install or postinstall steps and must be reviewed after pull."
+    case .mas:
+      base = "MAS entries can install App Store software and must be reviewed after pull."
+    case .vscode, .go, .cargo, .uv, .krew, .npm, .flatpak:
+      base = "\(manager) entries can install executable tools and must be reviewed after pull."
+    case .comment, .blank:
+      base = "Metadata entry."
+    }
+
+    if decision.reason == "cooldown disabled in settings" {
+      return "\(base) Cooldown is disabled, but pull-apply consent still applies."
+    }
+    if decision.requiresPrompt || !decision.allowAuto {
+      return "\(base) Current policy: \(decision.reason)."
+    }
+    return base
+  }
+
+  private nonisolated static func osvEcosystem(for manager: String) -> String? {
+    switch manager {
+    case "brew", "cask": return "Homebrew"
+    case "npm":          return "npm"
+    case "cargo":        return "crates.io"
+    case "go":           return "Go"
+    default:             return nil
+    }
   }
 
   // MARK: - Hostname

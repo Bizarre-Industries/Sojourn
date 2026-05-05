@@ -146,6 +146,28 @@ When ConflictResolver state is conflict-pending:
   cooldown-elapsed background sync only — NOT on every SyncPane
   appearance. JobRunner 30s timeout (advisory tier) on the fetch.
 
+## v0.4 Stage 3 pull-apply review amendment
+
+After a successful `git pull`, `SyncCoordinator` inspects pulled
+`run_`, `run_once_`, and `run_onchange_` chezmoi scripts, chezmoi
+templates (`*.tmpl` / `.chezmoitemplates`), install-capable Brewfile
+entries, and unparsed Brewfile Ruby lines before any destructive
+apply. If any are present, pull pauses in `awaitingPullApplyReview`
+and the Sync pane lists the scripts/templates/packages. Push and fresh
+Pull gestures are ignored while this review is waiting, so the
+already-fetched state cannot be buried under a new sync action.
+
+The review stores a content fingerprint over the displayed Brewfiles
+and scripts. `Apply Listed Changes` recomputes that fingerprint before
+capturing a generation and running `chezmoi apply` / `brew bundle
+install`; if the content changed after review, Sojourn refuses to
+apply and asks the user to rerun Pull and Apply. Reviewed apply exposes
+step-level progress plus cancellation before each cancellable step.
+
+This keeps ADR-0012's "pull resolves before push" gate intact while
+adding the v0.4 consent rule: pulled executable lifecycle changes need
+a second, reviewable gesture before they mutate the machine.
+
 ### Council log
 
 `/Users/binghzal/Developer/Sojourn/.claude/council-logs/2026-05-03-v0.3-adr-batch.md`.

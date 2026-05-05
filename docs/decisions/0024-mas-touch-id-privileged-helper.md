@@ -132,7 +132,7 @@ disabling Sojourn in System Settings → General → Login Items
   time with Bizarre Industries team ID for `<TEAMID>`:
   ```
   anchor apple generic
-    and identifier "industries.bizarre.Sojourn"
+    and identifier "app.bizarre.sojourn"
     and certificate 1[field.1.2.840.113635.100.6.2.6] /* Developer ID intermediate */
     and certificate leaf[field.1.2.840.113635.100.6.1.13] /* Developer ID Application */
     and certificate leaf[subject.OU] = "<TEAMID>"
@@ -179,6 +179,24 @@ with version + register-time + a "Revoke" button. Revoke calls
 helper bundle. The row disappears once the helper is unregistered;
 the next `mas install` triggers a re-install prompt. Closes the
 "silent calls feel like surveillance" UX gap.
+
+### v0.4 Stage 3 executable-trust amendment
+
+The helper and client now fail closed unless Sojourn's Team ID is
+present in the built `Info.plist` and included in the app/helper
+code-signing requirements. The helper also validates the original
+`/opt/homebrew/bin/mas` path, its symlink-resolved path, and every path
+component before executing `mas` as root. Each component and the final
+executable must be root-owned and not group/other-writable; the final
+target must also be a regular executable file.
+
+This intentionally disables MAS install/upgrade on the normal
+user-writable Homebrew prefix until the user or installer provides a
+trusted root-owned `mas` path. PackagesPane surfaces this as "App Store
+installs disabled" instead of silently falling back to sudo or a
+weaker helper policy. A future helper-controlled root-owned `mas`
+copy, checksum/provenance pin, or per-call sudo fallback would require
+a separate ADR/council pass because it changes the trust model.
 
 ### Council log
 

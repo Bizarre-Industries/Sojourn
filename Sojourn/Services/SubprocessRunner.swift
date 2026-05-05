@@ -39,6 +39,7 @@ internal struct StreamChunk: Sendable {
 internal actor SubprocessRunner {
   internal static let streamOutputSnapshotLimit = 1_048_576
   internal static let streamBufferLimit = 1_024
+  internal static let terminationGraceSeconds: UInt64 = 5
 
   internal init() {}
 
@@ -48,12 +49,15 @@ internal actor SubprocessRunner {
   /// Throws `SubprocessError` on spawn failure, non-zero exit, timeout, or
   /// task cancellation. `timeout` is optional wall-clock seconds; on expiry
   /// SIGTERM is sent, then SIGKILL after a 5s grace window.
+  /// `outputLimitBytes` bounds each captured stream for commands whose output
+  /// is expected to be machine-readable and finite.
   internal func run(
     tool: URL,
     args: [String] = [],
     env: [String: String]? = nil,
     cwd: URL? = nil,
-    timeout: TimeInterval? = nil
+    timeout: TimeInterval? = nil,
+    outputLimitBytes: Int? = nil
   ) async throws -> SubprocessResult {
     let process = Process()
     process.executableURL = tool
@@ -84,8 +88,13 @@ internal actor SubprocessRunner {
     }
 
     // Drain pipes concurrently; availableData returns empty Data on EOF.
-    let stdoutTask = Task.detached { Self.drain(stdoutPipe.fileHandleForReading) }
-    let stderrTask = Task.detached { Self.drain(stderrPipe.fileHandleForReading) }
+    let pid = process.processIdentifier
+    let stdoutTask = Task.detached {
+      Self.drain(stdoutPipe.fileHandleForReading, stream: .stdout, limitBytes: outputLimitBytes, pid: pid)
+    }
+    let stderrTask = Task.detached {
+      Self.drain(stderrPipe.fileHandleForReading, stream: .stderr, limitBytes: outputLimitBytes, pid: pid)
+    }
 
     let startedAt = Date()
     var timedOut = false
@@ -99,21 +108,30 @@ internal actor SubprocessRunner {
           await exitBox.wait()
         }
       } onCancel: {
-        if process.isRunning { process.terminate() }
+        Self.terminateWithEscalation(process)
       }
     } catch is CancellationError {
-      if process.isRunning { process.terminate() }
+      Self.terminateWithEscalation(process)
       await exitBox.wait()
       throw SubprocessError.cancelled
     }
 
-    let stdout = await stdoutTask.value
-    let stderr = await stderrTask.value
+    let stdoutDrain = await stdoutTask.value
+    let stderrDrain = await stderrTask.value
+    let stdout = stdoutDrain.data
+    let stderr = stderrDrain.data
 
     let code = process.terminationStatus
 
     if timedOut {
       throw SubprocessError.timedOut(elapsed: Date().timeIntervalSince(startedAt))
+    }
+
+    if stdoutDrain.limitExceeded {
+      throw SubprocessError.outputTooLarge(stream: .stdout, limit: outputLimitBytes ?? 0)
+    }
+    if stderrDrain.limitExceeded {
+      throw SubprocessError.outputTooLarge(stream: .stderr, limit: outputLimitBytes ?? 0)
     }
 
     if Task.isCancelled {
@@ -201,7 +219,7 @@ internal actor SubprocessRunner {
       }
 
       continuation.onTermination = { _ in
-        if process.isRunning { process.terminate() }
+        Self.terminateWithEscalation(process)
         stdoutTask.cancel()
         stderrTask.cancel()
       }
@@ -220,14 +238,29 @@ internal actor SubprocessRunner {
 
   // MARK: - Private helpers
 
-  private static func drain(_ handle: FileHandle) -> Data {
+  private nonisolated static func drain(
+    _ handle: FileHandle,
+    stream: StreamTag,
+    limitBytes: Int?,
+    pid: pid_t
+  ) -> DrainResult {
     var acc = Data()
+    let limit = limitBytes.map { max(0, $0) }
     while true {
       let chunk = handle.availableData
       if chunk.isEmpty { break }
+      if let limit, acc.count + chunk.count > limit {
+        let remaining = max(0, limit - acc.count)
+        if remaining > 0 {
+          acc.append(chunk.prefix(remaining))
+        }
+        try? handle.close()
+        terminatePID(pid)
+        return DrainResult(stream: stream, data: acc, limitExceeded: true)
+      }
       acc.append(chunk)
     }
-    return acc
+    return DrainResult(stream: stream, data: acc, limitExceeded: false)
   }
 
   private nonisolated static func drainStream(
@@ -283,22 +316,52 @@ internal actor SubprocessRunner {
         group.cancelAll()
         return false
       case .timedOut:
-        if process.isRunning { process.terminate() }
-        try? await Task.sleep(nanoseconds: 5 * 1_000_000_000)
-        if process.isRunning {
-          kill(process.processIdentifier, SIGKILL)
-        }
-        await exit.wait()
+        await terminateAndWait(process: process, exit: exit)
         group.cancelAll()
         return true
       }
     }
+  }
+
+  private nonisolated static func terminateWithEscalation(_ process: Process) {
+    guard process.isRunning else { return }
+    process.terminate()
+    let pid = process.processIdentifier
+    DispatchQueue.global(qos: .utility).asyncAfter(
+      deadline: .now() + .seconds(Int(terminationGraceSeconds))
+    ) {
+      guard process.isRunning else { return }
+      kill(pid, SIGKILL)
+    }
+  }
+
+  private nonisolated static func terminatePID(_ pid: pid_t) {
+    kill(pid, SIGTERM)
+  }
+
+  private static func terminateAndWait(process: Process, exit: ExitBox) async {
+    guard process.isRunning else {
+      await exit.wait()
+      return
+    }
+    process.terminate()
+    try? await Task.sleep(nanoseconds: terminationGraceSeconds * 1_000_000_000)
+    if process.isRunning {
+      kill(process.processIdentifier, SIGKILL)
+    }
+    await exit.wait()
   }
 }
 
 private enum TimeoutOutcome: Sendable {
   case exited
   case timedOut
+}
+
+private struct DrainResult: Sendable {
+  let stream: StreamTag
+  let data: Data
+  let limitExceeded: Bool
 }
 
 /// Thread-safe byte accumulator for the stream path.

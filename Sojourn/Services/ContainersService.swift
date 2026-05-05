@@ -253,6 +253,7 @@ internal actor ContainersService {
     switch err {
     case .spawnFailed(let msg):        return "spawn failed: \(msg)"
     case .timedOut(let elapsed):       return "version probe timed out after \(Int(elapsed))s"
+    case .outputTooLarge(let stream, let limit): return "\(stream.rawValue) exceeded \(limit) bytes"
     case .nonZeroExit(let code, _, _): return "exited \(code)"
     case .cancelled:                   return "cancelled"
     }

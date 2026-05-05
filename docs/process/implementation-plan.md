@@ -57,7 +57,7 @@ fanout, 90s timeout.
 `--no-pager --color=false`.
 **3d PrefService** — `defaults export/import`, `plutil -convert xml1`,
 FDA canary probe, app quit/relaunch.
-**3e SecretScanService** — bundled `gitleaks dir --staged --report-format json`,
+**3e SecretScanService** — bundled `gitleaks git --staged --report-format json --report-path -`,
 classifies high-severity (AWS/GitHub PAT/OpenAI/Stripe) with 5s UI
 lockout.
 **3f BrewService** — signed .pkg install via `/usr/sbin/installer` with

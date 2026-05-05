@@ -54,6 +54,72 @@ struct PrefServiceTests {
 }
 
 struct SecretScanServiceTests {
+  @Test func scanStagedRequestsStdoutJSONAndPinnedConfig() async throws {
+    let config = URL(fileURLWithPath: "/tmp/sojourn-gitleaks.toml")
+    let cwd = URL(fileURLWithPath: "/tmp/sojourn-data")
+    let observed = ServiceEventRecorder()
+    let scanner = SecretScanService(
+      gitleaksURL: URL(fileURLWithPath: "/usr/local/bin/gitleaks"),
+      configURL: config,
+      runCommand: { args, commandCWD in
+        await observed.record(args.joined(separator: "\u{1f}"))
+        await observed.record(commandCWD?.path ?? "")
+        return SubprocessResult(exitCode: 0, stdout: Data("[]".utf8), stderr: Data())
+      }
+    )
+
+    _ = try await scanner.scanStaged(cwd: cwd)
+
+    let events = await observed.values
+    let args = events[0].split(separator: "\u{1f}").map(String.init)
+    #expect(args.contains("--report-format"))
+    #expect(args.contains("json"))
+    #expect(args.contains("--report-path"))
+    #expect(args.contains("-"))
+    #expect(args.contains("--config"))
+    #expect(args.contains(config.path))
+    #expect(events[1] == cwd.path)
+  }
+
+  @Test func scanDirectoryUsesCurrentGitleaksDirFlags() async throws {
+    let observed = ServiceEventRecorder()
+    let scanner = SecretScanService(
+      gitleaksURL: URL(fileURLWithPath: "/usr/local/bin/gitleaks"),
+      configURL: nil,
+      runCommand: { args, _ in
+        await observed.record(args.joined(separator: "\u{1f}"))
+        return SubprocessResult(exitCode: 0, stdout: Data("[]".utf8), stderr: Data())
+      }
+    )
+
+    _ = try await scanner.scanDirectory(URL(fileURLWithPath: "/tmp/sojourn-data"))
+
+    let args = await observed.values[0].split(separator: "\u{1f}").map(String.init)
+    #expect(args.first == "dir")
+    #expect(args.contains("--report-path"))
+    #expect(args.contains("-"))
+    #expect(!args.contains("--no-git"))
+  }
+
+  @Test func bundledConfigResolvesFromSourceTree() throws {
+    let url = try #require(SecretScanService.bundledConfigURL())
+    #expect(url.lastPathComponent == "gitleaks.toml")
+    #expect(
+      url.path.contains("Sojourn/Resources/data")
+        || url.path.contains("Sojourn.app/Contents/Resources/data")
+    )
+  }
+
+  @Test func bundledConfigExtendsDefaultRulesAndCapturesFullAWSKey() throws {
+    let url = try #require(SecretScanService.bundledConfigURL())
+    let text = try String(contentsOf: url, encoding: .utf8)
+    #expect(text.contains("[extend]"))
+    #expect(text.contains("useDefault = true"))
+    #expect(text.contains("id = \"sojourn-aws-access-key\""))
+    #expect(text.contains("((?:AKIA|ASIA)[A-Z0-9]{16})"))
+    #expect(text.contains("secretGroup = 1"))
+  }
+
   @Test func decodesFixtureReport() async throws {
     let url = try #require(
       Bundle.sojournFixtureURL(name: "gitleaks-report", ext: "json"),
@@ -73,6 +139,18 @@ struct SecretScanServiceTests {
     #expect(findings.isEmpty)
   }
 
+  @Test func oversizedReportFailsClosed() async {
+    let oversized = Data(
+      repeating: UInt8(ascii: " "),
+      count: SecretScanService.jsonReportSizeLimit + 1
+    )
+    let scanner = SecretScanService.mock { _ in oversized }
+
+    await #expect(throws: SecretScanError.self) {
+      _ = try await scanner.scanDirectory(URL(fileURLWithPath: "/tmp"))
+    }
+  }
+
   @Test func nonHighConfidenceRuleIsFlaggedCorrectly() {
     let f = SecretFinding(
       description: "generic entropy",
@@ -86,6 +164,21 @@ struct SecretScanServiceTests {
       entropy: 4.2
     )
     #expect(!f.isHighConfidence)
+  }
+
+  @Test func bundledSlackRuleBlocksAsHighConfidence() {
+    let f = SecretFinding(
+      description: "Slack bot token",
+      file: "Brewfile.common",
+      startLine: 12,
+      endLine: 12,
+      match: "REDACTED",
+      secret: "REDACTED",
+      ruleID: "sojourn-slack-bot-token",
+      fingerprint: "Brewfile.common:sojourn-slack-bot-token:12",
+      entropy: nil
+    )
+    #expect(f.isHighConfidence)
   }
 }
 
@@ -116,5 +209,55 @@ struct BootstrapServiceTests {
     default:
       Issue.record("unexpected state: \(bs.state)")
     }
+  }
+}
+
+struct BrewServiceSignatureTests {
+  @Test func verifySignatureAcceptsHomebrewInstallerTeam() async throws {
+    let output = """
+    Package "Homebrew.pkg":
+       Status: signed by a developer certificate issued by Apple for distribution
+       Notarization: trusted by the Apple notary service
+       Certificate Chain:
+        1. Developer ID Installer: Patrick Linnane (927JGANW46)
+    """
+    let brew = BrewService(
+      runCommand: { _, _, _ in
+        SubprocessResult(exitCode: 0, stdout: Data(output.utf8), stderr: Data())
+      },
+      fetch: { _ in (Data(), URLResponse()) }
+    )
+
+    try await brew.verifySignature(at: URL(fileURLWithPath: "/tmp/Homebrew.pkg"))
+  }
+
+  @Test func verifySignatureRejectsDifferentDeveloperIDInstallerTeam() async throws {
+    let output = """
+    Package "Homebrew.pkg":
+       Status: signed by a developer certificate issued by Apple for distribution
+       Notarization: trusted by the Apple notary service
+       Certificate Chain:
+        1. Developer ID Installer: Example Corp (ABCDE12345)
+    """
+    let brew = BrewService(
+      runCommand: { _, _, _ in
+        SubprocessResult(exitCode: 0, stdout: Data(output.utf8), stderr: Data())
+      },
+      fetch: { _ in (Data(), URLResponse()) }
+    )
+
+    await #expect(throws: BrewError.self) {
+      try await brew.verifySignature(at: URL(fileURLWithPath: "/tmp/Homebrew.pkg"))
+    }
+  }
+}
+
+private actor ServiceEventRecorder {
+  private var storage: [String] = []
+
+  var values: [String] { storage }
+
+  func record(_ value: String) {
+    storage.append(value)
   }
 }

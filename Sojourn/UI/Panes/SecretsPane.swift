@@ -31,7 +31,7 @@ struct SecretsPane: View {
           .padding(.top, 6)
 
         VStack(alignment: .leading, spacing: 0) {
-          scanLogLine("14:21:58", "$", "gitleaks dir --staged --no-git --report-format json", .secondary)
+          scanLogLine("14:21:58", "$", "gitleaks git --staged --report-format json --report-path -", .secondary)
           scanLogLine("14:21:58", "→", "scanning 47 staged files (4.2 MB)", .lime)
           scanLogLine("14:21:59", "✓", "rule set: 142 patterns loaded from .gitleaks.toml", .ok)
           scanLogLine("14:22:00", "✓", "dotfiles/dot_zshrc.tmpl    clean", .ok)
@@ -60,7 +60,7 @@ struct SecretsPane: View {
             Text("Sojourn ships gitleaks under Contents/Resources/bin, re-signed with the hardened runtime at build time.")
               .font(.bzrBody(size: 12))
               .foregroundStyle(Color.txtSecondary)
-            BzrCodeBlock(text: "gitleaks dir --staged --report-format json --config=.gitleaks.toml")
+            BzrCodeBlock(text: "gitleaks git --staged --report-format json --report-path - --config=.gitleaks.toml")
           }
         }
       }

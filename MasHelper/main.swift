@@ -41,12 +41,11 @@ internal final class MasHelperListenerDelegate: NSObject, NSXPCListenerDelegate,
     // Per-connection code-signing requirement. macOS 13+ API.
     // DEBUG builds skip — local dev has no Developer ID identity.
 #if !DEBUG
-    let requirement = """
-      anchor apple generic \
-      and identifier "app.bizarre.sojourn" \
-      and certificate 1[field.1.2.840.113635.100.6.2.6] /* Developer ID intermediate */ \
-      and certificate leaf[field.1.2.840.113635.100.6.1.13] /* Developer ID Application */
-      """
+    guard let teamID = sojournDevelopmentTeamID() else {
+      masHelperLog.error("code-signing requirement missing DEVELOPMENT_TEAM; rejecting connection")
+      return false
+    }
+    let requirement = masHelperAuthorizedClientRequirement(teamID: teamID)
     do {
       try newConnection.setCodeSigningRequirement(requirement)
     } catch {
@@ -55,7 +54,7 @@ internal final class MasHelperListenerDelegate: NSObject, NSXPCListenerDelegate,
     }
 #endif
 
-    let interface = NSXPCInterface(with: MasHelperProtocol.self)
+    let interface = NSXPCInterface(with: (any MasHelperProtocol).self)
     newConnection.exportedInterface = interface
     newConnection.exportedObject = MasHelperService()
     newConnection.invalidationHandler = {

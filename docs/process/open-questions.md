@@ -23,6 +23,18 @@ session (2026-04-30). Maintainer chose strict proposal §3 naming. See
 4. Strike the question from this file (move to a "Decided" section
    below).
 
+## Security follow-ups
+
+### Process-tree cancellation for installer children — opened 2026-05-05
+
+Stage 3 adds SIGTERM then SIGKILL escalation for the direct
+`SubprocessRunner` child process. Installer-style commands such as
+`brew bundle`, casks, or package installers may spawn grandchildren
+that survive if only the direct child is killed. Decide whether
+Sojourn should create and terminate process groups, use `posix_spawn`
+session controls, or add job-specific cleanup probes for installer
+children before broadening cask/install cancellation guarantees.
+
 ## Decided
 
 ### Audit §8 — eight questions (closed 2026-04-30)

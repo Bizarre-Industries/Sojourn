@@ -44,13 +44,77 @@ struct MasHelperProtocolConstantsTests {
     // collision with real exit codes.
     #expect(masHelperTimeoutExitCode < 0)
     #expect(masHelperInvalidInputExitCode < 0)
+    #expect(masHelperUntrustedToolExitCode < 0)
     #expect(masHelperTimeoutExitCode != masHelperInvalidInputExitCode)
+    #expect(masHelperInvalidInputExitCode != masHelperUntrustedToolExitCode)
   }
 
   @Test func toolPathIsAppleSiliconHomebrew() {
     // Helper runs as root with minimal PATH — no PATH lookup. Hard
     // path required.
     #expect(masHelperToolPath == "/opt/homebrew/bin/mas")
+  }
+
+  @Test func appRequirementIncludesTeamIDPin() throws {
+    let requirement = masHelperClientRequirement(teamID: "ABCD123456")
+    #expect(requirement.contains("identifier \"\(masHelperBundleIdentifier)\""))
+    #expect(requirement.contains("certificate leaf[subject.OU] = \"ABCD123456\""))
+  }
+
+  @Test func helperRequirementIncludesTeamIDPin() throws {
+    let requirement = masHelperAuthorizedClientRequirement(teamID: "ABCD123456")
+    #expect(requirement.contains("identifier \"app.bizarre.sojourn\""))
+    #expect(requirement.contains("certificate leaf[subject.OU] = \"ABCD123456\""))
+  }
+}
+
+struct MasExecutableValidatorTests {
+  @Test func trustedSystemExecutablePasses() throws {
+    let url = try MasExecutableValidator.trustedExecutableURL(at: "/usr/bin/true")
+    #expect(url.path == "/usr/bin/true")
+  }
+
+  @Test func userOwnedExecutableIsRejectedForRootHelper() throws {
+    let tmp = FileManager.default.temporaryDirectory
+      .appendingPathComponent("sojourn-mas-validator-\(UUID().uuidString)", isDirectory: true)
+    try FileManager.default.createDirectory(at: tmp, withIntermediateDirectories: true)
+    defer { try? FileManager.default.removeItem(at: tmp) }
+
+    let script = tmp.appendingPathComponent("mas")
+    try Data("#!/bin/sh\nexit 0\n".utf8).write(to: script)
+    try FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: script.path)
+
+    #expect(throws: MasExecutableTrustError.self) {
+      _ = try MasExecutableValidator.trustedExecutableURL(at: script.path)
+    }
+  }
+
+  @Test func userWritableSymlinkPrefixIsRejectedBeforeResolution() throws {
+    let tmp = FileManager.default.temporaryDirectory
+      .appendingPathComponent("sojourn-mas-validator-\(UUID().uuidString)", isDirectory: true)
+    try FileManager.default.createDirectory(at: tmp, withIntermediateDirectories: true)
+    defer { try? FileManager.default.removeItem(at: tmp) }
+
+    let link = tmp.appendingPathComponent("mas")
+    try FileManager.default.createSymbolicLink(
+      at: link,
+      withDestinationURL: URL(fileURLWithPath: "/usr/bin/true")
+    )
+
+    #expect(throws: MasExecutableTrustError.self) {
+      _ = try MasExecutableValidator.trustedExecutableURL(at: link.path)
+    }
+  }
+
+  @Test func hardcodedMasHelperToolPathIsAudited() {
+    do {
+      let url = try MasExecutableValidator.trustedExecutableURL(at: masHelperToolPath)
+      #expect(url.path.hasSuffix("/mas"))
+    } catch let error as MasExecutableTrustError {
+      #expect(error.description.contains("mas") || error.description.contains("/opt/homebrew"))
+    } catch {
+      Issue.record("unexpected trust error type: \(error)")
+    }
   }
 }
 
@@ -84,6 +148,17 @@ struct MasInvocationResultTests {
     #expect(r.didReject)
   }
 
+  @Test func untrustedToolDetectedAsRejection() {
+    let r = MasInvocationResult(
+      exitCode: masHelperUntrustedToolExitCode,
+      stdout: "",
+      stderr: "untrusted mas executable"
+    )
+    #expect(!r.didSucceed)
+    #expect(!r.didTimeOut)
+    #expect(r.didReject)
+  }
+
   @Test func nonZeroExitIsFailure() {
     let r = MasInvocationResult(exitCode: 1, stdout: "", stderr: "auth required")
     #expect(!r.didSucceed)
@@ -105,6 +180,9 @@ struct MasHelperClientErrorTests {
 
     let e4 = MasHelperClientError.helperUnreachable("daemon not loaded")
     #expect(e4.description.contains("daemon not loaded"))
+
+    let e5 = MasServiceError.untrustedTool("/opt/homebrew/bin is owned by uid 501")
+    #expect(e5.description.contains("not trusted"))
   }
 
   @Test func equalityRespectsAssociatedValues() {

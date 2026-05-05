@@ -48,9 +48,11 @@ internal struct SecretFinding: Sendable, Hashable, Codable, Identifiable {
       "slack-user-token",
       "sojourn-aws-access-key",
       "sojourn-github-pat",
+      "sojourn-github-fine-grained-pat",
       "sojourn-openai-key",
       "sojourn-stripe-live",
-      "sojourn-anthropic-key"
+      "sojourn-anthropic-key",
+      "sojourn-slack-bot-token"
     ]
     return blocking.contains(ruleID)
   }
@@ -59,9 +61,12 @@ internal struct SecretFinding: Sendable, Hashable, Codable, Identifiable {
 internal enum SecretScanError: Error, Sendable {
   case binaryNotFound(URL)
   case decodeFailed(String)
+  case reportTooLarge(bytes: Int, limit: Int)
 }
 
 internal actor SecretScanService {
+  internal static let jsonReportSizeLimit = 10_000_000
+
   internal typealias Runner = @Sendable ([String], URL?) async throws -> SubprocessResult
 
   private let runCommand: Runner
@@ -87,9 +92,30 @@ internal actor SecretScanService {
     }) else {
       return nil
     }
-    return SecretScanService(gitleaksURL: found, configURL: configURL, runCommand: { args, cwd in
-      try await runner.run(tool: found, args: args, cwd: cwd, timeout: 60)
+    guard let effectiveConfigURL = configURL ?? bundledConfigURL() else {
+      return nil
+    }
+    return SecretScanService(gitleaksURL: found, configURL: effectiveConfigURL, runCommand: { args, cwd in
+      try await runner.run(
+        tool: found,
+        args: args,
+        cwd: cwd,
+        timeout: 60,
+        outputLimitBytes: Self.jsonReportSizeLimit
+      )
     })
+  }
+
+  internal static func bundledConfigURL() -> URL? {
+    let candidates: [URL] = [
+      Bundle.main.bundleURL
+        .appendingPathComponent("Contents/Resources/data/gitleaks.toml"),
+      URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
+        .appendingPathComponent("Sojourn/Resources/data/gitleaks.toml")
+    ]
+    return candidates.first {
+      FileManager.default.fileExists(atPath: $0.path)
+    }
   }
 
   internal static func mock(
@@ -107,7 +133,10 @@ internal actor SecretScanService {
   // MARK: - Public
 
   internal func scanDirectory(_ dir: URL) async throws -> [SecretFinding] {
-    var args = ["dir", "--no-git", "--report-format", "json", "--redact", "--exit-code=0"]
+    var args = [
+      "dir", "--report-format", "json", "--report-path", "-",
+      "--redact", "--exit-code=0"
+    ]
     if let configURL {
       args.append(contentsOf: ["--config", configURL.path])
     }
@@ -117,7 +146,10 @@ internal actor SecretScanService {
   }
 
   internal func scanStaged(cwd: URL) async throws -> [SecretFinding] {
-    var args = ["git", "--staged", "--report-format", "json", "--redact", "--exit-code=0"]
+    var args = [
+      "git", "--staged", "--report-format", "json", "--report-path", "-",
+      "--redact", "--exit-code=0"
+    ]
     if let configURL {
       args.append(contentsOf: ["--config", configURL.path])
     }
@@ -129,6 +161,9 @@ internal actor SecretScanService {
 
   private func decode(_ data: Data) throws -> [SecretFinding] {
     if data.isEmpty { return [] }
+    guard data.count <= Self.jsonReportSizeLimit else {
+      throw SecretScanError.reportTooLarge(bytes: data.count, limit: Self.jsonReportSizeLimit)
+    }
     do {
       return try decoder.decode([SecretFinding].self, from: data)
     } catch {

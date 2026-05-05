@@ -19,6 +19,9 @@ internal enum SubprocessError: Error, Sendable {
   /// SIGKILL'd after a 5s grace window.
   case timedOut(elapsed: TimeInterval)
 
+  /// Captured stdout/stderr exceeded the caller's memory bound.
+  case outputTooLarge(stream: StreamTag, limit: Int)
+
   /// The enclosing `Task` was cancelled before the child finished.
   case cancelled
 }
@@ -29,6 +32,8 @@ extension SubprocessError: Equatable {
     case (.spawnFailed(let a), .spawnFailed(let b)): return a == b
     case (.nonZeroExit(let a, _, _), .nonZeroExit(let b, _, _)): return a == b
     case (.timedOut(let a), .timedOut(let b)): return a == b
+    case (.outputTooLarge(let aStream, let aLimit), .outputTooLarge(let bStream, let bLimit)):
+      return aStream == bStream && aLimit == bLimit
     case (.cancelled, .cancelled): return true
     default: return false
     }

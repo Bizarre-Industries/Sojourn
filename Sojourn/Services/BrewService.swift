@@ -26,6 +26,8 @@ internal struct BrewRelease: Sendable, Hashable {
 }
 
 internal actor BrewService {
+  internal static let expectedInstallerTeamID = "927JGANW46"
+
   internal typealias Runner = @Sendable (URL, [String], URL?) async throws -> SubprocessResult
   internal typealias Fetcher = @Sendable (URL) async throws -> (Data, URLResponse)
 
@@ -87,9 +89,15 @@ internal actor BrewService {
 
   internal func verifySignature(at pkg: URL) async throws {
     let result = try await runCommand(pkgutilURL, ["--check-signature", pkg.path], nil)
-    if !result.stdoutString.contains("Developer ID Installer:") {
+    guard Self.signatureOutputPinsHomebrewInstaller(result.stdoutString) else {
       throw BrewError.signatureVerificationFailed(result.stdoutString)
     }
+  }
+
+  internal nonisolated static func signatureOutputPinsHomebrewInstaller(_ output: String) -> Bool {
+    output.contains("Developer ID Installer:")
+      && output.contains("(\(expectedInstallerTeamID))")
+      && output.contains("Notarization: trusted by the Apple notary service")
   }
 
   internal func install(pkg: URL) async throws {

@@ -170,7 +170,7 @@ struct SyncCoordinatorTests {
       await events.record("scan")
       return Data()
     }
-    let coordinator = try makeMockCoordinator(
+    let coordinator = try await makeMockCoordinator(
       workroot: workroot,
       git: git,
       secrets: secrets
@@ -195,7 +195,7 @@ struct SyncCoordinatorTests {
       await events.record("git:\(args.first ?? "")")
       return SubprocessResult(exitCode: 0, stdout: Data(), stderr: Data())
     }
-    let coordinator = try makeMockCoordinator(
+    let coordinator = try await makeMockCoordinator(
       workroot: workroot,
       git: git,
       secrets: nil
@@ -242,7 +242,7 @@ struct SyncCoordinatorTests {
       await events.record("scan")
       return Data()
     }
-    let coordinator = try makeMockCoordinator(
+    let coordinator = try await makeMockCoordinator(
       workroot: workroot,
       git: git,
       secrets: secrets
@@ -297,7 +297,7 @@ struct SyncCoordinatorTests {
       await events.record("scan")
       return findingJSON
     }
-    let coordinator = try makeMockCoordinator(
+    let coordinator = try await makeMockCoordinator(
       workroot: workroot,
       git: git,
       secrets: secrets
@@ -354,7 +354,7 @@ struct SyncCoordinatorTests {
       await events.record("scan")
       return findingJSON
     }
-    let coordinator = try makeMockCoordinator(
+    let coordinator = try await makeMockCoordinator(
       workroot: workroot,
       git: git,
       secrets: secrets
@@ -379,14 +379,287 @@ struct SyncCoordinatorTests {
     #expect(backups.isEmpty)
   }
 
+  @Test func pullPausesBeforeApplyingBrewfileEntriesThatNeedReview() async throws {
+    let workroot = FileManager.default.temporaryDirectory
+      .appendingPathComponent("sojourn-sync-review-\(UUID().uuidString)", isDirectory: true)
+    try FileManager.default.createDirectory(at: workroot, withIntermediateDirectories: true)
+    defer { try? FileManager.default.removeItem(at: workroot) }
+
+    let events = SyncEventRecorder()
+    let git = GitService(gitURL: URL(fileURLWithPath: "/usr/bin/git")) { args, _ in
+      await events.record("git:\(args.first ?? "")")
+      if args.first == "rev-list" {
+        return SubprocessResult(exitCode: 0, stdout: Data("0\t0\n".utf8), stderr: Data())
+      }
+      return SubprocessResult(exitCode: 0, stdout: Data(), stderr: Data())
+    }
+    let brewBundle = BrewBundleService(
+      runner: SubprocessRunner(),
+      brewURL: URL(fileURLWithPath: "/usr/bin/false"),
+      chezmoiSourceRoot: workroot
+    )
+    let coordinator = try await makeMockCoordinator(
+      workroot: workroot,
+      git: git,
+      secrets: nil,
+      brewBundle: brewBundle
+    )
+
+    await coordinator.pull(branch: "main")
+
+    guard case .awaitingPullApplyReview(let review) = coordinator.phase else {
+      Issue.record("expected review phase, got \(coordinator.phase)")
+      return
+    }
+    #expect(review.packageReviews.contains { $0.package == "ripgrep" })
+    let observed = await events.values
+    #expect(observed.contains("git:pull"))
+  }
+
+  @Test func pendingPullApplyReviewBlocksPushAndFreshPull() async throws {
+    let workroot = FileManager.default.temporaryDirectory
+      .appendingPathComponent("sojourn-sync-review-protected-\(UUID().uuidString)", isDirectory: true)
+    try FileManager.default.createDirectory(at: workroot, withIntermediateDirectories: true)
+    defer { try? FileManager.default.removeItem(at: workroot) }
+
+    let events = SyncEventRecorder()
+    let git = GitService(gitURL: URL(fileURLWithPath: "/usr/bin/git")) { args, _ in
+      await events.record("git:\(args.first ?? "")")
+      if args.first == "rev-list" {
+        return SubprocessResult(exitCode: 0, stdout: Data("0\t0\n".utf8), stderr: Data())
+      }
+      return SubprocessResult(exitCode: 0, stdout: Data(), stderr: Data())
+    }
+    let coordinator = try await makeMockCoordinator(
+      workroot: workroot,
+      git: git,
+      secrets: SecretScanService.mock { _ in Data("[]".utf8) }
+    )
+
+    await coordinator.pull(branch: "main")
+    guard case .awaitingPullApplyReview = coordinator.phase else {
+      Issue.record("expected pending review, got \(coordinator.phase)")
+      return
+    }
+
+    await coordinator.push(branch: "main", message: "test: should-not-push")
+    await coordinator.pull(branch: "main")
+
+    guard case .awaitingPullApplyReview = coordinator.phase else {
+      Issue.record("expected review phase to remain protected, got \(coordinator.phase)")
+      return
+    }
+    let observed = await events.values
+    #expect(observed.filter { $0 == "git:pull" }.count == 1)
+    #expect(!observed.contains("git:add"))
+    #expect(!observed.contains("git:push"))
+  }
+
+  @Test func applyReviewedPullRunsAfterConsent() async throws {
+    let workroot = FileManager.default.temporaryDirectory
+      .appendingPathComponent("sojourn-sync-apply-review-\(UUID().uuidString)", isDirectory: true)
+    try FileManager.default.createDirectory(at: workroot, withIntermediateDirectories: true)
+    defer { try? FileManager.default.removeItem(at: workroot) }
+
+    let events = SyncEventRecorder()
+    let git = GitService(gitURL: URL(fileURLWithPath: "/usr/bin/git")) { args, _ in
+      await events.record("git:\(args.first ?? "")")
+      if args.first == "rev-list" {
+        return SubprocessResult(exitCode: 0, stdout: Data("0\t0\n".utf8), stderr: Data())
+      }
+      return SubprocessResult(exitCode: 0, stdout: Data(), stderr: Data())
+    }
+    let brewBundle = BrewBundleService(
+      runner: SubprocessRunner(),
+      brewURL: URL(fileURLWithPath: "/usr/bin/true"),
+      chezmoiSourceRoot: workroot
+    )
+    let coordinator = try await makeMockCoordinator(
+      workroot: workroot,
+      git: git,
+      secrets: nil,
+      brewBundle: brewBundle
+    )
+
+    await coordinator.pull(branch: "main")
+    await coordinator.applyReviewedPull()
+
+    #expect(coordinator.phase == .done(.syncPull))
+  }
+
+  @Test func applyReviewedPullRejectsChangedReviewedContent() async throws {
+    let workroot = FileManager.default.temporaryDirectory
+      .appendingPathComponent("sojourn-sync-review-fingerprint-\(UUID().uuidString)", isDirectory: true)
+    try FileManager.default.createDirectory(at: workroot, withIntermediateDirectories: true)
+    defer { try? FileManager.default.removeItem(at: workroot) }
+
+    let events = SyncEventRecorder()
+    let git = GitService(gitURL: URL(fileURLWithPath: "/usr/bin/git")) { args, _ in
+      await events.record("git:\(args.first ?? "")")
+      if args.first == "rev-list" {
+        return SubprocessResult(exitCode: 0, stdout: Data("0\t0\n".utf8), stderr: Data())
+      }
+      return SubprocessResult(exitCode: 0, stdout: Data(), stderr: Data())
+    }
+    let brewBundle = BrewBundleService(
+      runner: SubprocessRunner(),
+      brewURL: URL(fileURLWithPath: "/usr/bin/false"),
+      chezmoiSourceRoot: workroot
+    )
+    let coordinator = try await makeMockCoordinator(
+      workroot: workroot,
+      git: git,
+      secrets: nil,
+      brewBundle: brewBundle,
+      brewfileContents: "brew \"ripgrep\"\n"
+    )
+
+    await coordinator.pull(branch: "main")
+    guard case .awaitingPullApplyReview = coordinator.phase else {
+      Issue.record("expected pending review, got \(coordinator.phase)")
+      return
+    }
+
+    let brewfile = workroot
+      .appendingPathComponent("repo", isDirectory: true)
+      .appendingPathComponent("Brewfile.common")
+    try Data("brew \"ripgrep\"\nbrew \"fd\"\n".utf8).write(to: brewfile)
+
+    await coordinator.applyReviewedPull()
+
+    guard case .failed(let message) = coordinator.phase else {
+      Issue.record("expected changed-content failure, got \(coordinator.phase)")
+      return
+    }
+    #expect(message.contains("changed after review"))
+  }
+
+  @Test func pullReviewCannotBeBypassedByDisablingCooldowns() async throws {
+    let workroot = FileManager.default.temporaryDirectory
+      .appendingPathComponent("sojourn-sync-review-cooldown-off-\(UUID().uuidString)", isDirectory: true)
+    try FileManager.default.createDirectory(at: workroot, withIntermediateDirectories: true)
+    defer { try? FileManager.default.removeItem(at: workroot) }
+
+    let events = SyncEventRecorder()
+    let git = GitService(gitURL: URL(fileURLWithPath: "/usr/bin/git")) { args, _ in
+      await events.record("git:\(args.first ?? "")")
+      if args.first == "rev-list" {
+        return SubprocessResult(exitCode: 0, stdout: Data("0\t0\n".utf8), stderr: Data())
+      }
+      return SubprocessResult(exitCode: 0, stdout: Data(), stderr: Data())
+    }
+    let brewBundle = BrewBundleService(
+      runner: SubprocessRunner(),
+      brewURL: URL(fileURLWithPath: "/usr/bin/false"),
+      chezmoiSourceRoot: workroot
+    )
+    let coordinator = try await makeMockCoordinator(
+      workroot: workroot,
+      git: git,
+      secrets: nil,
+      brewBundle: brewBundle,
+      brewfileContents: "cask \"arc\"\n",
+      cooldownEnabled: false
+    )
+
+    await coordinator.pull(branch: "main")
+
+    guard case .awaitingPullApplyReview(let review) = coordinator.phase else {
+      Issue.record("expected review phase, got \(coordinator.phase)")
+      return
+    }
+    #expect(review.packageReviews.contains { item in
+      item.manager == "cask"
+        && item.package == "arc"
+        && item.reason.contains("pull-apply consent still applies")
+    })
+    let observed = await events.values
+    #expect(observed.contains("git:pull"))
+  }
+
+  @Test func pullReviewRequiresConsentForChezmoiTemplates() async throws {
+    let workroot = FileManager.default.temporaryDirectory
+      .appendingPathComponent("sojourn-sync-review-template-\(UUID().uuidString)", isDirectory: true)
+    try FileManager.default.createDirectory(at: workroot, withIntermediateDirectories: true)
+    defer { try? FileManager.default.removeItem(at: workroot) }
+
+    let events = SyncEventRecorder()
+    let git = GitService(gitURL: URL(fileURLWithPath: "/usr/bin/git")) { args, _ in
+      await events.record("git:\(args.first ?? "")")
+      if args.first == "rev-list" {
+        return SubprocessResult(exitCode: 0, stdout: Data("0\t0\n".utf8), stderr: Data())
+      }
+      return SubprocessResult(exitCode: 0, stdout: Data(), stderr: Data())
+    }
+    let coordinator = try await makeMockCoordinator(
+      workroot: workroot,
+      git: git,
+      secrets: nil,
+      brewfileContents: "# no packages\n"
+    )
+    let template = workroot
+      .appendingPathComponent("repo", isDirectory: true)
+      .appendingPathComponent("dot_config", isDirectory: true)
+      .appendingPathComponent("app", isDirectory: true)
+      .appendingPathComponent("config.toml.tmpl")
+    try FileManager.default.createDirectory(
+      at: template.deletingLastPathComponent(),
+      withIntermediateDirectories: true
+    )
+    try Data("value={{ output \"date\" }}\n".utf8).write(to: template)
+
+    await coordinator.pull(branch: "main")
+
+    guard case .awaitingPullApplyReview(let review) = coordinator.phase else {
+      Issue.record("expected review phase, got \(coordinator.phase)")
+      return
+    }
+    #expect(review.chezmoiTemplates.contains("dot_config/app/config.toml.tmpl"))
+  }
+
+  @Test func pullReviewRequiresConsentForUnparsedBrewfileRuby() async throws {
+    let workroot = FileManager.default.temporaryDirectory
+      .appendingPathComponent("sojourn-sync-review-ruby-\(UUID().uuidString)", isDirectory: true)
+    try FileManager.default.createDirectory(at: workroot, withIntermediateDirectories: true)
+    defer { try? FileManager.default.removeItem(at: workroot) }
+
+    let events = SyncEventRecorder()
+    let git = GitService(gitURL: URL(fileURLWithPath: "/usr/bin/git")) { args, _ in
+      await events.record("git:\(args.first ?? "")")
+      if args.first == "rev-list" {
+        return SubprocessResult(exitCode: 0, stdout: Data("0\t0\n".utf8), stderr: Data())
+      }
+      return SubprocessResult(exitCode: 0, stdout: Data(), stderr: Data())
+    }
+    let coordinator = try await makeMockCoordinator(
+      workroot: workroot,
+      git: git,
+      secrets: nil,
+      brewfileContents: "system \"touch\", \"/tmp/sojourn-bypass\"\n"
+    )
+
+    await coordinator.pull(branch: "main")
+
+    guard case .awaitingPullApplyReview(let review) = coordinator.phase else {
+      Issue.record("expected review phase, got \(coordinator.phase)")
+      return
+    }
+    #expect(review.packageReviews.contains { item in
+      item.manager == "ruby" && item.package == "line 1"
+    })
+  }
+
   private func makeMockCoordinator(
     workroot: URL,
     git: GitService,
-    secrets: SecretScanService?
-  ) throws -> SyncCoordinator {
+    secrets: SecretScanService?,
+    brewBundle: BrewBundleService? = nil,
+    brewfileContents: String = "brew \"ripgrep\"\n",
+    cooldownEnabled: Bool = true
+  ) async throws -> SyncCoordinator {
     let repoURL = workroot.appendingPathComponent("repo", isDirectory: true)
     try FileManager.default.createDirectory(at: repoURL, withIntermediateDirectories: true)
-    try Data("brew \"ripgrep\"\n".utf8)
+    try Data(brewfileContents.utf8)
       .write(to: repoURL.appendingPathComponent("Brewfile.common"))
 
     let runner = SubprocessRunner()
@@ -394,8 +667,13 @@ struct SyncCoordinatorTests {
     let backups = BackupsDirectory(paths: paths)
     let snapshots = SnapshotService.live(backups: backups, runner: runner)
     let settings = try SettingsStore(paths: paths)
+    if !cooldownEnabled {
+      var snapshot = await settings.value
+      snapshot.cooldownEnabled = false
+      try await settings.replace(snapshot)
+    }
     let cooldown = CooldownGate(settings: settings, fetch: { _ in (Data(), URLResponse()) })
-    let brewBundle = BrewBundleService(
+    let defaultBrewBundle = BrewBundleService(
       runner: runner,
       brewURL: URL(fileURLWithPath: "/usr/bin/false")
     )
@@ -404,7 +682,7 @@ struct SyncCoordinatorTests {
       repoURL: repoURL,
       git: git,
       chezmoi: nil,
-      brewBundle: brewBundle,
+      brewBundle: brewBundle ?? defaultBrewBundle,
       pref: nil,
       secrets: secrets,
       snapshots: snapshots,

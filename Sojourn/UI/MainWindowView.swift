@@ -123,6 +123,16 @@ internal struct MainWindowView: View {
       .disabled(store.sync == nil || syncActionDisabled || store.conflictResolver?.canPush == false)
       .accessibilityIdentifier("toolbar.push")
       .accessibilityHint("Stages sync files, runs gitleaks on the staged index, commits clean changes, and pushes to origin.")
+
+      if case .applyingReviewedPull = store.sync?.phase {
+        Button {
+          store.cancelSyncOperation()
+        } label: {
+          Label("Cancel Apply", systemImage: "xmark.circle")
+        }
+        .accessibilityIdentifier("toolbar.cancel-reviewed-apply")
+        .accessibilityHint("Stops the reviewed pull apply task before the next cancellable step.")
+      }
     }
 
     ToolbarItem(placement: .status) {
@@ -170,6 +180,9 @@ internal struct MainWindowView: View {
     if let activeOperationTitle {
       return activeOperationTitle
     }
+    if case .awaitingPullApplyReview = store.sync?.phase {
+      return String(localized: "Apply review waiting")
+    }
     if syncActionDisabled, store.sync != nil {
       return String(localized: "Sync busy")
     }
@@ -189,6 +202,9 @@ internal struct MainWindowView: View {
     if activeOperationTitle != nil {
       return "hourglass"
     }
+    if case .awaitingPullApplyReview = store.sync?.phase {
+      return "exclamationmark.triangle"
+    }
     if syncActionDisabled, store.sync != nil {
       return "hourglass"
     }
@@ -207,6 +223,9 @@ internal struct MainWindowView: View {
   private var toolbarStatusHint: String {
     if case .failed = store.sync?.phase {
       return String(localized: "Open Sync for the failure reason and recovery steps.")
+    }
+    if case .awaitingPullApplyReview = store.sync?.phase {
+      return String(localized: "Open Sync. Pulled scripts, templates, or packages have not been applied.")
     }
     if let count = syncBadgeCount, count > 0 {
       return String(localized: "\(count) inbound commit(s) need review in Sync.")
@@ -228,7 +247,9 @@ internal struct MainWindowView: View {
         return String(localized: "Scanning staged files")
       case .pushing:
         return String(localized: "Pushing")
-      case .idle, .awaitingPullDecision, .done, .failed:
+      case .applyingReviewedPull(let step):
+        return String(localized: "Applying: \(step)")
+      case .idle, .awaitingPullDecision, .awaitingPullApplyReview, .done, .failed:
         break
       }
     }
@@ -247,6 +268,9 @@ internal struct MainWindowView: View {
   }
 
   private var syncActionDisabled: Bool {
+    if case .awaitingPullApplyReview = store.sync?.phase {
+      return true
+    }
     if store.sync?.isOperationActive == true {
       return true
     }
@@ -280,7 +304,7 @@ internal struct MainWindowView: View {
   private var syncConfirmationMessage: String {
     switch pendingSyncAction {
     case .pull:
-      return String(localized: "Pull creates a pre-operation generation, fetches remote changes, may apply chezmoi dotfiles, and may run brew bundle install for Brewfiles. A rollback snapshot will appear in Generations.")
+      return String(localized: "Pull fetches remote changes, then either pauses for review or creates a generation before applying dotfiles and Brewfiles. Review appears when pulled scripts, templates, or packages need a second gesture.")
     case .push:
       return String(localized: "Push stages sync files, runs gitleaks on staged content, refuses unresolved inbound commits, captures a generation only after the scan passes, commits clean sync paths, and pushes to origin. Blocked scans stop before snapshot capture.")
     case nil:
@@ -320,10 +344,10 @@ internal struct MainWindowView: View {
 
   private func routeToSyncIfAttentionNeeded() {
     switch store.sync?.phase {
-    case .awaitingPullDecision, .failed:
+    case .awaitingPullDecision, .awaitingPullApplyReview, .applyingReviewedPull, .failed:
       selectedPaneRaw = Pane.sync.rawValue
       return
-    case .idle, .pulling, .resolvingConflicts, .scanningSecrets, .pushing, .done, nil:
+    case .idle, .pulling, .resolvingConflicts, .applyingReviewedPull, .scanningSecrets, .pushing, .done, nil:
       break
     }
 

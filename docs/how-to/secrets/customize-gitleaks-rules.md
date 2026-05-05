@@ -52,9 +52,8 @@ secret patterns.
    ```sh
    /Applications/Sojourn.app/Contents/Resources/bin/gitleaks dir \
      --config=.gitleaks.toml \
-     --staged \
      --report-format=json \
-     --no-git
+     --report-path=-
    ```
 
    Expected: no findings on intentional fixtures, real findings on

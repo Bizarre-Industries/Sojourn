@@ -21,7 +21,7 @@ and [decisions/0009-bundle-binary-policy.md](../../decisions/0009-bundle-binary-
 ## Invocation
 
 ```
-gitleaks dir --staged --no-git --report-format json
+gitleaks git --staged --report-format json --report-path -
 ```
 
 Run on pending diffs before each auto-commit. Rules in a bundled

@@ -92,6 +92,26 @@ struct SubprocessRunnerTests {
     #expect(result.stdout.count == 500_000)
   }
 
+  @Test func runFailsWhenCapturedOutputExceedsLimit() async throws {
+    let runner = SubprocessRunner()
+    do {
+      _ = try await runner.run(
+        tool: URL(fileURLWithPath: "/bin/sh"),
+        args: ["-c", "yes | head -c 200000"],
+        timeout: 5,
+        outputLimitBytes: 1_024
+      )
+      Issue.record("expected outputTooLarge")
+    } catch let error as SubprocessError {
+      guard case .outputTooLarge(let stream, let limit) = error else {
+        Issue.record("expected outputTooLarge, got \(error)")
+        return
+      }
+      #expect(stream == .stdout)
+      #expect(limit == 1_024)
+    }
+  }
+
   @Test func streamYieldsChunksInOrder() async throws {
     let runner = SubprocessRunner()
     let stream = runner.stream(
@@ -194,5 +214,25 @@ struct SubprocessRunnerTests {
     let elapsed = Date().timeIntervalSince(start)
     // 0.5s timeout + up to 5s SIGKILL fallback; far less than 30s.
     #expect(elapsed < 10.0)
+  }
+
+  @Test(.timeLimit(.minutes(1))) func cancellationEscalatesSigtermResistantProcess() async throws {
+    let runner = SubprocessRunner()
+    let task = Task {
+      try await runner.run(
+        tool: URL(fileURLWithPath: "/bin/sh"),
+        args: ["-c", "trap '' TERM; while true; do sleep 1; done"],
+        timeout: nil
+      )
+    }
+
+    try await Task.sleep(nanoseconds: 200_000_000)
+    let start = Date()
+    task.cancel()
+
+    await #expect(throws: SubprocessError.self) {
+      _ = try await task.value
+    }
+    #expect(Date().timeIntervalSince(start) < 8.0)
   }
 }

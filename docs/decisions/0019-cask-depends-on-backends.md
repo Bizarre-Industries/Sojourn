@@ -82,6 +82,12 @@ Sojourn cask.
 - `git`/`brew` not declared because brew itself requires them; cask
   installation implies brew is installed, which implies CLT (and thus
   git) per Homebrew bootstrap.
+- v0.4 Stage 3 narrows what the privileged MAS helper will execute:
+  the cask still declares `mas` for discovery, inventory, and normal
+  CLI availability, but root helper install/upgrade is disabled unless
+  `/opt/homebrew/bin/mas` is reachable through a root-owned,
+  non-group-writable path. A standard user-writable Homebrew formula
+  remains visible to Sojourn but is not trusted for root execution.
 
 ## Alternatives considered
 

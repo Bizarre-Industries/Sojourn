@@ -27,6 +27,14 @@ internal let masHelperMachServiceName = "industries.bizarre.Sojourn.helper.mach"
 /// and by the `SMAuthorizedClients` requirement string template.
 internal let masHelperBundleIdentifier = "industries.bizarre.Sojourn.helper"
 
+/// Main app bundle identifier allowed to install and call the helper.
+internal let masHelperAuthorizedClientIdentifier = "app.bizarre.sojourn"
+
+/// Info.plist key carrying `$(DEVELOPMENT_TEAM)` after Xcode build
+/// setting expansion. Release helper/client trust fails closed when
+/// this is absent or still an unsubstituted placeholder.
+internal let sojournDevelopmentTeamInfoKey = "SojournDevelopmentTeam"
+
 /// Daemon launchd plist filename inside the app's
 /// `Contents/Library/LaunchDaemons/` directory.
 internal let masHelperLaunchdPlistName = "industries.bizarre.Sojourn.helper.plist"
@@ -73,7 +81,42 @@ internal let masHelperTimeoutExitCode: Int32 = -2
 /// rejects the input (e.g. `appStoreID == 0`).
 internal let masHelperInvalidInputExitCode: Int32 = -3
 
+/// Sentinel exit code returned when the root helper refuses to execute
+/// a user-writable or otherwise untrusted `mas` binary.
+internal let masHelperUntrustedToolExitCode: Int32 = -4
+
 /// Helper-side path to `mas`. Hardcoded — the helper runs as root
 /// with a minimal PATH, so we cannot rely on PATH lookup. Apple
 /// Silicon Homebrew prefix.
 internal let masHelperToolPath = "/opt/homebrew/bin/mas"
+
+internal func sojournDevelopmentTeamID(from bundle: Bundle = .main) -> String? {
+  guard let raw = bundle.object(forInfoDictionaryKey: sojournDevelopmentTeamInfoKey) as? String else {
+    return nil
+  }
+  let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+  guard !trimmed.isEmpty, !trimmed.contains("$("), !trimmed.contains(")") else {
+    return nil
+  }
+  return trimmed
+}
+
+internal func masHelperAuthorizedClientRequirement(teamID: String) -> String {
+  """
+  anchor apple generic \
+  and identifier "\(masHelperAuthorizedClientIdentifier)" \
+  and certificate 1[field.1.2.840.113635.100.6.2.6] /* Developer ID intermediate */ \
+  and certificate leaf[field.1.2.840.113635.100.6.1.13] /* Developer ID Application */ \
+  and certificate leaf[subject.OU] = "\(teamID)"
+  """
+}
+
+internal func masHelperClientRequirement(teamID: String) -> String {
+  """
+  anchor apple generic \
+  and identifier "\(masHelperBundleIdentifier)" \
+  and certificate 1[field.1.2.840.113635.100.6.2.6] \
+  and certificate leaf[field.1.2.840.113635.100.6.1.13] \
+  and certificate leaf[subject.OU] = "\(teamID)"
+  """
+}

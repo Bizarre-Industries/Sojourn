@@ -247,6 +247,7 @@ struct PackagesPane: View {
     case .requiresApproval: return "exclamationmark.circle"
     case .notRegistered:    return "circle"
     case .missing, .unknown:return "xmark.octagon"
+    case .untrustedTool:    return "lock.slash"
     }
   }
 
@@ -255,7 +256,8 @@ struct PackagesPane: View {
     case .registered:       return .green
     case .requiresApproval: return .orange
     case .notRegistered:    return .secondary
-    case .missing, .unknown:return .red
+    case .missing, .unknown, .untrustedTool:
+      return .red
     }
   }
 
@@ -266,6 +268,7 @@ struct PackagesPane: View {
     case .notRegistered:    return "Touch ID install helper not installed"
     case .missing:          return "Helper missing from app bundle"
     case .unknown:          return "Helper status unknown"
+    case .untrustedTool:    return "App Store installs disabled"
     }
   }
 
@@ -281,6 +284,8 @@ struct PackagesPane: View {
       return "Reinstall Sojourn or rebuild from source."
     case .unknown:
       return "Sojourn could not read SMAppService status."
+    case .untrustedTool(let reason, _):
+      return "Use the App Store manually, or install a root-owned mas path and refresh. Details: \(reason)"
     }
   }
 
@@ -291,7 +296,7 @@ struct PackagesPane: View {
   @ViewBuilder
   private var masStatusButton: some View {
     switch store.masHelperStatus {
-    case .registered:
+    case .registered, .untrustedTool(_, true):
       Button("Revoke") {
         confirmingMasHelperRevoke = true
       }
@@ -310,7 +315,7 @@ struct PackagesPane: View {
       .buttonStyle(.borderedProminent)
       .accessibilityIdentifier("packages.mas-helper-register")
       .accessibilityHint("Registers a privileged helper for App Store installs and may show a macOS approval prompt.")
-    case .missing, .unknown:
+    case .missing, .unknown, .untrustedTool(_, false):
       EmptyView()
     }
   }

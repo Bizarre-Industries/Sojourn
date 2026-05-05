@@ -19,7 +19,7 @@ import Foundation
 import OSLog
 import ServiceManagement
 
-internal enum MasHelperStatus: String, Sendable, Equatable {
+internal enum MasHelperStatus: Sendable, Equatable {
   /// Never registered, or unregistered + cleaned up.
   case notRegistered
   /// Registered + launchd will spawn the helper on demand.
@@ -31,6 +31,9 @@ internal enum MasHelperStatus: String, Sendable, Equatable {
   case missing
   /// SMAppService returned an unrecognized state.
   case unknown
+  /// The helper would run a user-writable or otherwise untrusted
+  /// `mas` executable. MAS install/upgrade is disabled until fixed.
+  case untrustedTool(String, helperRegistered: Bool)
 }
 
 internal enum MasServiceError: Error, Sendable, CustomStringConvertible {
@@ -38,6 +41,7 @@ internal enum MasServiceError: Error, Sendable, CustomStringConvertible {
   case unregistrationFailed(String)
   case helperError(MasHelperClientError)
   case invocationFailed(exitCode: Int32, stderr: String)
+  case untrustedTool(String)
 
   internal var description: String {
     switch self {
@@ -50,6 +54,8 @@ internal enum MasServiceError: Error, Sendable, CustomStringConvertible {
     case .invocationFailed(let code, let stderr):
       let trimmed = stderr.trimmingCharacters(in: .whitespacesAndNewlines)
       return "mas exited \(code): \(trimmed)"
+    case .untrustedTool(let msg):
+      return "mas executable is not trusted for privileged execution: \(msg)"
     }
   }
 }
@@ -98,19 +104,27 @@ internal actor MasService {
   }
 
   internal func status() -> MasHelperStatus {
-    switch daemon.status {
-    case .notRegistered:    return .notRegistered
-    case .enabled:          return .registered
-    case .requiresApproval: return .requiresApproval
-    case .notFound:         return .missing
-    @unknown default:       return .unknown
+    let serviceStatus: MasHelperStatus = switch daemon.status {
+    case .notRegistered:    .notRegistered
+    case .enabled:          .registered
+    case .requiresApproval: .requiresApproval
+    case .notFound:         .missing
+    @unknown default:       .unknown
     }
+    if let trustError = Self.masToolTrustError() {
+      return .untrustedTool(
+        trustError,
+        helperRegistered: serviceStatus == .registered || serviceStatus == .requiresApproval
+      )
+    }
+    return serviceStatus
   }
 
   // MARK: - Helper invocations (forwarded to MasHelperClient)
 
   internal func install(appStoreID: UInt64) async throws -> MasInvocationResult {
     do {
+      try Self.validateTrustedMasTool()
       let result = try await client.install(appStoreID: appStoreID)
       if !result.didSucceed {
         log.error("install id=\(appStoreID) exited \(result.exitCode)")
@@ -123,6 +137,7 @@ internal actor MasService {
 
   internal func upgrade(appStoreIDs: [UInt64] = []) async throws -> MasInvocationResult {
     do {
+      try Self.validateTrustedMasTool()
       let result = try await client.upgrade(appStoreIDs: appStoreIDs)
       if !result.didSucceed {
         log.error("upgrade exited \(result.exitCode)")
@@ -138,6 +153,21 @@ internal actor MasService {
       return try await client.helperVersion()
     } catch let err as MasHelperClientError {
       throw MasServiceError.helperError(err)
+    }
+  }
+
+  internal nonisolated static func masToolTrustError() -> String? {
+    do {
+      _ = try MasExecutableValidator.trustedExecutableURL(at: masHelperToolPath)
+      return nil
+    } catch {
+      return String(describing: error)
+    }
+  }
+
+  private nonisolated static func validateTrustedMasTool() throws {
+    if let trustError = masToolTrustError() {
+      throw MasServiceError.untrustedTool(trustError)
     }
   }
 }

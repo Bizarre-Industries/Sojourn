@@ -72,8 +72,17 @@ internal final class MasHelperService: NSObject, MasHelperProtocol, @unchecked S
     args: [String],
     reply: @escaping (Int32, String, String) -> Void
   ) {
+    let executableURL: URL
+    do {
+      executableURL = try MasExecutableValidator.trustedExecutableURL(at: masHelperToolPath)
+    } catch {
+      log.error("mas executable rejected: \(String(describing: error), privacy: .public)")
+      reply(masHelperUntrustedToolExitCode, "", "untrusted mas executable: \(error)")
+      return
+    }
+
     let process = Process()
-    process.executableURL = URL(fileURLWithPath: masHelperToolPath)
+    process.executableURL = executableURL
     process.arguments = args
 
     let stdoutPipe = Pipe()

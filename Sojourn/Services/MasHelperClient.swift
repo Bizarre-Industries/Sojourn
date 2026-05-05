@@ -22,7 +22,10 @@ internal struct MasInvocationResult: Sendable, Equatable {
 
   internal var didSucceed: Bool { exitCode == 0 }
   internal var didTimeOut: Bool { exitCode == masHelperTimeoutExitCode }
-  internal var didReject: Bool { exitCode == masHelperInvalidInputExitCode }
+  internal var didReject: Bool {
+    exitCode == masHelperInvalidInputExitCode
+      || exitCode == masHelperUntrustedToolExitCode
+  }
 }
 
 internal enum MasHelperClientError: Error, Sendable, Equatable, CustomStringConvertible {
@@ -100,12 +103,12 @@ internal actor MasHelperClient {
     let conn = NSXPCConnection(machServiceName: masHelperMachServiceName, options: .privileged)
     conn.remoteObjectInterface = NSXPCInterface(with: (any MasHelperProtocol).self)
 #if !DEBUG
-    let requirement = """
-      anchor apple generic \
-      and identifier "\(masHelperBundleIdentifier)" \
-      and certificate 1[field.1.2.840.113635.100.6.2.6] \
-      and certificate leaf[field.1.2.840.113635.100.6.1.13]
-      """
+    guard let teamID = sojournDevelopmentTeamID() else {
+      throw MasHelperClientError.connectionFailed(
+        "DEVELOPMENT_TEAM is missing from the app bundle"
+      )
+    }
+    let requirement = masHelperClientRequirement(teamID: teamID)
     do {
       try conn.setCodeSigningRequirement(requirement)
     } catch {

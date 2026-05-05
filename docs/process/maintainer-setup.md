@@ -724,7 +724,7 @@ gh api -X PUT "repos/Bizarre-Industries/Sojourn/branches/main/protection" \
 ```
 
 `enforce_admins=false` lets you push directly as maintainer for the
-autonomous-commit pattern in [CLAUDE.md](../../CLAUDE.md). Flip to
+autonomous-commit pattern in [AGENTS.md](../../AGENTS.md). Flip to
 `true` if you ever take on co-maintainers.
 
 ### 11.6 Runner version pinning

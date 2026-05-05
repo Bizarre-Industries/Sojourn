@@ -3,48 +3,46 @@
 Carry your Mac setup — apps, packages, shell configs, and app preferences
 — across machines and across time.
 
-Sojourn is a native macOS 14+ SwiftUI app that unifies package management
-(`mpm`), dotfile sync (`chezmoi`), and app-preference round-tripping
-(`defaults`) behind a GUI. Explicit push/pull between machines, git-backed
-rollback, scheduled package updates with a supply-chain-attack cooldown,
-and automatic cleanup of dotfile cruft from uninstalled tools.
+Sojourn is a native macOS 26+ SwiftUI app for brew-native Mac config
+management. It uses Brewfile + chezmoi as the declarative source of truth,
+wraps system-defaults round-tripping behind a GUI, keeps explicit push/pull
+between machines, and records rollback generations before risky changes.
+Think "what nix-darwin would be if it didn't make you learn Nix."
 
 ## Status
 
-**v0.1 scaffold**, pre-alpha. Not yet shippable as a notarized DMG; the
-code landed per the phased implementation in
-[docs/process/implementation-plan.md](docs/process/implementation-plan.md)
-and every subsystem is fixture-backed tested. See
-[docs/reference/architecture.md](docs/reference/architecture.md) for
-the full spec.
+**v0.4 is in active development.** v0.3.0 shipped as a notarized DMG on
+2026-05-04; v0.4 is the native UI reset and release-hardening pass. The
+active execution plan is
+[docs/process/plans/v0.4-plan.md](docs/process/plans/v0.4-plan.md).
 
-## Features (v0.1)
+## Current direction
 
 - **Bootstrap** first-run wizard that probes, installs, and verifies
-  `xcode-select`, `brew` (signed `.pkg`), `mpm`, `chezmoi`.
-- **Sync** push/pull against a user-owned git remote, with pre-op tarball
-  snapshots (30-day retention) and bundled gitleaks scanning before every
-  auto-commit.
-- **Packages** via mpm: brew, cask, mas, pip, pipx, uvx, npm, yarn, cargo,
-  gem, composer, vscode. Per-manager cooldown tiers (A–E) per
-  [docs/reference/cooldown-policy.md](docs/reference/cooldown-policy.md).
-- **Dotfiles** via chezmoi with ownership-registry-classified orphan
-  cleanup.
+  `xcode-select`, Homebrew via signed `.pkg`, `chezmoi`, `git`, `gitleaks`,
+  and `age`.
+- **Sync** push/pull against a user-owned git remote, with pre-op generation
+  snapshots and bundled gitleaks scanning before every auto-commit.
+- **Packages** through **brew bundle** as the single backend. No `mpm`, no Nix,
+  no speculative `Backend` protocol; ADR-0018 supersedes the old split-backend
+  plan.
+- **Dotfiles** via chezmoi with ownership-registry-classified orphan cleanup.
 - **Preferences** via `defaults export` + `plutil -convert xml1`; no
   `~/Library/Preferences` symlink farms.
-- **Menu bar** status + main window with six panes (Packages, Dotfiles,
-  Preferences, History, Machines, Cleanup).
+- **Native macOS utility UI** with overview, packages, containers,
+  generations, macOS features, preferences, sync, machines, advisories, jobs,
+  and settings panes.
 - **Diagnostics** exportable log bundle with redacted secrets.
 
 ## Requirements
 
-- macOS 14 Sonoma or later (Apple Silicon or Intel).
-- Xcode 16+ with Swift 6.1+ toolchain for building from source.
+- macOS 26.0 Tahoe or later (Apple Silicon or Intel).
+- Xcode 26+ / Swift 6.2+ era toolchain for building from source.
 - Homebrew (installed on first run if absent).
 
 ## Install
 
-Not yet published to Homebrew. Build from source:
+Build from source:
 
 ```sh
 git clone https://github.com/Bizarre-Industries/Sojourn.git
@@ -54,12 +52,13 @@ make generate          # regenerate Sojourn.xcodeproj from project.yml
 open Sojourn.xcodeproj
 ```
 
-Run the test suite:
+Run useful local gates:
 
 ```sh
-make test              # swift test (67+ tests in ~6s)
+make test              # swift test
 make xcodebuild        # xcodebuild -scheme Sojourn test
 make leaks             # gitleaks dir --config=.gitleaks.toml
+make ci-local          # local release-oriented checks
 ```
 
 ## Docs
@@ -75,12 +74,11 @@ Sojourn's docs follow [Diátaxis](https://diataxis.fr) — start here:
 - [Sync model](docs/reference/sync-model.md) — push/pull semantics.
 - [Cooldown policy](docs/reference/cooldown-policy.md) — supply-chain tiers.
 - [Conflict shapes](docs/reference/conflict-shapes.md) — sync-merge shapes.
-- [Preference sync](docs/reference/preferences.md) +
-  [Preference domains](docs/reference/preferences.md) — plist round-trip.
+- [Preference sync](docs/reference/preferences.md) — plist round-trip.
 - [Cleanup](docs/reference/cleanup.md) — orphan detection.
 - [Licensing](docs/reference/licensing.md) — GPL-3.0-or-later, IPC-not-linking.
-- [Testing](docs/reference/testing.md), [Observability](docs/explain/observability.md).
-- [Backends](docs/reference/backends/) — mpm, chezmoi, gitleaks, git.
+- [Testing](docs/reference/testing.md), [Observability](docs/reference/observability.md).
+- [Backends](docs/reference/backends/) — chezmoi, gitleaks, git, and historical mpm notes.
 - [Managers](docs/reference/package-managers/) — per-manager pages + matrix.
 - [Externals](docs/reference/externals.md), [SSH config](docs/reference/ssh-config.md),
   [Secret brokers](docs/reference/secret-brokers.md),
@@ -97,11 +95,12 @@ Sojourn's docs follow [Diátaxis](https://diataxis.fr) — start here:
 
 **Decisions** (immutable ADR log):
 
-- [Decisions index](docs/decisions/README.md) — 14 ADRs.
+- [Decisions index](docs/decisions/README.md) — ADRs 0001–0027.
 
 **Process** (contributor/maintainer):
 
-- [Implementation plan](docs/process/implementation-plan.md) — phases 0–14.
+- [Active v0.4 plan](docs/process/plans/v0.4-plan.md) — current autonomous agent plan.
+- [Implementation plan](docs/process/implementation-plan.md) — historical v0.1 → v1 plan.
 - [Audit 2026-04](docs/process/audit-2026-04.md) — gap analysis.
 - [Open questions](docs/process/open-questions.md) — deferred to maintainer.
 - [Release](docs/process/release.md), [Docs policy](docs/process/DOCS_POLICY.md).
@@ -110,8 +109,9 @@ Sojourn's docs follow [Diátaxis](https://diataxis.fr) — start here:
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) and [CLAUDE.md](CLAUDE.md) for
-invariants (IPC-not-linking, no bundled mpm, fixture-backed tests).
+See [CONTRIBUTING.md](CONTRIBUTING.md) and [AGENTS.md](AGENTS.md) for
+invariants (IPC-not-linking, brew bundle as the single backend, no lower-macOS
+compatibility gates, fixture-backed tests).
 
 ## License
 

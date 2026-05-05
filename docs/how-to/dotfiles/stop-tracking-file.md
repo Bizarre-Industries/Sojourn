@@ -65,4 +65,4 @@ If you change your mind:
   §2.2.6.
 - [reference/cleanup.md](../../reference/cleanup.md) — when to
   delete vs forget.
-- [CLAUDE.md](../../../CLAUDE.md) "Do not auto-delete orphans" rule.
+- [AGENTS.md](../../../AGENTS.md) "Do not auto-delete orphans" rule.

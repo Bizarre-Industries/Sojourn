@@ -41,13 +41,13 @@ Two surfaces matter.
 ### 1. The user's git remote
 
 Sojourn reads from and writes to a repo the user owns. If the remote is
-compromised, a pull lands an attacker-chosen `packages.toml` and chezmoi
-source tree, including `run_*` scripts ([reference/backends/chezmoi.md](../reference/backends/chezmoi.md)).
+compromised, a pull lands an attacker-chosen Brewfile and chezmoi source
+tree, including `run_*` scripts ([reference/backends/chezmoi.md](../reference/backends/chezmoi.md)).
 
 Mitigations:
 
-- **Pull preview**: every conflict, every `chezmoi diff`, every
-  `mpm restore` plan is shown before any subprocess runs. Defer to
+- **Pull preview**: every conflict, every `chezmoi diff`, every Brewfile
+  apply plan is shown before any subprocess runs. Defer to
   [reference/sync-model.md](../reference/sync-model.md) for the flow.
 - **Pre-op snapshot**: every destructive op writes
   `~/Library/Application Support/Sojourn/backups/<ts>-<op>/` first, 30-day
@@ -62,9 +62,9 @@ Mitigations:
 
 ### 2. Upstream package registries
 
-`mpm restore` shells out to `brew install X`, `npm install -g X`, etc.
-Trust is delegated to each registry. The 2024–2026 supply-chain incident
-list ([reference/cooldown-policy.md "Evidence base"](../reference/cooldown-policy.md#evidence-base--incidents-20242026-a-7-day-gate-blocks-outright))
+`brew bundle install` shells out through Homebrew and any package manager
+Brewfile invokes. Trust is delegated to those registries. The 2024–2026
+supply-chain incident list ([reference/cooldown-policy.md "Evidence base"](../reference/cooldown-policy.md#evidence-base--incidents-20242026-a-7-day-gate-blocks-outright))
 documents what cooldown blocks.
 
 Mitigations:

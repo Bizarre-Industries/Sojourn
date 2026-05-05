@@ -1,5 +1,10 @@
 # Sojourn — Full Implementation Plan (v0.1 → v1 → v1.x)
 
+> **Historical plan.** This file preserves the April 2026 v0.1-era roadmap,
+> including macOS 14 and mpm assumptions that were later superseded. Current
+> active work lives in [plans/v0.4-plan.md](plans/v0.4-plan.md); current
+> invariants live in [AGENTS.md](../../AGENTS.md).
+
 ## Context
 
 Sojourn is a macOS 14+ SwiftUI app for cross-Mac setup sync (packages via
@@ -12,7 +17,7 @@ v1.
 
 Execution contract: autonomous commits on `main`. Every phase passes
 `swift test` + (eventually) `xcodebuild test` + `gitleaks dir` before
-commit. Fixture-backed tests mandatory per [CLAUDE.md](../../CLAUDE.md).
+commit. Fixture-backed tests mandatory per [AGENTS.md](../../AGENTS.md).
 
 Target spec for phases 0–9:
 [reference/architecture.md](../reference/architecture.md). Target spec

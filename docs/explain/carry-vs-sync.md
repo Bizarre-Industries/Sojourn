@@ -90,7 +90,7 @@ Naming the operation correctly upfront usually clarifies the bug.
 Carry and sync share the underlying primitives:
 
 - `chezmoi apply` writes dotfiles.
-- `mpm restore` writes packages.
+- `brew bundle install` writes packages.
 - `defaults import` writes prefs.
 - The pre-snapshot, conflict-resolution, and cooldown machinery applies
   to both.
@@ -102,7 +102,7 @@ The difference is in `SyncCoordinator` orchestration:
   Always apply, never merge.
 - **Sync**: full pull-preview / conflict-resolution / writer-lock
   flow. `chezmoi diff` first, `chezmoi merge` for text dotfiles,
-  `mpm restore` only after explicit confirmation, etc.
+  `brew bundle install` only after explicit confirmation, etc.
 
 The same code paths run; the user-facing flow differs.
 

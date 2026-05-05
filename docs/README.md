@@ -65,9 +65,10 @@ artifacts Diátaxis does not cover.
 
 ### Maintainer / contributor
 
-- [Decisions: ADR log](decisions/README.md) — 14 architectural decisions.
+- [Decisions: ADR log](decisions/README.md) — ADRs 0001–0027.
+- [Process: active v0.4 plan](process/plans/v0.4-plan.md) — current autonomous agent plan.
 - [Process: audit](process/audit-2026-04.md) — gap analysis + coverage map.
-- [Process: implementation plan](process/implementation-plan.md) — phased delivery (phases 0–14).
+- [Process: implementation plan](process/implementation-plan.md) — historical phased delivery plan.
 - [Process: open questions](process/open-questions.md) — deferred decisions.
 - [Process: future](process/future.md) — long-tail backlog.
 - [Process: docs policy](process/DOCS_POLICY.md) — redirect rules, ADR immutability, naming.

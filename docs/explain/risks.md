@@ -15,19 +15,18 @@ even if pref sync breaks. Watch Apple security guides at each WWDC. Have a
 plan to ship "preferences as declarative `defaults write` scripts" as a
 fallback. See [reference/preferences.md](../reference/preferences.md).
 
-## 2. mpm bus factor
+## 2. Homebrew behavior changes
 
-Single maintainer, self-declared. If kdeldycke stops shipping mpm, Sojourn
-needs either to fork or to reimplement the per-manager wrappers.
+Sojourn now bets on Brewfile / `brew bundle` as the single package backend
+([decisions/0018-drop-mpm-for-brew-bundle.md](../decisions/0018-drop-mpm-for-brew-bundle.md)).
+If Homebrew changes `brew bundle`, `brew outdated`, or JSON surfaces, package
+sync can break across many managers at once.
 
-Mitigation: keep `MPMService` surface small; each method is thin enough to
-reimplement against the underlying managers directly within a week of work.
-The audit's
-[decisions/0010-native-brew-keep-mpm.md](../decisions/0010-native-brew-keep-mpm.md)
-also moves the highest-traffic managers (brew, cask, mas) off the
-single-maintainer dependency.
+Mitigation: keep parsing fixture-backed, surface per-command failures loudly,
+never hash exact subprocess stdout, and prefer documented Brewfile behavior
+over scraping human output.
 
-## 3. `swift-subprocess` is pre-1.0 and requires Swift 6.1+
+## 3. `swift-subprocess` is pre-1.0 and requires Swift 6.2-era tooling
 
 The API could change. Mitigation: wrap it in `SubprocessRunner` so swapping
 to raw `Process + Pipe + AsyncStream` is an internal refactor.
@@ -36,9 +35,8 @@ to raw `Process + Pipe + AsyncStream` is an internal refactor.
 
 The JSON API refresh was 1 day, then 7 days (PR #21262, Dec 2025);
 `brew outdated` output format flapped in bug #20976 (Nov 2025, unresolved).
-Parsers break when brew changes output. Mitigation: treat every mpm/brew
-output as advisory and surface per-manager `errors[]`; don't write tests
-that hash exact strings.
+Parsers break when brew changes output. Mitigation: treat backend output as
+advisory and don't write tests that hash exact strings.
 
 ## 5. chezmoi's `diff`/`status` are not stable structured formats
 

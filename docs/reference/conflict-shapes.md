@@ -25,13 +25,13 @@ Example: both Macs edited `dotfiles/.zshrc` between syncs.
   working tree then runs `chezmoi apply` to push that back into the
   live dotfile.
 
-## Shape 2: `packages.toml` entry diverged
+## Shape 2: Brewfile entry diverged
 
-- Two Macs ran different `mpm install/remove`; the TOML diff shows both
-  versions of a given manager's section.
-- `kind == .packagesToml`.
-- Resolution UX: merge keys per-manager. The UI groups by manager so
-  the user doesn't manually scan the full TOML.
+- Two Macs made different package changes; the Brewfile diff shows both
+  versions of a given package declaration.
+- `kind == .brewfile`.
+- Resolution UX: merge entries by package. The UI groups by declaration type
+  so the user doesn't manually scan the full Brewfile.
 
 ## Shape 3: chezmoi template conflict
 

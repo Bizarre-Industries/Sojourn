@@ -17,9 +17,9 @@ captured the consensus:
 > dotfiles but not packages. nix-darwin handles everything but good luck
 > onboarding a junior with it. Nothing just does the whole thing."
 
-Sojourn fills that gap with a native macOS GUI that wraps `mpm`,
-`chezmoi`, and `defaults` behind a single push/pull model — and refuses
-to ask the user to learn Nix.
+Sojourn fills that gap with a native macOS GUI that wraps Brewfile,
+`brew bundle`, `chezmoi`, and `defaults` behind a single push/pull model —
+and refuses to ask the user to learn Nix.
 
 ## The market splits four ways; none cover Sojourn's scope
 

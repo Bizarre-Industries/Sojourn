@@ -68,4 +68,4 @@ includes the full DB.
 - [history-db.md](history-db.md) — sibling DB for push/pull history.
 - [explain/threat-model.md](../../explain/threat-model.md) — invariant
   about never silently dropping data.
-- [CLAUDE.md](../../../CLAUDE.md) — "Do not auto-delete orphans" rule.
+- [AGENTS.md](../../../AGENTS.md) — "Do not auto-delete orphans" rule.

@@ -52,14 +52,8 @@ Sojourn offers two paths for git auth:
   shows a one-time code; you paste it into github.com/login/device.
   Token lives in macOS Keychain under `app.bizarre.sojourn`.
 
-  > **v0.1.0 caveat**: Sojourn does not yet ship a project-owned
-  > GitHub OAuth App. To use the Device Flow, register your own at
-  > <https://github.com/settings/developers> (any name, any homepage
-  > URL, no callback URL needed for device flow), then paste the
-  > resulting `client_id` into Settings → Integrations → GitHub
-  > client_id. v0.1.1 ships a Sojourn-owned default. Until then, BYO
-  > is the only working path; you can also just use the
-  > git-credential-osxkeychain path above.
+  Device Flow is optional. If it is not configured or fails, use the BYO
+  git-credential path above; Sojourn core does not depend on hosted auth.
 
 Pick whichever you prefer. Tutorial 03 needs git auth working too.
 
@@ -67,7 +61,7 @@ Pick whichever you prefer. Tutorial 03 needs git auth working too.
 
 Sojourn now scans:
 
-- All package managers it can detect via `mpm managers`.
+- Package state from Brewfile / `brew bundle`.
 - Common dotfile owners (`~/.zshrc`, `~/.gitconfig`, `~/.ssh/config`,
   …) per [reference/cleanup.md](../reference/cleanup.md).
 - Tracked unsandboxed app preferences if you opted in.
@@ -88,7 +82,7 @@ Click *Back up and push*.
 
 Sojourn:
 
-1. Runs `mpm backup ~/.local/share/chezmoi/packages.toml`.
+1. Writes the current Brewfile state into the data repo.
 2. Runs `chezmoi add` for each detected dotfile.
 3. Runs `gitleaks dir --staged` against the staged tree. **Stop and
    read** any findings — see
@@ -103,7 +97,7 @@ Push takes 5–30 seconds depending on dotfile count.
 - `git log` in `~/.local/share/chezmoi/` shows your initial commit
   pushed.
 - The remote (e.g. github.com/<you>/sojourn-setup) has files:
-  - `packages.toml`
+  - `Brewfile.<hostname>`
   - `dot_zshrc`, `dot_gitconfig`, etc.
   - `.sojourn/active.toml` (with this Mac as active writer)
   - `.sojourn/machines/MAC-XXXX.toml`
@@ -121,9 +115,6 @@ Push takes 5–30 seconds depending on dotfile count.
 - **Push fails with "permission denied"** — git auth isn't working.
   Test `git push` from Terminal manually; fix credentials there;
   retry from Sojourn.
-- **"Manager errored: pip"** — pip's mpm wrapper doesn't implement
-  `search`; this fires harmlessly during backup. Ignore unless your
-  Mac actually has no pip and you want it tracked.
 
 ## Next
 

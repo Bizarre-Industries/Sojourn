@@ -4,7 +4,7 @@ Thanks for the interest. Sojourn is GPL-3.0-or-later and actively accepts contri
 
 ## Before you start
 
-1. Read [CLAUDE.md](CLAUDE.md) — the invariants and "do not do" list apply to humans too.
+1. Read [AGENTS.md](AGENTS.md) — the invariants and "do not do" list apply to humans too. `CLAUDE.md` is the Claude Code mirror.
 2. Read [docs/reference/architecture.md](docs/reference/architecture.md) and
    [docs/reference/modules.md](docs/reference/modules.md) (module layout). For
    licensing, see [docs/decisions/0004-gpl-3-or-later.md](docs/decisions/0004-gpl-3-or-later.md)
@@ -16,10 +16,10 @@ Thanks for the interest. Sojourn is GPL-3.0-or-later and actively accepts contri
 
 ## Development setup
 
-- macOS 14 Sonoma or later.
-- Xcode 16+ (Swift 6.1+ toolchain).
+- macOS 26.0 Tahoe or later.
+- Xcode 26+ / Swift 6.2+ era toolchain.
 - Homebrew with `gitleaks` (`brew install gitleaks`).
-- `chezmoi` and `mpm` on `PATH` if you'll touch the service layer.
+- `chezmoi`, `git`, `age`, and Homebrew on `PATH` if you'll touch the service layer.
 
 ```sh
 git clone https://github.com/bizarreindustries/sojourn.git
@@ -43,7 +43,7 @@ swift package resolve          # pulls swift-subprocess + MenuBarExtraAccess
 
 ### Style
 
-- Swift 6.1 strict concurrency; everything that can be `Sendable`, is.
+- Swift 6.2-era strict concurrency; everything that can be `Sendable`, is.
 - Two-space indentation.
 - Imports: Foundation → SwiftUI → third-party → first-party.
 - One top-level type per file. File name matches primary declaration.
@@ -55,9 +55,9 @@ swift package resolve          # pulls swift-subprocess + MenuBarExtraAccess
 Imperative, lowercase, scoped when it helps. Examples:
 
 ```
-svc(mpm): surface per-manager errors in installed()
-ui: wire PackagesPane to ManagerSnapshot
-docs: expand §8 TCC canary rationale
+svc(brew): surface bundle apply failures
+ui: wire PackagesPane to BrewBundleSummary
+docs: expand TCC canary rationale
 ```
 
 No `Co-authored-by` trailers. No `Generated with Claude` trailers. Sign-off trailer is mandatory.
@@ -66,13 +66,13 @@ No `Co-authored-by` trailers. No `Generated with Claude` trailers. Sign-off trai
 
 1. Open the PR against `main`.
 2. CI runs: `swift test`, `xcodebuild test`, `gitleaks`, CodeQL.
-3. A maintainer (see [MAINTAINERS.md](MAINTAINERS.md)) reviews for architecture alignment with `docs/reference/architecture.md` + ADRs and invariants in `CLAUDE.md`.
+3. A maintainer (see [MAINTAINERS.md](MAINTAINERS.md)) reviews for architecture alignment with `docs/reference/architecture.md` + ADRs and invariants in `AGENTS.md`.
 4. Squash-merge is default. Use merge-commit only when preserving a bisectable sequence matters.
 
 ## Things that will get your PR rejected fast
 
 - Adding TCA, SwiftGit2, libgit2, SwiftShell, or any library that embeds a GPL-2.0-only tool.
-- Linking `mpm` or `chezmoi` as a library (breaks the IPC-not-linking invariant).
+- Linking `chezmoi`, git, gitleaks, age, or any GPL-2.0-only tool as a library (breaks the IPC-not-linking invariant).
 - Calling `Process` directly from a `View`.
 - `@State` holding the root `AppStore`.
 - Silent `catch` blocks or retry loops added "defensively."

@@ -4,5 +4,5 @@ This page moved to [reference/package-managers/index.md](../package-managers/ind
 The whole `managers/` directory was renamed to `package-managers/` to
 match the docs proposal §3 naming.
 
-The redirect will be removed in **v0.3**. See
+This is a compatibility redirect for older docs and bookmarks. See
 [docs/process/DOCS_POLICY.md](../../process/DOCS_POLICY.md).

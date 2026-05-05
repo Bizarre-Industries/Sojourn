@@ -42,10 +42,10 @@ sequenceDiagram
     S->>F: Show onboarding screen
     F->>S: Onboard from existing repository
     S->>G: Clone repo
-    G-->>S: packages.toml, dotfiles, .sojourn/*
+    G-->>S: Brewfiles, dotfiles, .sojourn/*
     S->>F: Pull preview (large — fresh Mac)
     F->>S: Restore everything
-    S->>S: mpm restore (parallel managers)
+    S->>S: brew bundle install
     S->>S: chezmoi apply
     S->>S: defaults import
     S->>F: Up to date
@@ -98,8 +98,7 @@ After the first push from the fresh Mac:
 
 ## Verification
 
-- The fresh Mac's installed packages match the data repo
-  (`mpm installed | diff <(mpm installed)` against another Mac).
+- The fresh Mac's installed packages match the data repo's Brewfile plan.
 - All dotfiles in `~/` match the data-repo state.
 - Tracked apps' preferences match.
 - gitleaks finds no leaks.

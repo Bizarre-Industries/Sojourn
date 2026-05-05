@@ -1,10 +1,10 @@
 # IPC, not linking — the licensing firewall
 
-Sojourn is GPL-3.0-or-later. `mpm` is GPL-2.0-only. Linking them as a
-combined work is not legal under either license. Sojourn keeps the
-licenses compatible by keeping `mpm` (and every other backend) at
-arm's length: separate process, argv in, structured stdout out, exit
-code back. The decision is recorded immutably in
+Sojourn is GPL-3.0-or-later. The original v0.1 risk was `mpm`, a
+GPL-2.0-only tool; ADR-0018 later removed that backend, but the firewall
+remains the rule for every operational CLI. Sojourn keeps tools at arm's
+length: separate process, argv in, structured stdout out, exit code back.
+The decision is recorded immutably in
 [decisions/0001-ipc-not-linking.md](../decisions/0001-ipc-not-linking.md);
 this page is the explanatory companion.
 
@@ -12,10 +12,10 @@ this page is the explanatory companion.
 
 GPL-3.0-or-later and GPL-2.0-only are **incompatible** for combined
 works. The GPL combined-work test is structural — code linked into the
-same address space at runtime is one work. If Sojourn linked `mpm` (or
-even imported it as a Swift package wrapping its source), the resulting
-binary would be a derivative of GPL-2.0-only code, and Sojourn could not
-ship under GPL-3 anymore.
+same address space at runtime is one work. If Sojourn linked a GPL-2.0-only
+backend (the old `mpm` plan, or a future equivalent), the resulting binary
+would be a derivative of GPL-2.0-only code, and Sojourn could not ship under
+GPL-3 anymore.
 
 Re-licensing options would close at the same time:
 
@@ -39,8 +39,8 @@ Sojourn invokes every external CLI through `SubprocessRunner`:
 
 There is no `dlopen`, no static archive embedded, no Swift wrapper that
 imports the backend's source, no thread sharing. The Swift Package
-manifest contains zero dependencies that pull in `mpm`, `chezmoi`,
-`gitleaks`, or `age` source.
+manifest contains zero dependencies that pull in CLI backend source such as
+`chezmoi`, `gitleaks`, or `age`.
 
 The FSF GPL FAQ recognises this exact pattern as **mere aggregation**:
 two programs that communicate via "pipes, sockets, and command-line
@@ -58,11 +58,11 @@ Reviewers reject these patterns even when they look small:
 - Embedding `chezmoi` source as Go-via-cgo — linked.
 - Adding `SwiftShell` or `ShellOut` as a transitive dep — those
   packages run subprocesses but their unmaintained status creates a
-  different problem (see [CLAUDE.md](../../CLAUDE.md) "Do not do" list).
+  different problem (see [AGENTS.md](../../AGENTS.md) "Do not do" list).
 
 The acid test: if the entire backend disappeared at runtime (binary
 unlinked, file deleted), would Sojourn crash? If yes, it's linked. If
-Sojourn would just fail an `mpm not found` job, the firewall holds.
+Sojourn would just fail a "tool not found" job, the firewall holds.
 
 ## Bundled binaries are not linked binaries
 
@@ -86,8 +86,8 @@ Sojourn ever adds a hosted server component (e.g. an opt-in fleet
 sync), the project can move to AGPL-3.0 without re-coordinating
 contributor rights — the "or-later" clause already permits it.
 
-Linking `mpm` would close this door permanently. The IPC firewall
-keeps it open.
+Linking a GPL-2.0-only backend would close this door permanently. The IPC
+firewall keeps it open.
 
 ## See also
 
@@ -99,4 +99,4 @@ keeps it open.
   license table.
 - [decisions/0007-shell-out-to-git.md](../decisions/0007-shell-out-to-git.md)
   — same firewall logic for `git` (avoiding libgit2).
-- [CLAUDE.md](../../CLAUDE.md) "Do not do" — the non-negotiable list.
+- [AGENTS.md](../../AGENTS.md) "Do not do" — the non-negotiable list.

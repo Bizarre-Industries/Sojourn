@@ -2,21 +2,18 @@
 
 First-run experience for Sojourn. Owned by `BootstrapService`. See
 [decisions/0008-no-curl-bash-for-brew.md](../decisions/0008-no-curl-bash-for-brew.md)
-for the install model, and
-[explain/bootstrap-state-machine.md](../explain/bootstrap-state-machine.md)
-for the rationale on Authorization sheets.
+for the install model and Authorization-sheet rationale.
 
 ## State machine
 
 ```
 .unknown
-  → .probingSystem        // parallel: locate brew/git/mpm/chezmoi/age/gitleaks + xcode-select -p
+  → .probingSystem        // parallel: locate brew/git/chezmoi/age/gitleaks + xcode-select -p
   → .reportingStatus      // show inventory to user
   → .awaitingUserConsent  // single "Install missing" sheet
   → .installingCLT        // xcode-select --install; observe until done
   → .installingBrew       // signed .pkg installer via /usr/sbin/installer
-  → .installingMpm        // brew install meta-package-manager
-  → .installingChezmoi    // brew install chezmoi
+  → .installingTools      // brew install chezmoi gitleaks age
   → .ready
   → .failed(Error)        // per-step retry/skip UI
 ```
@@ -52,28 +49,15 @@ Flow:
 5. Post-install verify: `/opt/homebrew/bin/brew --version` on Apple Silicon,
    `/usr/local/bin/brew --version` on Intel.
 
-## mpm install
+## Tool install
 
-Prefer `brew install meta-package-manager`. Fallback if brew fails or is
-skipped:
+Prefer `brew install chezmoi gitleaks age`. `mpm` is no longer installed:
+package sync is Brewfile / `brew bundle` per
+[decisions/0018-drop-mpm-for-brew-bundle.md](../decisions/0018-drop-mpm-for-brew-bundle.md).
 
-1. Download the Nuitka-compiled standalone binary for the host arch from the
-   mpm releases page via `gh release download`.
-2. Verify SHA-256 against the checksum file in the same release.
-3. Remove the quarantine xattr: `xattr -d com.apple.quarantine /path/to/mpm`.
-4. Install to `~/Library/Application Support/Sojourn/bin/mpm`. Add that to
-   the `Settings.toolLocations` cache.
-
-Do not bundle mpm inside `Contents/Resources/`. See
-[reference/backends/mpm.md](backends/mpm.md) and
-[decisions/0009-bundle-binary-policy.md](../decisions/0009-bundle-binary-policy.md).
-
-## chezmoi install
-
-Prefer `brew install chezmoi`. Fallback: direct binary from chezmoi's
-release page (signed + notarized as of 2024+). Do not use the
-`get.chezmoi.io` pipe-to-shell path from a GUI context for the same reason
-as brew.
+Fallback for chezmoi: direct binary from chezmoi's release page (signed +
+notarized as of 2024+). Do not use the `get.chezmoi.io` pipe-to-shell path
+from a GUI context for the same reason as brew.
 
 Configure `merge.command` in `~/.config/chezmoi/chezmoi.toml` during
 bootstrap so future `chezmoi merge` calls have a default (e.g., `opendiff`,

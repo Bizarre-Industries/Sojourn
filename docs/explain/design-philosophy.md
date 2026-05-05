@@ -2,12 +2,12 @@
 
 Sojourn is opinionated about a few things. The opinions are stated here
 so contributors can apply them to new features without re-deriving them
-each time. The full invariants live in [CLAUDE.md](../../CLAUDE.md);
+each time. The full invariants live in [AGENTS.md](../../AGENTS.md);
 this page is the rationale.
 
 ## Bet on macOS-native
 
-Sojourn is **SwiftUI on macOS 14+ only**. No Electron, no cross-platform
+Sojourn is **SwiftUI on macOS 26+ only**. No Electron, no cross-platform
 abstraction, no plans for Linux or Windows.
 
 Why:
@@ -40,14 +40,13 @@ full reasoning.
 
 ## IPC, not linking
 
-Sojourn invokes `mpm`, `chezmoi`, `git`, `gitleaks`, `age`, and
+Sojourn invokes `brew`, `chezmoi`, `git`, `gitleaks`, `age`, and
 `defaults` as **separate processes** — argv in, JSON / TOML / exit code
 out. No FFI. No embedding. No shared library.
 
-This is the licensing firewall ([decisions/0001-ipc-not-linking.md](../decisions/0001-ipc-not-linking.md)):
-mpm is GPL-2.0-only; linking it would cap Sojourn's license at GPL-2
-forever. Subprocess IPC keeps mpm at arm's length and lets Sojourn ship
-under GPL-3-or-later.
+This is the licensing firewall ([decisions/0001-ipc-not-linking.md](../decisions/0001-ipc-not-linking.md)).
+It also keeps operational tools at arm's length so Sojourn can ship under
+GPL-3.0-or-later without turning CLI wrappers into in-process dependencies.
 
 It is also a robustness choice: each backend is a process boundary that
 can fail, time out, or get cancelled without taking the whole app down.
@@ -79,8 +78,8 @@ Every destructive operation writes a backup to
 30-day retention. See [reference/cleanup.md](../reference/cleanup.md).
 
 This is non-negotiable. `chezmoi apply --force`, `defaults import`,
-`mpm restore`, `git pull --force`, and orphan trashing all snapshot
-first. The cost is disk space on a developer machine; the benefit is
+`brew bundle install --cleanup`, `git pull --force`, and orphan trashing all
+snapshot first. The cost is disk space on a developer machine; the benefit is
 the user can always undo.
 
 ## No telemetry, no server
@@ -108,17 +107,18 @@ False confidence ages worse than an extra click.
 
 ## Ship 80% of the envisioned feature, then ship the next one
 
-`v0.1` ships unsandboxed-app preference sync. Sandboxed-app sync waits
-for a future phase. `v0.1` ships cooperative writer lock; three-way
-merge waits. `v0.1` ships brew, cask, mas, pip, pipx, npm, cargo, gem;
-pnpm waits.
+v0.4 continues the same discipline: reset the app to a quiet native macOS
+utility before adding more backend scope. Sandboxed-app sync, richer conflict
+resolution, and plugin-style manager expansion can wait until the core shipped
+surfaces feel trustworthy.
 
-The deferred list is in [process/future.md](../process/future.md).
-Honest scope cuts beat infinite-runway features.
+The active plan is in [process/plans/v0.4-plan.md](../process/plans/v0.4-plan.md);
+the deferred list is in [process/future.md](../process/future.md). Honest scope
+cuts beat infinite-runway features.
 
 ## See also
 
-- [CLAUDE.md](../../CLAUDE.md) — the full invariants and "do not do"
+- [AGENTS.md](../../AGENTS.md) — the full invariants and "do not do"
   list.
 - [decisions/](../decisions/) — every architectural choice as an ADR.
 - [explain/trade-offs.md](trade-offs.md) — what Sojourn doesn't do and

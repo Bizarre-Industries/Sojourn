@@ -1,29 +1,26 @@
 # Trade-offs
 
-Honest list of what Sojourn does not do and why. Sourced from the
-v0.1 risk register and v1 scope cut in
-[`docs/process/audit-2026-04.md` §13–§15](../process/audit-2026-04.md).
-Tracking continues in [process/future.md](../process/future.md).
+Honest list of what Sojourn does not do and why. The old v0.1 risk register
+and v1 scope cut remain in
+[`docs/process/audit-2026-04.md`](../process/audit-2026-04.md); current work
+tracks through [process/plans/v0.4-plan.md](../process/plans/v0.4-plan.md)
+and [process/future.md](../process/future.md).
 
-## Capabilities Sojourn ships in v1
+## Capabilities Sojourn ships now
 
-The full v1 scope is in
-[process/implementation-plan.md](../process/implementation-plan.md).
-Headline:
+Current direction:
 
-- Package sync via `mpm` for brew, cask, mas, pip, pipx, npm, cargo, gem.
-- Dotfile sync via `chezmoi` with templating, age encryption,
+- Package sync via Brewfile / `brew bundle` as the single backend.
+- Dotfile sync via `chezmoi` with templating, age encryption, and
   per-machine overrides.
-- App-preference sync for **unsandboxed plists only** —
-  `defaults export/import` round-trip.
+- App-preference sync for **unsandboxed plists only** — `defaults
+  export/import` round-trip.
 - Explicit push/pull with cooperative writer lock.
 - BYO git remote (primary). Optional GitHub Device Flow.
-- Auto-update with 7-day cooldown + tier gating + OSV bypass.
+- Auto-update with cooldown + tier gating + `brew vulns` advisory signal.
 - Pre-commit secret scan via bundled gitleaks.
-- Orphan detection via bundle-ID reconciliation + curated dotfile
-  registry.
-- First-run bootstrap via signed Homebrew `.pkg` + brew-installed
-  `mpm` / `chezmoi`.
+- Orphan detection via bundle-ID reconciliation + curated dotfile registry.
+- First-run bootstrap via signed Homebrew `.pkg` + brew-installed tools.
 - Menu bar extra + main window.
 - Notarized DMG. GPL-3.0-or-later.
 
@@ -38,7 +35,8 @@ These ship eventually but not in v1:
 - **Concurrent-write conflict resolution.** Three-way merge with
   per-file timestamps. v1 ships the cooperative writer lock instead
   ([decisions/0012-cooperative-writer-lock.md](../decisions/0012-cooperative-writer-lock.md)).
-- **`pnpm` support.** mpm doesn't cover it; needs the plugin protocol
+- **Package managers not expressible in Brewfile.** Add only when the
+  plugin protocol earns its keep
   ([decisions/0013-out-of-process-plugins.md](../decisions/0013-out-of-process-plugins.md)).
 - **Full VT100 terminal pane** (`SwiftTerm`-backed advanced tab).
 - **Headless LaunchAgent.** `SMAppService.agent` so Sojourn can run
@@ -49,7 +47,7 @@ These ship eventually but not in v1:
 Out of scope for the foreseeable future:
 
 - **Mac App Store distribution.** App Sandbox is incompatible with
-  subprocess invocation of `brew`, `mpm`, `chezmoi`, `defaults`. Direct
+  subprocess invocation of `brew`, `chezmoi`, `defaults`, and helper tools. Direct
   notarized-DMG distribution is the model.
 - **Windows or Linux.** Sojourn is macOS-native by design
   ([decisions/0014-no-linux-no-helling-plugin.md](../decisions/0014-no-linux-no-helling-plugin.md)).
@@ -73,9 +71,9 @@ These are real and the mitigations are partial:
    Apple security guides every WWDC. Fallback plan: ship preferences
    as declarative `defaults write` scripts. See
    [reference/preferences.md](../reference/preferences.md).
-2. **mpm bus factor.** Single maintainer. *Mitigation*: keep
-   `MPMService` surface small enough that each method can be
-   reimplemented against the underlying managers within ~1 week.
+2. **Homebrew behavior changes.** The single-backend bet deliberately rides
+   Homebrew's CLI and JSON surfaces. *Mitigation*: fixture-backed parsing,
+   loud per-command errors, and no exact stdout hashes.
 3. **`swift-subprocess` is pre-1.0.** API may change. *Mitigation*:
    wrap in `SubprocessRunner` so swapping to raw `Process + Pipe +
    AsyncStream` is an internal refactor.

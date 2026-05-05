@@ -6,8 +6,8 @@ Sojourn's test contract is fixture-backed and Apple-first.
 
 Every `Service` actor ships with a `.mock(response:)` factory that takes a
 `@Sendable (Args) -> Data` closure. Tests inject fixture JSON/TOML from
-`SojournTests/Fixtures/`. **No live brew, mpm, chezmoi, or network calls in
-unit tests.**
+`SojournTests/Fixtures/`. **No live brew, chezmoi, or network calls in unit
+tests.**
 
 ## Integration tests
 
@@ -24,7 +24,7 @@ tests assert on those strings rather than pixels.
 
 ## No stdout-snapshot tests
 
-Per CLAUDE.md, mpm/brew output is unstable across minor versions.
+Per AGENTS.md, subprocess output is unstable across minor versions.
 
 ## Coverage target
 
@@ -39,6 +39,6 @@ XCTest stays. See [CONTRIBUTING.md](../../CONTRIBUTING.md).
 ## Fixture maintenance
 
 Fixtures under `SojournTests/Fixtures/` are checked-in golden files of real
-mpm, chezmoi, git output. Update the fixtures when upstream output changes;
-do not generate them on the fly. See
-[CLAUDE.md](../../CLAUDE.md) "Test requirements" for the policy.
+brew, chezmoi, git, and helper-tool output. Update the fixtures when upstream
+output changes; do not generate them on the fly. See
+[AGENTS.md](../../AGENTS.md) "Test requirements" for the policy.

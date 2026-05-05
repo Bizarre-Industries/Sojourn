@@ -1,16 +1,15 @@
 # Sojourn — Third-party components
 
-Sojourn is GPL-3.0-or-later. Full license text in [/LICENSE](LICENSE).
+Sojourn is GPL-3.0-or-later. Full license text in [LICENSE](../../LICENSE).
 
 This file inventories every third-party component Sojourn ships with, links
 to, or invokes at runtime, per the policy in
-[docs/reference/licensing.md](docs/reference/licensing.md). It is regenerated on each release and
+[reference/licensing.md](licensing.md). It is regenerated on each release and
 shipped alongside the notarized DMG.
 
 ## Bundled binaries (`Sojourn/Resources/bin/`)
 
-Re-signed under Sojourn's Developer ID. Source available at the upstream
-repo.
+Re-signed under Sojourn's Developer ID. Source available at the upstream repo.
 
 | Binary | Upstream | License | Purpose |
 |---|---|---|---|
@@ -20,30 +19,29 @@ repo.
 ## Invoked (not bundled)
 
 Discovered or installed on the user's system via the bootstrap flow described
-in [docs/explain/bootstrap-state-machine.md](docs/explain/bootstrap-state-machine.md). Sojourn invokes these as separate
-processes only (see
-[docs/reference/licensing.md](docs/reference/licensing.md#the-ipc-not-linking-invariant)).
+in [bootstrap-state-machine.md](../explain/bootstrap-state-machine.md). Sojourn
+invokes these as separate processes only (see
+[licensing.md#the-ipc-not-linking-invariant](licensing.md#the-ipc-not-linking-invariant)).
 
 | Tool | Upstream | License | Role |
 |---|---|---|---|
-| `mpm` (meta-package-manager) | https://github.com/kdeldycke/meta-package-manager | GPL-2.0-only | Unified package-manager wrapper. |
+| `brew` (Homebrew) | https://github.com/Homebrew/brew | BSD-2-Clause | Single package backend via Brewfile / `brew bundle`; installer for chezmoi, gitleaks, and age. |
 | `chezmoi` | https://github.com/twpayne/chezmoi | MIT | Dotfile templating and apply. |
 | `git` | https://git-scm.com | GPL-2.0 | VCS operations; provided by Xcode CLT. |
-| `brew` (Homebrew) | https://github.com/Homebrew/brew | BSD-2-Clause | Primary package manager; installer for `mpm`, `chezmoi`, `age`. |
 | `defaults`, `plutil`, `killall`, `xattr` | Apple | Proprietary | System CLIs for plist round-trip and file attributes. |
 
 ## Data files
 
 | Path | Source | License | Status |
 |---|---|---|---|
-| `Sojourn/Resources/data/applications/*.toml` | Derived from [lra/mackup](https://github.com/lra/mackup) | GPL-3.0-or-later | Fork, re-classified per [docs/reference/architecture.md](docs/reference/architecture.md). Mackup credited in each file header. |
+| `Sojourn/Resources/data/applications/*.toml` | Derived from [lra/mackup](https://github.com/lra/mackup) | GPL-3.0-or-later | Fork, re-classified per [architecture.md](architecture.md). Mackup credited in each file header. |
 | `Sojourn/Resources/data/gitleaks.toml` | Derived from gitleaks defaults | MIT (upstream) | Locally tuned. |
 | `Sojourn/Resources/data/dotfile_owners.toml` | Original to Sojourn | GPL-3.0-or-later | Hand-curated. |
 
 ## Swift packages
 
-Declared in [Package.swift](Package.swift) and [project.yml](project.yml).
-Minor-version pinned per [docs/reference/architecture.md](docs/reference/architecture.md).
+Declared in [Package.swift](../../Package.swift) and [project.yml](../../project.yml).
+Minor-version pinned per [architecture.md](architecture.md).
 
 | Package | Upstream | License | Pinned version |
 |---|---|---|---|
@@ -61,10 +59,10 @@ The app MUST show, under Help → Acknowledgements:
 
 ## Prohibited additions
 
-Per [CLAUDE.md](CLAUDE.md) "Do not do" list:
+Per [AGENTS.md](../../AGENTS.md) "Do not do" list:
 
 - **TCA** (`swift-composable-architecture`) — project uses raw `@Observable`.
 - **SwiftGit2**, **SwiftGitX**, **ObjectiveGit**, **libgit2** — git is
   subprocess-only.
 - **SwiftShell**, **ShellOut** — unmaintained; use `Process` directly.
-- Any library that would embed mpm/chezmoi/brew source into the app bundle.
+- Any library that would embed operational CLI source into the app bundle.

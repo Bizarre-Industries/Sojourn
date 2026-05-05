@@ -31,12 +31,12 @@ sequenceDiagram
     participant G as Git remote
     participant W as Source Mac (writer)
     S->>G: Clone via git
-    G-->>S: packages.toml, dotfiles, .sojourn/*
+    G-->>S: Brewfiles, dotfiles, .sojourn/*
     S->>S: Read active.toml — writer is W
     S->>S: Generate machine_id (MAC-9C2B)
     S->>N: Pull preview screen
     N->>S: Confirm restore plan
-    S->>S: mpm restore packages.toml
+    S->>S: brew bundle install from Brewfile
     S->>S: chezmoi apply --dry-run, then apply
     S->>S: defaults import (per tier)
     S->>N: Onboarding complete
@@ -91,7 +91,7 @@ for the recipient-add flow.
 
 Click *Restore everything*. Sojourn:
 
-1. Runs `mpm restore` for each manager (parallel by manager).
+1. Runs `brew bundle install` for the selected Brewfile plan.
 2. Runs `chezmoi apply --dry-run` then real apply.
 3. For tracked preferences: runs `defaults import` per app, quitting
    the app first if running.
@@ -106,7 +106,7 @@ The History pane logs the onboarding restore.
 
 ## Verification
 
-- `which mpm chezmoi` shows the same versions as the source Mac.
+- `brew --version` and `chezmoi --version` are available on the new Mac.
 - `~/.zshrc` (or whatever your shell is) is the synced version.
 - A test command from your shell (e.g. an alias defined in
   `~/.zshrc`) works.

@@ -54,6 +54,8 @@ internal struct SyncPane: View {
       }
       .pickerStyle(.segmented)
       .labelsHidden()
+      .accessibilityLabel("Sync sections")
+      .accessibilityIdentifier("sync.tabs")
       .padding(.horizontal, 24)
       .padding(.top, 16)
       .padding(.bottom, 8)

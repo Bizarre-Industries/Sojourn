@@ -18,7 +18,7 @@ struct SettingsRoot: View {
         .tabItem { Label("About", systemImage: "info.circle") }
     }
     .padding(20)
-    .frame(width: 520, height: 360)
+    .frame(minWidth: 520, idealWidth: 560, minHeight: 360, idealHeight: 400)
     .accessibilityIdentifier("settings.root")
   }
 }
@@ -105,6 +105,8 @@ struct SyncSettingsTab: View {
         Text(store.settings.remoteRepoURL ?? "not configured")
           .font(.caption.monospaced())
           .foregroundStyle(.secondary)
+          .lineLimit(1)
+          .truncationMode(.middle)
       }
       Toggle("Cooldown gate enabled", isOn: cooldownBinding)
         .accessibilityIdentifier("settings.cooldown")

@@ -76,7 +76,6 @@ internal struct MainWindowView: View {
       Label {
         HStack(spacing: 6) {
           Text(pane.label)
-            .accessibilityIdentifier("sidebar.\(pane.rawValue)")
           if pane == .sync, let count = syncBadgeCount, count > 0 {
             Text("\(count)")
               .font(.caption2.monospacedDigit())
@@ -92,7 +91,15 @@ internal struct MainWindowView: View {
       }
       .tag(pane)
       .accessibilityIdentifier("sidebar.\(pane.rawValue)")
+      .accessibilityLabel(sidebarAccessibilityLabel(for: pane))
     }
+  }
+
+  private func sidebarAccessibilityLabel(for pane: Pane) -> String {
+    if pane == .sync, let count = syncBadgeCount, count > 0 {
+      return "\(pane.label), \(count) inbound commits pending"
+    }
+    return pane.label
   }
 
   @ToolbarContentBuilder
@@ -139,6 +146,7 @@ internal struct MainWindowView: View {
       Label(toolbarStatusTitle, systemImage: toolbarStatusIcon)
         .foregroundStyle(.secondary)
         .accessibilityIdentifier("toolbar.status")
+        .accessibilityLabel(toolbarStatusTitle)
         .accessibilityHint(toolbarStatusHint)
     }
   }
@@ -347,7 +355,7 @@ internal struct MainWindowView: View {
     case .awaitingPullDecision, .awaitingPullApplyReview, .applyingReviewedPull, .failed:
       selectedPaneRaw = Pane.sync.rawValue
       return
-    case .idle, .pulling, .resolvingConflicts, .applyingReviewedPull, .scanningSecrets, .pushing, .done, nil:
+    case .idle, .pulling, .resolvingConflicts, .scanningSecrets, .pushing, .done, nil:
       break
     }
 

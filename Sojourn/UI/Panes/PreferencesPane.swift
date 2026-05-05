@@ -74,13 +74,18 @@ struct PreferencesPane: View {
       VStack(alignment: .leading, spacing: 2) {
         Text(domain.displayName)
           .font(.callout.weight(.semibold))
+          .lineLimit(1)
         Text(domain.bundleID)
           .font(.caption.monospaced())
           .foregroundStyle(.secondary)
+          .lineLimit(1)
+          .truncationMode(.middle)
         Text(accessLabel(for: domain))
           .font(.caption2)
           .foregroundStyle(.tertiary)
+          .fixedSize(horizontal: false, vertical: true)
       }
+      .layoutPriority(1)
       Spacer()
       VStack(alignment: .trailing, spacing: 3) {
         Text(layerLabel(for: domain))
@@ -89,6 +94,7 @@ struct PreferencesPane: View {
           .font(.caption)
           .foregroundStyle(.secondary)
       }
+      .layoutPriority(0)
     }
     .padding(.vertical, 5)
     .accessibilityElement(children: .combine)

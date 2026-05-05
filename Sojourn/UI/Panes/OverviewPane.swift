@@ -112,6 +112,7 @@ struct OverviewPane: View {
       Text(detail)
         .font(.callout)
         .foregroundStyle(.secondary)
+        .fixedSize(horizontal: false, vertical: true)
       Spacer()
     }
     .accessibilityElement(children: .combine)

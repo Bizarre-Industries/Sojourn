@@ -53,6 +53,9 @@ struct AdvisoriesPane: View {
       } label: {
         Label("Refresh Cache", systemImage: "arrow.clockwise")
       }
+      .accessibilityIdentifier("advisories.refresh")
+      .accessibilityLabel("Refresh advisory cache")
+      .accessibilityHint("Reloads the cached Homebrew vulnerability snapshot.")
     }
   }
 
@@ -74,28 +77,37 @@ struct AdvisoriesPane: View {
           .foregroundStyle(.tertiary)
           .lineLimit(2)
       }
+      .accessibilityElement(children: .combine)
+      .accessibilityLabel(
+        "\(advisory.id). \(advisory.summary). \(advisoryPackageSummary(advisory))."
+      )
       Spacer()
       VStack(alignment: .trailing, spacing: 4) {
-        Text(advisory.severity.rawValue.capitalized)
-          .font(.caption.weight(.semibold))
-          .foregroundStyle(color(for: advisory.severity))
-        Text(advisory.feed.rawValue.uppercased())
-          .font(.caption2.monospaced())
-          .foregroundStyle(.secondary)
-        Text(advisory.triggersBypass ? "Bypasses cooldown" : "Cooldown applies")
-          .font(.caption2)
-          .foregroundStyle(advisory.triggersBypass ? Color.orange : Color.secondary)
+        VStack(alignment: .trailing, spacing: 4) {
+          Text(advisory.severity.rawValue.capitalized)
+            .font(.caption.weight(.semibold))
+            .foregroundStyle(color(for: advisory.severity))
+          Text(advisory.feed.rawValue.uppercased())
+            .font(.caption2.monospaced())
+            .foregroundStyle(.secondary)
+          Text(advisory.triggersBypass ? "Bypasses cooldown" : "Cooldown applies")
+            .font(.caption2)
+            .foregroundStyle(advisory.triggersBypass ? Color.orange : Color.secondary)
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(
+          "\(advisory.severity.rawValue.capitalized). \(advisory.feed.rawValue.uppercased()). \(advisory.triggersBypass ? "Bypasses cooldown." : "Cooldown applies.")"
+        )
+
         if let url = advisory.referenceURL {
           Link("Reference", destination: url)
             .font(.caption2)
+            .accessibilityLabel("Open reference for \(advisory.id)")
         }
       }
     }
     .padding(.vertical, 5)
-    .accessibilityElement(children: .combine)
-    .accessibilityLabel(
-      "\(advisory.id). \(advisory.severity.rawValue.capitalized). \(advisory.feed.rawValue.uppercased()). \(advisory.summary). \(advisoryPackageSummary(advisory))."
-    )
+    .accessibilityElement(children: .contain)
   }
 
   private var cacheFooter: some View {

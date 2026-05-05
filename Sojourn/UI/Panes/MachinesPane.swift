@@ -24,6 +24,7 @@ struct MachinesPane: View {
           .font(.bzrBody(size: 13))
           .foregroundStyle(Color.txtSecondary)
           .frame(maxWidth: 64 * 9, alignment: .leading)
+          .fixedSize(horizontal: false, vertical: true)
 
         if machines.isEmpty {
           BzrCard(eyebrow: "FLEET") {
@@ -37,11 +38,7 @@ struct MachinesPane: View {
             }
           }
         } else {
-          let cols = [
-            GridItem(.flexible(minimum: 320), spacing: 12),
-            GridItem(.flexible(minimum: 320), spacing: 12),
-            GridItem(.flexible(minimum: 320), spacing: 12)
-          ]
+          let cols = [GridItem(.adaptive(minimum: 260), spacing: 12)]
           LazyVGrid(columns: cols, spacing: 12) {
             ForEach(machines) { m in
               machineCard(m)
@@ -66,6 +63,8 @@ struct MachinesPane: View {
             .font(.bzrStencil(size: 18, weight: .heavy))
             .tracking(1.6)
             .foregroundStyle(Color.txtPrimary)
+            .lineLimit(1)
+            .truncationMode(.middle)
           Spacer()
           if isThisMac {
             BzrBadge(text: "THIS MAC", kind: .lime)
@@ -100,6 +99,8 @@ struct MachinesPane: View {
         )
     )
     .clipShape(RoundedRectangle(cornerRadius: BzrRadius.card, style: .continuous))
+    .accessibilityElement(children: .ignore)
+    .accessibilityLabel(machineAccessibilityLabel(m))
   }
 
   @ViewBuilder
@@ -120,5 +121,10 @@ struct MachinesPane: View {
       }
       Spacer()
     }
+  }
+
+  private func machineAccessibilityLabel(_ machine: MachineMetadata) -> String {
+    let current = machine.hostname == MachineMetadata.currentHostname() ? "This Mac. " : ""
+    return "\(machine.hostname). \(current)First seen \(Self.relativeFormatter.localizedString(for: machine.firstSeenAt, relativeTo: Date())). Last seen \(Self.relativeFormatter.localizedString(for: machine.lastSeenAt, relativeTo: Date())). \(machine.overrides.count) overrides."
   }
 }

@@ -70,6 +70,8 @@ internal struct ContainersPane: View {
       }
       .disabled(rescanning)
       .accessibilityIdentifier("containers.rescan")
+      .accessibilityLabel(rescanning ? "Rescanning container runtimes" : "Rescan container runtimes")
+      .accessibilityHint("Rechecks installed container command-line tools without starting or stopping runtimes.")
     }
   }
 
@@ -82,6 +84,7 @@ internal struct ContainersPane: View {
         HStack(spacing: 8) {
           Text(status.runtime.displayName)
             .font(.callout.weight(.semibold))
+            .lineLimit(1)
           if status.runtime == store.containers.activeRuntime, status.installed {
             Label("Active", systemImage: "checkmark.circle.fill")
               .font(.caption)
@@ -91,10 +94,15 @@ internal struct ContainersPane: View {
         Text(detail(for: status))
           .font(.caption)
           .foregroundStyle(.secondary)
+          .lineLimit(2)
+          .fixedSize(horizontal: false, vertical: true)
         Text("Tool: \(status.runtime.toolName) \(status.runtime.versionArgs.joined(separator: " "))")
           .font(.caption2.monospaced())
           .foregroundStyle(.tertiary)
+          .lineLimit(1)
+          .truncationMode(.middle)
       }
+      .layoutPriority(1)
       Spacer()
       VStack(alignment: .trailing, spacing: 3) {
         Text(status.installed ? "Installed" : "Not installed")
@@ -104,6 +112,7 @@ internal struct ContainersPane: View {
           .font(.caption2)
           .foregroundStyle(status.installed ? Color.secondary : Color.gray)
       }
+      .layoutPriority(0)
     }
     .padding(.vertical, 5)
     .accessibilityElement(children: .combine)
@@ -111,15 +120,16 @@ internal struct ContainersPane: View {
   }
 
   private var footer: some View {
-    HStack {
+    VStack(alignment: .leading, spacing: 3) {
       Text("Last probed: \(formattedProbedAt)")
         .font(.caption)
         .foregroundStyle(.secondary)
-      Spacer()
       Text("Read-only detection. Sojourn does not start, stop, or install runtimes from this pane.")
         .font(.caption)
         .foregroundStyle(.tertiary)
+        .fixedSize(horizontal: false, vertical: true)
     }
+    .accessibilityElement(children: .combine)
   }
 
   private func detail(for status: RuntimeStatus) -> String {

@@ -54,6 +54,9 @@ struct GenerationsPane: View {
       } label: {
         Label("Refresh", systemImage: "arrow.clockwise")
       }
+      .accessibilityIdentifier("generations.refresh")
+      .accessibilityLabel("Refresh generations")
+      .accessibilityHint("Reloads retained generation manifests from Application Support.")
     }
   }
 
@@ -88,7 +91,8 @@ struct GenerationsPane: View {
       }
     }
     .padding(.vertical, 5)
-    .accessibilityElement(children: .combine)
+    .accessibilityElement(children: .ignore)
+    .accessibilityLabel(generationAccessibilityLabel(for: manifest))
   }
 
   private func generationMetadata(for manifest: GenerationManifest) -> String {
@@ -103,6 +107,16 @@ struct GenerationsPane: View {
       + counts.vscode + counts.go + counts.cargo + counts.uv
       + counts.krew + counts.npm + counts.flatpak
     return "\(total) entries · \(counts.brews) brews · \(counts.casks) casks · \(counts.mas) apps"
+  }
+
+  private func generationAccessibilityLabel(for manifest: GenerationManifest) -> String {
+    let commit = manifest.generation.chezmoiCommit
+      .map { "Chezmoi commit \(String($0.prefix(12)))." }
+      ?? "No chezmoi commit recorded."
+    let note = manifest.generation.note.isEmpty
+      ? "Tag \(manifest.generation.tag)."
+      : "Note \(manifest.generation.note). Tag \(manifest.generation.tag)."
+    return "Generation \(manifest.generation.number). \(note) \(commit) Archive \(Self.byteFormatter.string(fromByteCount: manifest.archiveSizeBytes)). SHA \(String(manifest.sha256.prefix(12))). \(brewfileCounts(for: manifest.generation.brewfileCounts))."
   }
 
   private static let byteFormatter: ByteCountFormatter = {

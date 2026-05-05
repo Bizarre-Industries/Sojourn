@@ -81,6 +81,34 @@ final class SojournUITests: XCTestCase {
     XCTAssertFalse(app.staticTexts["Outdated scan unavailable"].exists)
   }
 
+  func testToolbarLabelsAndPaneActionsExposeAccessibility() throws {
+    let app = XCUIApplication()
+    launchAgentApp(app)
+    XCTAssertTrue(app.windows.firstMatch.waitForExistence(timeout: 10))
+
+    XCTAssertEqual(toolbarButton(app, "toolbar.refresh").label, "Refresh")
+    XCTAssertEqual(toolbarButton(app, "toolbar.pull").label, "Pull and Apply")
+    XCTAssertEqual(toolbarButton(app, "toolbar.push").label, "Push After Scan")
+    XCTAssertFalse(toolbarButton(app, "toolbar.status").label.isEmpty)
+
+    let paneActions: [(sidebarID: String, actionID: String, label: String)] = [
+      ("sidebar.packages", "packages.refresh", "Refresh package inventory"),
+      ("sidebar.containers", "containers.rescan", "Rescan container runtimes"),
+      ("sidebar.generations", "generations.refresh", "Refresh generations"),
+      ("sidebar.macosFeatures", "macosFeatures.refresh", "Refresh macOS feature state"),
+      ("sidebar.advisories", "advisories.refresh", "Refresh advisory cache")
+    ]
+
+    for (sidebarID, actionID, label) in paneActions {
+      let row = sidebarEntry(app, sidebarID)
+      XCTAssertTrue(row.waitForExistence(timeout: 4), "Missing \(sidebarID)")
+      row.click()
+      let action = toolbarButton(app, actionID)
+      XCTAssertTrue(action.waitForExistence(timeout: 4), "Missing \(actionID)")
+      XCTAssertEqual(action.label, label, "Unexpected label for \(actionID)")
+    }
+  }
+
   private func launchAgentApp(_ app: XCUIApplication) {
     app.launch()
 
@@ -114,6 +142,8 @@ final class SojournUITests: XCTestCase {
   private func toolbarButton(_ app: XCUIApplication, _ identifier: String) -> XCUIElement {
     let button = app.buttons[identifier]
     if button.exists { return button }
+    let staticText = app.staticTexts[identifier]
+    if staticText.exists { return staticText }
     return app.otherElements[identifier]
   }
 }

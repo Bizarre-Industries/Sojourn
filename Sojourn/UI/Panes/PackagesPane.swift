@@ -127,6 +127,8 @@ struct PackagesPane: View {
       }
       .disabled(refreshingBrewfile)
       .accessibilityIdentifier("packages.refresh")
+      .accessibilityLabel("Refresh package inventory")
+      .accessibilityHint("Reloads Brewfile package entries.")
     }
   }
 

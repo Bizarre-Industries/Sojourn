@@ -19,6 +19,9 @@ All notable changes to Sojourn. Follows
   scanning, pull-apply review gates, MAS helper Team-ID and executable
   trust checks, Homebrew installer signer pinning, and SIGKILL
   escalation for cancelled subprocesses.
+- v0.4 stage 4 UI polish and accessibility: refresh-action VoiceOver
+  labels, safer minimum-window text wrapping, native machine rows, and
+  expanded UI smoke assertions for pane actions.
 
 ### Planned (post-v0.3.0)
 

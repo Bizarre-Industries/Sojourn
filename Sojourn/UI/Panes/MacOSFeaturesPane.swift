@@ -43,6 +43,9 @@ struct MacOSFeaturesPane: View {
       } label: {
         Label("Refresh", systemImage: "arrow.clockwise")
       }
+      .accessibilityIdentifier("macosFeatures.refresh")
+      .accessibilityLabel("Refresh macOS feature state")
+      .accessibilityHint("Reloads the read-only system preference snapshot.")
     }
   }
 
@@ -64,6 +67,7 @@ struct MacOSFeaturesPane: View {
         .font(.callout)
         .foregroundStyle(row.value == "Unknown" ? .secondary : .primary)
         .lineLimit(1)
+        .truncationMode(.middle)
     }
     .padding(.vertical, 5)
     .accessibilityElement(children: .combine)

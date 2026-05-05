@@ -34,16 +34,22 @@ struct MenuBarRootView: View {
             .font(.bzrMono(size: 10, weight: .semibold))
             .tracking(1.4)
             .foregroundStyle(Color.bzrLimeText)
+            .lineLimit(1)
+            .truncationMode(.middle)
           Text("-")
             .font(.bzrMono(size: 10))
             .foregroundStyle(Color.txtTertiary)
           Text(syncRelative)
             .font(.bzrMono(size: 10))
             .foregroundStyle(Color.txtTertiary)
+            .lineLimit(1)
+            .truncationMode(.tail)
         }
         Text(syncStatus.label)
           .font(.bzrBody(size: 11))
           .foregroundStyle(Color.txtSecondary)
+          .lineLimit(2)
+          .fixedSize(horizontal: false, vertical: true)
       }
       .padding(.horizontal, 14)
       .padding(.vertical, 10)
@@ -116,7 +122,9 @@ struct MenuBarRootView: View {
         .padding(.vertical, 8)
       }
     }
-    .frame(width: 300, alignment: .leading)
+    .frame(minWidth: 300, idealWidth: 340, alignment: .leading)
+    .accessibilityElement(children: .contain)
+    .accessibilityLabel("Sojourn menu. \(machineName), \(syncRelative). \(syncStatus.accessibilityLabel).")
     .confirmationDialog(
       pendingSyncAction?.confirmationTitle ?? "Confirm sync",
       isPresented: confirmationPresented,

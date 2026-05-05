@@ -29,6 +29,9 @@ All notable changes to Sojourn. Follows
   upload, corrected Sparkle fallback assumptions, refreshed
   Sparkle/cask runbook checks, and v0.4 install-source detection
   coverage.
+- v0.4 release acceptance: build 35, signed UI smoke accessibility
+  markers for package/container panes, and removal of visible legacy
+  MPM bootstrap copy.
 
 ### Planned (post-v0.3.0)
 

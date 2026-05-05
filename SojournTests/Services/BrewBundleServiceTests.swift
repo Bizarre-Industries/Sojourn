@@ -163,4 +163,15 @@ struct PackageInventoryRowTests {
     #expect(PackageInventoryRow.rows(from: ast, managerID: "cask").map(\.packageID) == ["iterm2"])
     #expect(PackageInventoryRow.rows(from: ast, managerID: "mas").map(\.packageID) == ["Xcode"])
   }
+
+  @Test func flatpakEntriesStayParsedButHiddenFromMacOSInventoryUI() {
+    let ast = BrewfileAST(entries: [
+      .brew("ripgrep"),
+      .flatpak("org.example.NotForMac")
+    ])
+
+    #expect(ast.counts.flatpak == 1)
+    #expect(PackageInventoryRow.rows(from: ast).map(\.managerID) == ["brew"])
+    #expect(PackageInventoryRow.rows(from: ast, managerID: "flatpak").isEmpty)
+  }
 }

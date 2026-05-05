@@ -41,7 +41,7 @@ struct OverviewPane: View {
   private var metrics: some View {
     Grid(alignment: .leading, horizontalSpacing: 12, verticalSpacing: 12) {
       GridRow {
-        metric("Packages", "\(store.brewfile?.packageCount ?? 0)", "Brewfile entries")
+        metric("Packages", "\(visiblePackageCount)", "Brewfile entries")
         metric(
           "Containers", "\(store.containers.runtimes.filter(\.installed).count)", containerSubtitle)
       }
@@ -211,6 +211,10 @@ struct OverviewPane: View {
 
   private var recentJobs: [Job] {
     Array(store.jobRunner.jobs.suffix(5).reversed())
+  }
+
+  private var visiblePackageCount: Int {
+    PackageInventoryRow.rows(from: store.brewfile).count
   }
 
   private func recentHistory(limit: Int) -> [HistoryEntry] {

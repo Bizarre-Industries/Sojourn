@@ -37,6 +37,7 @@ struct GenerationsPane: View {
     }
     .padding(24)
     .background(Color(nsColor: .windowBackgroundColor))
+    .accessibilityElement(children: .contain)
     .accessibilityIdentifier("pane.generations")
     .task {
       await store.refreshGenerations()
@@ -56,7 +57,9 @@ struct GenerationsPane: View {
         Task { await store.refreshGenerations() }
       } label: {
         Label("Refresh", systemImage: "arrow.clockwise")
+          .accessibilityIdentifier("generations.refresh")
       }
+      .accessibilityElement(children: .combine)
       .accessibilityIdentifier("generations.refresh")
       .accessibilityLabel("Refresh generations")
       .accessibilityHint("Reloads retained generation manifests from Application Support.")
@@ -114,7 +117,7 @@ struct GenerationsPane: View {
     let total =
       counts.taps + counts.brews + counts.casks + counts.mas
       + counts.vscode + counts.go + counts.cargo + counts.uv
-      + counts.krew + counts.npm + counts.flatpak
+      + counts.krew + counts.npm
     return "\(total) entries · \(counts.brews) brews · \(counts.casks) casks · \(counts.mas) apps"
   }
 

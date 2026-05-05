@@ -91,6 +91,7 @@ internal struct MainWindowView: View {
         Image(systemName: pane.icon)
       }
       .tag(pane)
+      .accessibilityElement(children: .combine)
       .accessibilityIdentifier("sidebar.\(pane.rawValue)")
       .accessibilityLabel(sidebarAccessibilityLabel(for: pane))
     }

@@ -145,7 +145,7 @@ struct OnboardPane: View {
     case .awaitingUserConsent:    return "Awaiting consent — open the bootstrap sheet to continue."
     case .installingCLT:          return "Installing — Xcode Command Line Tools."
     case .installingBrew:         return "Installing — Homebrew (signed .pkg)."
-    case .installingMPM:          return "Installing — meta-package-manager (legacy)."
+    case .installingMPM:          return "Installing — Homebrew bundle support."
     case .installingChezmoi:      return "Installing — chezmoi via brew."
     case .installingMas:          return "Installing — mas via brew."
     case .ready:                  return "Ready — all required tools detected."

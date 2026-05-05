@@ -149,18 +149,8 @@ internal struct PackageInventoryRow: Identifiable, Hashable, Sendable {
         source: "npm",
         symbol: "curlybraces"
       )
-    case .flatpak(let name):
-      self.init(
-        index: index,
-        managerID: "flatpak",
-        kindLabel: "Flatpak",
-        packageID: name,
-        detail: "Application",
-        tier: .e,
-        promptLabel: "Required before apply",
-        source: "flatpak",
-        symbol: "shippingbox.circle"
-      )
+    case .flatpak:
+      return nil
     case .comment, .blank:
       return nil
     }

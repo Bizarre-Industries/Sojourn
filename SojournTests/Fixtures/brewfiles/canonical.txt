@@ -1,5 +1,5 @@
 # Sojourn — canonical Brewfile fixture
-# Covers all 11 brew bundle ecosystems documented in ADR-0018.
+# Covers the macOS-supported brew bundle ecosystems surfaced in Sojourn.
 
 tap "homebrew/cask"
 tap "shivammathur/php"

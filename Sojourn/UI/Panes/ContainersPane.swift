@@ -12,39 +12,56 @@ internal struct ContainersPane: View {
   }
 
   internal var body: some View {
-    VStack(alignment: .leading, spacing: 16) {
-      header
+    ScrollView {
+      VStack(alignment: .leading, spacing: 16) {
+        header
 
-      if store.containers.runtimes.isEmpty {
-        ProgressView("Probing runtimes...")
-          .frame(maxWidth: .infinity, maxHeight: .infinity)
-      } else if !store.containers.anyInstalled {
-        ContentUnavailableView {
-          Label("No container runtime installed", systemImage: "cube.box")
-        } description: {
-          Text(
-            "Open Packages and add Docker, OrbStack, Apple container, Lima, or Colima to your Brewfile before installing."
+        if !hasProbed {
+          ProgressView("Probing runtimes...")
+            .frame(maxWidth: .infinity, minHeight: 280)
+        } else if store.containers.runtimes.isEmpty {
+          ContentUnavailableView(
+            "No runtime probe results",
+            systemImage: "cube.box",
+            description: Text("Refresh to re-run read-only container runtime detection.")
           )
-        } actions: {
-          Button("Open Packages") {
-            onOpenPackages?()
+          .frame(maxWidth: .infinity, minHeight: 280)
+        } else if !store.containers.anyInstalled {
+          ContentUnavailableView {
+            Label("No container runtime installed", systemImage: "cube.box")
+          } description: {
+            Text(
+              "Open Packages and add Docker, OrbStack, Apple container, Lima, or Colima to your Brewfile before installing."
+            )
+          } actions: {
+            Button("Open Packages") {
+              onOpenPackages?()
+            }
+            .disabled(onOpenPackages == nil)
           }
-          .disabled(onOpenPackages == nil)
+          .frame(maxWidth: .infinity, minHeight: 280)
+        } else {
+          VStack(spacing: 0) {
+            ForEach(store.containers.runtimes) { runtime in
+              runtimeRow(runtime)
+              if runtime.id != store.containers.runtimes.last?.id {
+                Divider()
+              }
+            }
+          }
+          .padding(.horizontal, 12)
+          .padding(.vertical, 8)
+          .background(Color(nsColor: .controlBackgroundColor), in: RoundedRectangle(cornerRadius: 8))
+          .accessibilityElement(children: .contain)
+          .accessibilityLabel("Container runtimes")
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-      } else {
-        List(store.containers.runtimes) { runtime in
-          runtimeRow(runtime)
-        }
-        .listStyle(.inset)
-        .scrollContentBackground(.hidden)
-        .background(Color(nsColor: .windowBackgroundColor))
-      }
 
-      Divider()
-      footer
+        Divider()
+        footer
+      }
+      .padding(24)
+      .frame(maxWidth: 860, alignment: .leading)
     }
-    .padding(24)
     .background(Color(nsColor: .windowBackgroundColor))
     .accessibilityIdentifier("pane.containers")
     .task {
@@ -70,6 +87,7 @@ internal struct ContainersPane: View {
       } label: {
         Label(rescanning ? "Rescanning" : "Rescan", systemImage: "arrow.clockwise")
       }
+      .accessibilityElement(children: .combine)
       .disabled(rescanning)
       .accessibilityIdentifier("containers.rescan")
       .accessibilityLabel(
@@ -139,6 +157,7 @@ internal struct ContainersPane: View {
         .fixedSize(horizontal: false, vertical: true)
     }
     .accessibilityElement(children: .combine)
+    .accessibilityIdentifier("containers.probed-at")
   }
 
   private func detail(for status: RuntimeStatus) -> String {
@@ -178,5 +197,9 @@ internal struct ContainersPane: View {
     let formatter = RelativeDateTimeFormatter()
     formatter.unitsStyle = .abbreviated
     return formatter.localizedString(for: probedAt, relativeTo: Date())
+  }
+
+  private var hasProbed: Bool {
+    store.containers.probedAt != .distantPast
   }
 }

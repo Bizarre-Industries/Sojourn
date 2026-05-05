@@ -142,6 +142,7 @@ struct PackagesPane: View {
       HStack {
         Text("Inventory")
           .font(.headline)
+          .accessibilityIdentifier("packages.inventory")
         Spacer()
         Text("\(rows.count) rows")
           .font(.caption)
@@ -174,6 +175,7 @@ struct PackagesPane: View {
         .frame(minHeight: 220)
       }
     }
+    .accessibilityElement(children: .contain)
     .accessibilityIdentifier("packages.inventory")
   }
 

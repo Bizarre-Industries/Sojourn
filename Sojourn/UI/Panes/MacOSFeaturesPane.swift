@@ -23,6 +23,7 @@ struct MacOSFeaturesPane: View {
     }
     .padding(24)
     .background(Color(nsColor: .windowBackgroundColor))
+    .accessibilityElement(children: .contain)
     .accessibilityIdentifier("pane.macos-features")
     .task {
       await store.refreshMacOSFeatureSnapshot()
@@ -42,7 +43,9 @@ struct MacOSFeaturesPane: View {
         Task { await store.refreshMacOSFeatureSnapshot(force: true) }
       } label: {
         Label("Refresh", systemImage: "arrow.clockwise")
+          .accessibilityIdentifier("macosFeatures.refresh")
       }
+      .accessibilityElement(children: .combine)
       .accessibilityIdentifier("macosFeatures.refresh")
       .accessibilityLabel("Refresh macOS feature state")
       .accessibilityHint("Reloads the read-only system preference snapshot.")

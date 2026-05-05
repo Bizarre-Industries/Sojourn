@@ -30,6 +30,7 @@ struct AdvisoriesPane: View {
     }
     .padding(24)
     .background(Color(nsColor: .windowBackgroundColor))
+    .accessibilityElement(children: .contain)
     .accessibilityIdentifier("pane.advisories")
     .task {
       await store.refreshAdvisorySnapshot()
@@ -52,7 +53,9 @@ struct AdvisoriesPane: View {
         Task { await store.refreshAdvisorySnapshot(force: true) }
       } label: {
         Label("Refresh Cache", systemImage: "arrow.clockwise")
+          .accessibilityIdentifier("advisories.refresh")
       }
+      .accessibilityElement(children: .combine)
       .accessibilityIdentifier("advisories.refresh")
       .accessibilityLabel("Refresh advisory cache")
       .accessibilityHint("Reloads the cached Homebrew vulnerability snapshot.")

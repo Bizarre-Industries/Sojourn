@@ -173,16 +173,6 @@ internal struct PackageManagerSummary: Identifiable, Hashable {
         promptLabel: "Required before apply",
         source: "kubectl krew",
         description: "kubectl plugin manager entries."
-      ),
-      .init(
-        id: "flatpak",
-        name: "Flatpak",
-        symbol: "shippingbox.circle",
-        count: counts.flatpak,
-        tier: .e,
-        promptLabel: "Required before apply",
-        source: "flatpak",
-        description: "Flatpak application entries from the Brewfile."
       )
     ]
   }

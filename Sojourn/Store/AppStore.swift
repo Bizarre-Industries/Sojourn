@@ -98,6 +98,9 @@ internal final class AppStore {
   /// ADR-0024. Refreshed by `refreshMasHelperStatus()` (called by
   /// PackagesPane on appear / Register / Revoke gestures).
   internal var masHelperStatus: MasHelperStatus = .notRegistered
+
+  /// Last-observed SMAppService.mainApp Login Item status. Refreshed by
+  /// Settings on appear and after launch-at-login toggle gestures.
   internal var loginItemStatus: LoginItemStatus = .notRegistered
   internal var loginItemMessage: String?
 

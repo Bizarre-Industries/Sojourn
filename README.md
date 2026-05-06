@@ -11,9 +11,9 @@ Think "what nix-darwin would be if it didn't make you learn Nix."
 
 ## Status
 
-**v0.5 is in active development.** v0.3.0 shipped as a notarized DMG on
-2026-05-04; v0.4 completed the native UI reset and release-hardening pass. The
-active execution plan is
+**v0.5 is implemented on `main` pending release-artifact verification.**
+v0.3.0 shipped as a notarized DMG on 2026-05-04; v0.4 completed the native UI
+reset and release-hardening pass. The latest verified execution plan is
 [docs/process/plans/v0.5-plan.md](docs/process/plans/v0.5-plan.md).
 
 ## Current direction

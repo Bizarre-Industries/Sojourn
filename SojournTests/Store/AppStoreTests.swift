@@ -1,6 +1,7 @@
 import Foundation
-@testable import Sojourn
 import Testing
+
+@testable import Sojourn
 
 @MainActor
 struct AppStoreTests {
@@ -51,8 +52,9 @@ struct AppStoreTests {
 
     #expect(store.advisorySnapshot.advisories.isEmpty)
     #expect(store.advisorySnapshot.freshness == .unavailable)
-    #expect(store.advisoryMessage ==
-      "No cached advisory snapshot. Run an advisory scan after Homebrew vulnerability data is configured, then refresh this pane."
+    #expect(
+      store.advisoryMessage
+        == "No cached advisory snapshot. Run an advisory scan after Homebrew vulnerability data is configured, then refresh this pane."
     )
     await deletions.close()
   }
@@ -109,18 +111,45 @@ struct AppStoreTests {
     async let second: Void = store.refreshContainers(forceRescan: false)
     _ = await (first, second)
 
-#if DEBUG
+    #if DEBUG
     #expect(store.debugContainersRefreshStarts == 1)
-#endif
-    #expect(store.jobRunner.jobs.allSatisfy { job in
-      job.label != "Refresh Containers" && job.label != "Rescan Containers"
-    })
+    #endif
+    #expect(
+      store.jobRunner.jobs.allSatisfy { job in
+        job.label != "Refresh Containers" && job.label != "Rescan Containers"
+      })
+    await deletions.close()
+  }
+
+  @Test func loginItemToggleRegistersAndRefreshesStatus() async throws {
+    let tmp = FileManager.default.temporaryDirectory
+      .appendingPathComponent("sojourn-store-\(UUID().uuidString)", isDirectory: true)
+    defer { try? FileManager.default.removeItem(at: tmp) }
+
+    let fakeLoginItem = FakeLoginItemService()
+    let (store, deletions) = try makeStore(
+      paths: AppSupportPaths(overrideRoot: tmp),
+      loginItemService: fakeLoginItem
+    )
+
+    await store.refreshLoginItemStatus()
+    #expect(store.loginItemStatus == .notRegistered)
+
+    await store.setLoginItemEnabled(true)
+    #expect(store.loginItemStatus == .enabled)
+    #expect(
+      store.loginItemMessage == "Sojourn will open at login after macOS approval, if required.")
+
+    await store.setLoginItemEnabled(false)
+    #expect(store.loginItemStatus == .notRegistered)
+    #expect(store.loginItemMessage == "Sojourn will no longer open at login.")
     await deletions.close()
   }
 
   private func makeStore(
     paths: AppSupportPaths,
-    brewURL: URL = URL(fileURLWithPath: "/usr/bin/false")
+    brewURL: URL = URL(fileURLWithPath: "/usr/bin/false"),
+    loginItemService: any LoginItemServicing = FakeLoginItemService()
   ) throws -> (AppStore, DeletionsDB) {
     let runner = SubprocessRunner()
     let settings = try SettingsStore(paths: paths)
@@ -141,7 +170,8 @@ struct AppStoreTests {
       brewURL: brewURL,
       git: nil,
       chezmoi: nil,
-      secrets: nil
+      secrets: nil,
+      loginItemService: loginItemService
     )
     return (store, deletions)
   }
@@ -149,15 +179,38 @@ struct AppStoreTests {
   private func makeFakeBrewScript(in root: URL) throws -> URL {
     let script = root.appendingPathComponent("fake-brew")
     let body = """
-    #!/bin/sh
-    sleep 0.2
-    printf 'brew "ripgrep"\\n'
-    """
+      #!/bin/sh
+      sleep 0.2
+      printf 'brew "ripgrep"\\n'
+      """
     try body.write(to: script, atomically: true, encoding: .utf8)
     try FileManager.default.setAttributes(
       [.posixPermissions: 0o755],
       ofItemAtPath: script.path
     )
     return script
+  }
+}
+
+private actor FakeLoginItemService: LoginItemServicing {
+  private var currentStatus: LoginItemStatus
+  private let registerError: Error?
+
+  init(status: LoginItemStatus = .notRegistered, registerError: Error? = nil) {
+    self.currentStatus = status
+    self.registerError = registerError
+  }
+
+  func register() async throws {
+    if let registerError { throw registerError }
+    currentStatus = .enabled
+  }
+
+  func unregister() async throws {
+    currentStatus = .notRegistered
+  }
+
+  func status() async -> LoginItemStatus {
+    currentStatus
   }
 }

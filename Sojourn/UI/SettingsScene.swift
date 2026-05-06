@@ -30,6 +30,17 @@ struct GeneralSettingsTab: View {
     Form {
       Toggle("Dry-run destructive operations by default", isOn: dryRunBinding)
         .accessibilityIdentifier("settings.dryRun")
+      Toggle("Open Sojourn at login", isOn: loginItemBinding)
+        .accessibilityIdentifier("settings.openAtLogin")
+      VStack(alignment: .leading, spacing: 4) {
+        Text("Login item: \(store.loginItemStatus.label)")
+          .font(.caption)
+          .foregroundStyle(.secondary)
+        Text(store.loginItemMessage ?? store.loginItemStatus.detail)
+          .font(.caption)
+          .foregroundStyle(.secondary)
+      }
+      .accessibilityIdentifier("settings.loginItemStatus")
       Picker("Install source", selection: installSourceBinding) {
         Text(InstallSource.unknown.label).tag(InstallSource.unknown)
         Text(InstallSource.dmg.label).tag(InstallSource.dmg)
@@ -45,6 +56,7 @@ struct GeneralSettingsTab: View {
       .font(.caption)
       .foregroundStyle(.secondary)
     }
+    .task { await store.refreshLoginItemStatus() }
   }
 
   private var dryRunBinding: Binding<Bool> {
@@ -57,6 +69,15 @@ struct GeneralSettingsTab: View {
           try? await store.settingsStore.replace(snap)
           await store.reloadFromDisk()
         }
+      }
+    )
+  }
+
+  private var loginItemBinding: Binding<Bool> {
+    Binding(
+      get: { store.loginItemStatus.isEnabledForToggle },
+      set: { newValue in
+        Task { await store.setLoginItemEnabled(newValue) }
       }
     )
   }

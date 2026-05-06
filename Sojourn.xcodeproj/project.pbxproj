@@ -54,6 +54,7 @@
 		508C867592BF7AA7D2D54400 /* SubprocessRunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D717FBA5804F28F8892BC95F /* SubprocessRunnerTests.swift */; };
 		51FFB7477224BF2F58CFB77E /* CleanupPane.swift in Sources */ = {isa = PBXBuildFile; fileRef = 917C3CA7A3B22318CCEC81F1 /* CleanupPane.swift */; };
 		527CE4A5051F3BDD51B486E4 /* DotfilesPane.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4C7A81F96BAD6A1DB0EAA0 /* DotfilesPane.swift */; };
+		52BD1A31FC42E26C24865D6E /* LoginItemService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BCDABDC47424FF9098D041F /* LoginItemService.swift */; };
 		52EDC71EEB3F6B1019200816 /* LogBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75102F527B8749FB644C0444 /* LogBuffer.swift */; };
 		54BFA029AD66E7C96A082952 /* SparkleService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42E2ABBD80A9964361A8688C /* SparkleService.swift */; };
 		5637BD907CE29C5CEA91B8EB /* OnboardPane.swift in Sources */ = {isa = PBXBuildFile; fileRef = 382E9466BCD14C7A5C4CA0A7 /* OnboardPane.swift */; };
@@ -210,6 +211,7 @@
 		3A05293DDD6F76E28F023833 /* Redactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Redactor.swift; sourceTree = "<group>"; };
 		3A0B5A8BB60D9FFFA8948472 /* data */ = {isa = PBXFileReference; lastKnownFileType = folder; name = data; path = Sojourn/Resources/data; sourceTree = SOURCE_ROOT; };
 		3A7DAB9C286D5AEF17AC0A36 /* MenuBarRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarRootView.swift; sourceTree = "<group>"; };
+		3BCDABDC47424FF9098D041F /* LoginItemService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginItemService.swift; sourceTree = "<group>"; };
 		3BF1AACCC465682DC48834DF /* MasHelper */ = {isa = PBXFileReference; includeInIndex = 0; path = MasHelper; sourceTree = BUILT_PRODUCTS_DIR; };
 		3D1CE3F585241A7C3832E1FC /* ManagerSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagerSnapshot.swift; sourceTree = "<group>"; };
 		3E2C81F1F7CEDB139F93278C /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
@@ -585,6 +587,7 @@
 				51654B4F53BDA5905226D68E /* GitService.swift */,
 				F4207776C9EC0D4B31D82E91 /* JobRunner.swift */,
 				75102F527B8749FB644C0444 /* LogBuffer.swift */,
+				3BCDABDC47424FF9098D041F /* LoginItemService.swift */,
 				BF0F7E5B022F32A9CF6BF028 /* MacOSFeaturesService.swift */,
 				281D14573DB2FA7953B5A7BD /* MasExecutableValidator.swift */,
 				AC16F379586B175695E71BF2 /* MasHelperClient.swift */,
@@ -910,7 +913,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Re-sign gitleaks and age with hardened runtime\n# See docs/ARCHITECTURE.md §11 (bundled binaries)\nif [ -f \"${SRCROOT}/scripts/sign.sh\" ]; then\n  \"${SRCROOT}/scripts/sign.sh\" \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/Contents/Resources/bin\"\nfi\n";
+			shellScript = "# Re-sign gitleaks and age with hardened runtime\n# See docs/reference/architecture.md (bundled binaries)\nif [ -f \"${SRCROOT}/scripts/sign.sh\" ]; then\n  \"${SRCROOT}/scripts/sign.sh\" \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/Contents/Resources/bin\"\nfi\n";
 		};
 		B13F7BEE7DDF897669AC04AE /* Embed MasHelper binary + launchd plist */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1007,6 +1010,7 @@
 				2A8DAE1EF876120D899253E7 /* LiquidGlass.swift in Sources */,
 				52EDC71EEB3F6B1019200816 /* LogBuffer.swift in Sources */,
 				A89F889B6885C77574D1A9DB /* LogExporter.swift in Sources */,
+				52BD1A31FC42E26C24865D6E /* LoginItemService.swift in Sources */,
 				BACB75269B81A8C0DAF85490 /* MacOSFeaturesPane.swift in Sources */,
 				191866534A9570E447AEA969 /* MacOSFeaturesService.swift in Sources */,
 				C44DB6B79B4C736DEC87106E /* MachineMetadata.swift in Sources */,
@@ -1217,7 +1221,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Sojourn/SojournDebug.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 35;
+				CURRENT_PROJECT_VERSION = 36;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Sojourn/Info.plist;
@@ -1225,7 +1229,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.4.0;
+				MARKETING_VERSION = 0.5.0;
 				PRODUCT_BUNDLE_IDENTIFIER = app.bizarre.sojourn;
 				PRODUCT_NAME = Sojourn;
 				SDKROOT = macosx;
@@ -1258,7 +1262,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Sojourn/Sojourn.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 35;
+				CURRENT_PROJECT_VERSION = 36;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Sojourn/Info.plist;
@@ -1266,7 +1270,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.4.0;
+				MARKETING_VERSION = 0.5.0;
 				PRODUCT_BUNDLE_IDENTIFIER = app.bizarre.sojourn;
 				PRODUCT_NAME = Sojourn;
 				SDKROOT = macosx;
@@ -1281,7 +1285,7 @@
 				CODE_SIGN_ENTITLEMENTS = MasHelper/MasHelper.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
 				CREATE_INFOPLIST_SECTION_IN_BINARY = YES;
-				CURRENT_PROJECT_VERSION = 35;
+				CURRENT_PROJECT_VERSION = 36;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = MasHelper/Info.plist;
@@ -1289,7 +1293,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.4.0;
+				MARKETING_VERSION = 0.5.0;
 				PRODUCT_BUNDLE_IDENTIFIER = industries.bizarre.Sojourn.helper;
 				PRODUCT_NAME = industries.bizarre.Sojourn.helper;
 				SDKROOT = macosx;
@@ -1342,7 +1346,7 @@
 				CODE_SIGN_ENTITLEMENTS = MasHelper/MasHelper.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
 				CREATE_INFOPLIST_SECTION_IN_BINARY = YES;
-				CURRENT_PROJECT_VERSION = 35;
+				CURRENT_PROJECT_VERSION = 36;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = MasHelper/Info.plist;
@@ -1350,7 +1354,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.4.0;
+				MARKETING_VERSION = 0.5.0;
 				PRODUCT_BUNDLE_IDENTIFIER = industries.bizarre.Sojourn.helper;
 				PRODUCT_NAME = industries.bizarre.Sojourn.helper;
 				SDKROOT = macosx;

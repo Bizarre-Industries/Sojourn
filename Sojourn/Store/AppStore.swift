@@ -56,6 +56,7 @@ internal final class AppStore {
   internal let masService: MasService
   internal let sparkleService: SparkleService
   internal let backgroundActivity: BackgroundActivity
+  internal let loginItemService: any LoginItemServicing
 
   internal let historyDB: HistoryDB?
   internal let bootstrapCoordinator: BootstrapCoordinator
@@ -97,16 +98,20 @@ internal final class AppStore {
   /// ADR-0024. Refreshed by `refreshMasHelperStatus()` (called by
   /// PackagesPane on appear / Register / Revoke gestures).
   internal var masHelperStatus: MasHelperStatus = .notRegistered
+  internal var loginItemStatus: LoginItemStatus = .notRegistered
+  internal var loginItemMessage: String?
 
   @ObservationIgnored private var brewfileRefreshTask: Task<BrewfileAST?, Never>?
   @ObservationIgnored private var containersRefreshTask: Task<ContainersSnapshot, Never>?
   @ObservationIgnored private var generationsRefreshTask: Task<GenerationRefreshResult, Never>?
-  @ObservationIgnored private var macOSFeatureRefreshTask: Task<(Bool, [MacOSFeatureStatusRow]), Never>?
+  @ObservationIgnored private var macOSFeatureRefreshTask:
+    Task<(Bool, [MacOSFeatureStatusRow]), Never>?
   @ObservationIgnored private var advisoryRefreshTask: Task<AdvisorySnapshot, Never>?
-  @ObservationIgnored private var preferenceDomainsRefreshTask: Task<[PreferenceDomainEntry], Never>?
-#if DEBUG
+  @ObservationIgnored private var preferenceDomainsRefreshTask:
+    Task<[PreferenceDomainEntry], Never>?
+  #if DEBUG
   @ObservationIgnored internal private(set) var debugContainersRefreshStarts = 0
-#endif
+  #endif
 
   internal init(
     paths: AppSupportPaths,
@@ -117,7 +122,8 @@ internal final class AppStore {
     brewURL: URL = URL(fileURLWithPath: "/opt/homebrew/bin/brew"),
     git: GitService?,
     chezmoi: ChezmoiService?,
-    secrets: SecretScanService?
+    secrets: SecretScanService?,
+    loginItemService: any LoginItemServicing = LoginItemService()
   ) {
     let runner = SubprocessRunner()
     self.runner = runner
@@ -152,6 +158,7 @@ internal final class AppStore {
     self.masService = MasService()
     self.sparkleService = SparkleService()
     self.backgroundActivity = BackgroundActivity()
+    self.loginItemService = loginItemService
     self.historyDB = historyDB
     self.bootstrapCoordinator = BootstrapCoordinator(
       probe: ToolProbe(locator: toolLocator),
@@ -171,7 +178,8 @@ internal final class AppStore {
 
     let runner = SubprocessRunner()
     let locator = ToolLocator()
-    let brewURL = (await locator.locate("brew"))?.url
+    let brewURL =
+      (await locator.locate("brew"))?.url
       ?? URL(fileURLWithPath: "/opt/homebrew/bin/brew")
     let sourceRoot = paths.config.appendingPathComponent("sojourn-data", isDirectory: true)
     let brewBundle = BrewBundleService(
@@ -313,13 +321,15 @@ internal final class AppStore {
     }
 
     let task = Task { [brewBundle, brewURL, jobRunner] in
-      try? await jobRunner.track(JobRequest(
-        label: "Refresh Brewfile",
-        tool: brewURL,
-        args: ["bundle", "dump", "--file=-", "--all"],
-        timeout: 120,
-        kind: .advisory
-      )) {
+      try? await jobRunner.track(
+        JobRequest(
+          label: "Refresh Brewfile",
+          tool: brewURL,
+          args: ["bundle", "dump", "--file=-", "--all"],
+          timeout: 120,
+          kind: .advisory
+        )
+      ) {
         try await brewBundle.dump()
       }
     }
@@ -351,9 +361,9 @@ internal final class AppStore {
       return
     }
 
-#if DEBUG
+    #if DEBUG
     debugContainersRefreshStarts += 1
-#endif
+    #endif
     let task = Task { [containersService] in
       if forceRescan {
         return await containersService.rescan()
@@ -442,8 +452,12 @@ internal final class AppStore {
 
   private func applyAdvisoryMessage(force: Bool) {
     if force {
-      self.advisoryMessage = advisorySnapshot.advisories.isEmpty
-        ? String(localized: "No cached advisory snapshot. Run an advisory scan after Homebrew vulnerability data is configured, then refresh this pane.")
+      self.advisoryMessage =
+        advisorySnapshot.advisories.isEmpty
+        ? String(
+          localized:
+            "No cached advisory snapshot. Run an advisory scan after Homebrew vulnerability data is configured, then refresh this pane."
+        )
         : String(localized: "Reloaded cached advisory snapshot.")
     }
   }
@@ -481,46 +495,51 @@ internal final class AppStore {
       rows.append(await finderFeatureRow(key, macOSFeatures: macOSFeatures))
     }
 
-    rows.append(await stringFeatureRow(
-      id: "keyboard-initial-repeat",
-      title: "Initial key repeat",
-      domain: "NSGlobalDomain",
-      key: "InitialKeyRepeat",
-      symbol: "keyboard",
-      macOSFeatures: macOSFeatures
-    ))
-    rows.append(await stringFeatureRow(
-      id: "keyboard-repeat-rate",
-      title: "Key repeat",
-      domain: "NSGlobalDomain",
-      key: "KeyRepeat",
-      symbol: "keyboard",
-      macOSFeatures: macOSFeatures
-    ))
-    rows.append(await stringFeatureRow(
-      id: "screencapture-location",
-      title: "Screenshot location",
-      domain: "com.apple.screencapture",
-      key: "location",
-      symbol: "camera.viewfinder",
-      macOSFeatures: macOSFeatures
-    ))
-    rows.append(await stringFeatureRow(
-      id: "screencapture-type",
-      title: "Screenshot type",
-      domain: "com.apple.screencapture",
-      key: "type",
-      symbol: "photo",
-      macOSFeatures: macOSFeatures
-    ))
-    rows.append(await stringFeatureRow(
-      id: "login-window-text",
-      title: "Login window text",
-      domain: "/Library/Preferences/com.apple.loginwindow",
-      key: "LoginwindowText",
-      symbol: "rectangle.and.pencil.and.ellipsis",
-      macOSFeatures: macOSFeatures
-    ))
+    rows.append(
+      await stringFeatureRow(
+        id: "keyboard-initial-repeat",
+        title: "Initial key repeat",
+        domain: "NSGlobalDomain",
+        key: "InitialKeyRepeat",
+        symbol: "keyboard",
+        macOSFeatures: macOSFeatures
+      ))
+    rows.append(
+      await stringFeatureRow(
+        id: "keyboard-repeat-rate",
+        title: "Key repeat",
+        domain: "NSGlobalDomain",
+        key: "KeyRepeat",
+        symbol: "keyboard",
+        macOSFeatures: macOSFeatures
+      ))
+    rows.append(
+      await stringFeatureRow(
+        id: "screencapture-location",
+        title: "Screenshot location",
+        domain: "com.apple.screencapture",
+        key: "location",
+        symbol: "camera.viewfinder",
+        macOSFeatures: macOSFeatures
+      ))
+    rows.append(
+      await stringFeatureRow(
+        id: "screencapture-type",
+        title: "Screenshot type",
+        domain: "com.apple.screencapture",
+        key: "type",
+        symbol: "photo",
+        macOSFeatures: macOSFeatures
+      ))
+    rows.append(
+      await stringFeatureRow(
+        id: "login-window-text",
+        title: "Login window text",
+        domain: "/Library/Preferences/com.apple.loginwindow",
+        key: "LoginwindowText",
+        symbol: "rectangle.and.pencil.and.ellipsis",
+        macOSFeatures: macOSFeatures
+      ))
 
     return (touchID, rows)
   }
@@ -532,7 +551,8 @@ internal final class AppStore {
     let value: String
     do {
       if key == .preferredViewStyle {
-        value = try await macOSFeatures.readString(domain: key.domain, key: key.rawValue) ?? "Unknown"
+        value =
+          try await macOSFeatures.readString(domain: key.domain, key: key.rawValue) ?? "Unknown"
       } else if let enabled = try await macOSFeatures.readFinderDefault(key) {
         value = enabled ? "Enabled" : "Disabled"
       } else {
@@ -575,11 +595,11 @@ internal final class AppStore {
 
   private nonisolated static func finderTitle(for key: FinderDefault) -> String {
     switch key {
-    case .showAllExtensions:  return "Show all filename extensions"
-    case .showPathbar:        return "Show path bar"
-    case .showStatusBar:      return "Show status bar"
-    case .showHiddenFiles:    return "Show hidden files"
-    case .sortFoldersFirst:   return "Sort folders first"
+    case .showAllExtensions: return "Show all filename extensions"
+    case .showPathbar: return "Show path bar"
+    case .showStatusBar: return "Show status bar"
+    case .showHiddenFiles: return "Show hidden files"
+    case .sortFoldersFirst: return "Sort folders first"
     case .preferredViewStyle: return "Preferred Finder view"
     }
   }
@@ -602,5 +622,34 @@ internal final class AppStore {
   internal func unregisterMasHelper() async throws {
     try await masService.unregister()
     await refreshMasHelperStatus()
+  }
+
+  /// Refresh the main-app login-item status. `SMAppService.status` does
+  /// not launch subprocesses, but stays behind AppStore so the UI has a
+  /// single state/dispatch surface.
+  internal func refreshLoginItemStatus() async {
+    self.loginItemStatus = await loginItemService.status()
+  }
+
+  /// Enable or disable launch-at-login, then refresh the status shown in
+  /// Settings. Errors are surfaced as copy instead of silently flipping
+  /// the toggle back with no explanation.
+  internal func setLoginItemEnabled(_ enabled: Bool) async {
+    loginItemMessage = nil
+    do {
+      if enabled {
+        try await loginItemService.register()
+      } else {
+        try await loginItemService.unregister()
+      }
+      await refreshLoginItemStatus()
+      loginItemMessage =
+        enabled
+        ? "Sojourn will open at login after macOS approval, if required."
+        : "Sojourn will no longer open at login."
+    } catch {
+      await refreshLoginItemStatus()
+      loginItemMessage = String(describing: error)
+    }
   }
 }

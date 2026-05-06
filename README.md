@@ -11,10 +11,10 @@ Think "what nix-darwin would be if it didn't make you learn Nix."
 
 ## Status
 
-**v0.5 is implemented on `main` pending release-artifact verification.**
+**v0.6 is implemented on `main` pending release-artifact verification.**
 v0.3.0 shipped as a notarized DMG on 2026-05-04; v0.4 completed the native UI
 reset and release-hardening pass. The latest verified execution plan is
-[docs/process/plans/v0.5-plan.md](docs/process/plans/v0.5-plan.md).
+[docs/process/plans/v0.6-plan.md](docs/process/plans/v0.6-plan.md).
 
 ## Current direction
 
@@ -99,7 +99,7 @@ Sojourn's docs follow [Diátaxis](https://diataxis.fr) — start here:
 
 **Process** (contributor/maintainer):
 
-- [Active v0.5 plan](docs/process/plans/v0.5-plan.md) — current autonomous agent plan.
+- [Active v0.6 plan](docs/process/plans/v0.6-plan.md) — current autonomous agent plan.
 - [Implementation plan](docs/process/implementation-plan.md) — historical v0.1 → v1 plan.
 - [Audit 2026-04](docs/process/audit-2026-04.md) — gap analysis.
 - [Open questions](docs/process/open-questions.md) — deferred to maintainer.

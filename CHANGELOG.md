@@ -11,6 +11,10 @@ All notable changes to Sojourn. Follows
 - v0.5 login item control: `SMAppService.mainApp` wrapper,
   AppStore-owned launch-at-login status, General Settings toggle,
   approval-state messaging, and fake-service AppStore tests.
+- v0.6 update-check settings surface: General Settings now exposes a
+  source-aware "Check for Updates…" action, update status text, and
+  AppStore coverage for direct-DMG Sparkle routing vs Homebrew cask
+  suppression.
 - v0.4 stage 1 native UI reset: grouped split-view sidebar,
   compact toolbar actions, native pane surfaces, AppStore-backed
   pane snapshots, bounded job history, and staged-content secret
@@ -44,9 +48,9 @@ All notable changes to Sojourn. Follows
   dependencies such as PyJWT unless the script is actually querying
   external services.
 
-### Planned (post-v0.4)
+### Planned (post-v0.6)
 
-(See `docs/process/plans/v0.5-plan.md` for the active launch-at-login plan.)
+(See `docs/process/plans/v0.6-plan.md` for the latest implemented update UX plan.)
 
 ## [0.3.0] — 2026-05-04
 

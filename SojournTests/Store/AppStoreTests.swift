@@ -146,6 +146,46 @@ struct AppStoreTests {
     await deletions.close()
   }
 
+  @Test func updateCheckUsesSparkleForDirectDMGInstalls() async throws {
+    let tmp = FileManager.default.temporaryDirectory
+      .appendingPathComponent("sojourn-store-\(UUID().uuidString)", isDirectory: true)
+    defer { try? FileManager.default.removeItem(at: tmp) }
+
+    let (store, deletions) = try makeStore(paths: AppSupportPaths(overrideRoot: tmp))
+    var snapshot = await store.settingsStore.value
+    snapshot.installSource = .dmg
+    try await store.settingsStore.replace(snapshot)
+    await store.reloadFromDisk()
+
+    #if SWIFT_PACKAGE
+    await store.checkForUpdates()
+    #expect(store.sparkleService.statusMessage == "Updates unavailable in this build.")
+    #else
+    #expect(store.settings.effectiveInstallSource.allowsSparkleUpdates)
+    #endif
+    await deletions.close()
+  }
+
+  @Test func updateCheckSuppressesSparkleForHomebrewCaskInstalls() async throws {
+    let tmp = FileManager.default.temporaryDirectory
+      .appendingPathComponent("sojourn-store-\(UUID().uuidString)", isDirectory: true)
+    defer { try? FileManager.default.removeItem(at: tmp) }
+
+    let (store, deletions) = try makeStore(paths: AppSupportPaths(overrideRoot: tmp))
+    var snapshot = await store.settingsStore.value
+    snapshot.installSource = .cask
+    try await store.settingsStore.replace(snapshot)
+    await store.reloadFromDisk()
+
+    await store.checkForUpdates()
+
+    #expect(
+      store.sparkleService.statusMessage
+        == "Homebrew handles updates. Run brew upgrade --cask sojourn."
+    )
+    await deletions.close()
+  }
+
   private func makeStore(
     paths: AppSupportPaths,
     brewURL: URL = URL(fileURLWithPath: "/usr/bin/false"),

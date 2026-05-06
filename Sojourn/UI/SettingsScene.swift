@@ -55,8 +55,34 @@ struct GeneralSettingsTab: View {
       )
       .font(.caption)
       .foregroundStyle(.secondary)
+      HStack(alignment: .firstTextBaseline) {
+        Button("Check for Updates…") {
+          Task { await store.checkForUpdates() }
+        }
+        .disabled(!store.canCheckForUpdates)
+        .accessibilityIdentifier("settings.checkForUpdates")
+        Spacer()
+        Text(updateStatusText)
+          .font(.caption)
+          .foregroundStyle(.secondary)
+          .multilineTextAlignment(.trailing)
+          .accessibilityIdentifier("settings.updateStatus")
+      }
     }
     .task { await store.refreshLoginItemStatus() }
+  }
+
+  private var updateStatusText: String {
+    if !store.sparkleService.statusMessage.isEmpty {
+      return store.sparkleService.statusMessage
+    }
+    if store.settings.effectiveInstallSource == .cask {
+      return String(localized: "Use Homebrew to update this install.")
+    }
+    if store.canCheckForUpdates {
+      return String(localized: "Ready to check via Sparkle.")
+    }
+    return String(localized: "Update checker is starting.")
   }
 
   private var dryRunBinding: Binding<Bool> {

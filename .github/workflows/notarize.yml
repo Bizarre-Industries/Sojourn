@@ -16,12 +16,12 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           persist-credentials: false
       # ADD this step after the checkout (~line 20):
       - name: Load 1Password secrets
-        uses: 1password/load-secrets-action@92467eb28f72e8255933372f1e0707c567ce2259 # v4.0.0
+        uses: 1password/load-secrets-action@3a12b0ab99d9cd590a3e9b5a90ea017210ed9556 # v4.0.1
         with:
           export-env: true
         env:
@@ -50,7 +50,7 @@ jobs:
         # zizmor: ignore[cache-poisoning]
         # notarize.yml runs only on tag push — no PR vector. Cache key
         # is bound to Package.resolved.
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: |
             .build
@@ -156,7 +156,7 @@ jobs:
         id: prior-dmgs-cache
         # zizmor: ignore[cache-poisoning]
         # notarize.yml runs only on tag push; no PR vector.
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: prior-dmgs
           key: sparkle-prior-dmgs-${{ github.ref_name }}
@@ -166,7 +166,7 @@ jobs:
       - name: Load Sparkle EdDSA key
         id: load_sparkle_key
         if: "!contains(github.ref, '-')"
-        uses: 1password/load-secrets-action@92467eb28f72e8255933372f1e0707c567ce2259 # v4.0.0
+        uses: 1password/load-secrets-action@3a12b0ab99d9cd590a3e9b5a90ea017210ed9556 # v4.0.1
         with:
           export-env: false
         env:
@@ -215,7 +215,7 @@ jobs:
       - name: Upload required Sparkle assets to release
         if: "!contains(github.ref, '-')"
         # zizmor: ignore[superfluous-actions]
-        uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda # v3.0.0
+        uses: softprops/action-gh-release@718ea10b132b3b2eba29c1007bb80653f286566b # v3.0.1
         with:
           fail_on_unmatched_files: true
           files: |
@@ -225,7 +225,7 @@ jobs:
       - name: Upload optional Sparkle delta archives to release
         if: "!contains(github.ref, '-') && hashFiles('prior-dmgs/*.delta') != ''"
         # zizmor: ignore[superfluous-actions]
-        uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda # v3.0.0
+        uses: softprops/action-gh-release@718ea10b132b3b2eba29c1007bb80653f286566b # v3.0.1
         with:
           fail_on_unmatched_files: true
           files: |
@@ -236,7 +236,7 @@ jobs:
         # action handles checksum + asset upload + release-note glue
         # in one step; replacing with `gh release` script costs more
         # than the action saves. Informational finding only.
-        uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda # v3.0.0
+        uses: softprops/action-gh-release@718ea10b132b3b2eba29c1007bb80653f286566b # v3.0.1
         with:
           files: Sojourn.dmg
           generate_release_notes: true

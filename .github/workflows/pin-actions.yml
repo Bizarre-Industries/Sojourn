@@ -44,14 +44,14 @@ jobs:
       pull-requests: read # PAT supplies write
     steps:
       - name: Load 1Password secrets
-        uses: 1password/load-secrets-action@92467eb28f72e8255933372f1e0707c567ce2259 # v4.0.0
+        uses: 1password/load-secrets-action@3a12b0ab99d9cd590a3e9b5a90ea017210ed9556 # v4.0.1
         with:
           export-env: true
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
           WORKFLOWS_PAT: op://Bizarre-Industries/sojourn-workflows-pat/credential
 
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           # PAT instead of GITHUB_TOKEN — needed because the post-job
           # cleanup step and any subsequent git push must be allowed

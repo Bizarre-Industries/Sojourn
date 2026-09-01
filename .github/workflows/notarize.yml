@@ -16,12 +16,12 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       # ADD this step after the checkout (~line 20):
       - name: Load 1Password secrets
-        uses: 1password/load-secrets-action@3a12b0ab99d9cd590a3e9b5a90ea017210ed9556 # v4.0.1
+        uses: 1password/load-secrets-action@70062d7a876d3eb6334754fa26efd2fbd90c32f2 # v5.0.1
         with:
           export-env: true
         env:
@@ -166,7 +166,7 @@ jobs:
       - name: Load Sparkle EdDSA key
         id: load_sparkle_key
         if: "!contains(github.ref, '-')"
-        uses: 1password/load-secrets-action@3a12b0ab99d9cd590a3e9b5a90ea017210ed9556 # v4.0.1
+        uses: 1password/load-secrets-action@70062d7a876d3eb6334754fa26efd2fbd90c32f2 # v5.0.1
         with:
           export-env: false
         env:
@@ -215,7 +215,7 @@ jobs:
       - name: Upload required Sparkle assets to release
         if: "!contains(github.ref, '-')"
         # zizmor: ignore[superfluous-actions]
-        uses: softprops/action-gh-release@718ea10b132b3b2eba29c1007bb80653f286566b # v3.0.1
+        uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
         with:
           fail_on_unmatched_files: true
           files: |
@@ -225,7 +225,7 @@ jobs:
       - name: Upload optional Sparkle delta archives to release
         if: "!contains(github.ref, '-') && hashFiles('prior-dmgs/*.delta') != ''"
         # zizmor: ignore[superfluous-actions]
-        uses: softprops/action-gh-release@718ea10b132b3b2eba29c1007bb80653f286566b # v3.0.1
+        uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
         with:
           fail_on_unmatched_files: true
           files: |
@@ -236,7 +236,7 @@ jobs:
         # action handles checksum + asset upload + release-note glue
         # in one step; replacing with `gh release` script costs more
         # than the action saves. Informational finding only.
-        uses: softprops/action-gh-release@718ea10b132b3b2eba29c1007bb80653f286566b # v3.0.1
+        uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
         with:
           files: Sojourn.dmg
           generate_release_notes: true
